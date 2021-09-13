@@ -1,0 +1,8 @@
+﻿#page-wrapper {
+    position: relative;
+    z-index: 2;
+    background-color: transparent;
+    width: 50%;
+    margin: 0 auto;
+    padding: 25px;
+}

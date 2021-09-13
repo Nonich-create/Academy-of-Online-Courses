@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.LessonViewModel>
+
+@{
+    ViewData["Title"] = $"Занятия";
+    Layout = "_Layout";
+}
+<body>
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CourseId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.NumberLesson)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Homework)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Course.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NumberLesson)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Homework)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+
+                        <td>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-action="Edit" asp-route-id="@item.LessonId" asp-route-Url="@Context.Request.Path">Редактирование</a>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-action="Details" asp-route-id="@item.LessonId">Подробнее</a>
+                            <form method="post" asp-controller="Lessons" asp-action="Delete">
+                                <button class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
+                                        asp-controller="Lessons" asp-action="Delete" asp-route-LessonId="@item.LessonId">
+                                    Удалить
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                   
+                }
+                <tr>
+                    <td>
+                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                           asp-action="CreateWithCourse">Добавить занятия</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</body>

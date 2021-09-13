@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Академия онлайн курсов</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/reset.css" />
+    <link rel="stylesheet" href="~/css/menuStyle.css" />
+    <link rel="stylesheet" href="~/css/HeadStyle.css" />
+    <link rel="stylesheet" href="~/css/StyleWrapper.css" />
+    <link rel="stylesheet" href="~/css/StylePurple.css" />
+    <link rel="stylesheet" href="~/css/StylePurpleAssessments.css" />
+</head>
+
+<body>
+
+    <canvas id="pixie"></canvas>
+    <div class="container"></div>
+    <header>
+        <div id="menu_div" style="z-index: 5;">
+            <div id="navigation">
+                <div id="menu">
+                    <ul id="nav">
+                        <li>
+                            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Академия онлайн курсов</a>
+                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li>
+                                <a href="#">Меню</a>
+                                <ul>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Курсы</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("teacher"))
+                        {
+                            <li>
+                                <a href="#">Меню преподавателя</a>
+                                <ul>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Assessments" asp-action="Index">Оценки</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Groups" asp-action="IndexTeacher"> Группы</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("admin") || User.IsInRole("manager"))
+                        {
+                            <li>
+                                <a href="#">Меню управления</a>
+                                <ul>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Course" asp-action="Index">Курсы</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Groups" asp-action="Index">Группы</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Lessons" asp-action="Index">Уроки</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Assessments" asp-action="Index">Оценки</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="ApplicationCourses" asp-action="Index">Заявки</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Teachers" asp-action="Index">Преподаватели</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Index">Студенты</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("admin"))
+                        {
+                            <li>
+                                <a href="#">Меню администратора</a>
+                                <ul>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Course" asp-action="Index">Курсы</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Groups" asp-action="Index">Группы</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Lessons" asp-action="Index">Уроки</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="LessonPlans" asp-action="Index">Расписания</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="ApplicationCourses" asp-action="Index">Заявки</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Teachers" asp-action="Index">Преподаватели</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Manager" asp-action="Index">Методисты</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Index">Студенты</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        @if (User.Identity.IsAuthenticated)
+                        {
+
+                            <li class="nav-link text-white">@User.Identity.Name</li>
+                            <li class="nav-item">
+                                <form method="post" asp-controller="Security" asp-action="Logout">
+                                    <input class="navbar-brand" type="submit" value="Выход" />
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Security" asp-action="Authorization">Вход</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Create">Регистрация</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div id="page-wrapper">
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+
+    </div>
+    <footer class="border-top footer text-muted">
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-1b93190375e9ccc259df3a57c1abc0e64599724ae30d7ea4c6877eb615f89387.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="~/js/ScriptHead.js"></script>
+    <script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRefreshCSS-4793b73c6332f7f14a9b6bba5d5e62748e9d1bd0b5c52d7af6376f3d1c625d7e.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.AssessmentViewModel>
+@using System.Linq;
+@{
+    ViewData["Title"] = "Оценки";
+    Layout = "_Layout";
+}
+<body>
+    <table class="purpleHorizonAssessments">
+        <thead>
+            <tr>
+                <th>
+                    ФИО
+                </th>
+                @foreach (var mark in Model.GroupBy(l => l.Lesson.LessonId).Select(y => y.First()))
+                {
+                    <th>
+                        <ul id="nav" style="width:35px;"> 
+                            <li>
+                                <a href="#">@mark.Lesson.NumberLesson</a>
+                                <ul>
+                                    <li>
+                                        <a class="nav-link text-white" asp-controller="Lessons" asp-action="Details" asp-route-id="@mark.LessonId" asp-route-Url="@Context.Request.Path">@mark.Lesson.Name</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.GroupBy(l => l.Student.StudentId).Select(y => y.First()))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Student.Surname)   @Html.DisplayFor(modelItem => item.Student.Name)   @Html.DisplayFor(modelItem => item.Student.MiddleName)
+                    </td>
+                    @foreach (var mark in Model.Where(m => m.StudentId == item.StudentId))
+                    {
+                        <td>
+                            @mark.Score
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>

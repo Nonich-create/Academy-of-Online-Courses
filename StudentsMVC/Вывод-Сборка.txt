@@ -1,0 +1,5 @@
+﻿Сборка начата…
+1>------ Сборка начата: проект: Students.MVC, Конфигурация: Debug Any CPU ------
+1>Students.MVC -> S:\.Net\Kurse\LessonTwoUnitTest\StudentsMVC\bin\Debug\net5.0\Students.MVC.dll
+1>Students.MVC -> S:\.Net\Kurse\LessonTwoUnitTest\StudentsMVC\bin\Debug\net5.0\Students.MVC.Views.dll
+========== Сборка: успешно: 1, с ошибками: 0, без изменений: 1, пропущено: 0 ==========

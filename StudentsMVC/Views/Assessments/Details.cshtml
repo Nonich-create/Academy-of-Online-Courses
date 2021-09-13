@@ -1,0 +1,27 @@
+﻿@model Students.DAL.Models.Assessment
+@{
+    ViewData["Title"] = "Подробнее";
+    Layout = "_Layout";
+}
+<body  style="color: #FFFFFF">
+    <dl class="row" >
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Student)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Student.StudentId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Score)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Score)
+        </dd>
+    </dl>
+    <div>
+        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+           asp-action="Edit" asp-route-id="@Model.AssessmentId">Edit</a> |
+        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+           asp-action="Index">Назад</a>
+    </div>
+</body>

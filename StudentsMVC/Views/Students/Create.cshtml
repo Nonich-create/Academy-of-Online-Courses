@@ -1,0 +1,53 @@
+﻿@model Students.MVC.ViewModels.StudentViewModel
+@{
+    ViewData["Title"] = "Регистрация студента";
+    Layout = "_LayoutAdditional";
+}
+<body>
+    <div class="registration-form">
+        <form asp-antiforgery="true" asp-action="Create">
+            <div class="validation" asp-validation-summary="All"></div>
+            <div class="form-icon">
+                <span><i class="icon icon-user"></i></span>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control item" asp-for="Email" id="email" placeholder="Email">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control item" asp-for="Password" id="password" placeholder="Пароль">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control item" asp-for="PasswordConfirm" id="passwordConfirm" placeholder="Повторный пароль">
+                <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="PhoneNumber" id="username" placeholder="Номер телефона">
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="Name" id="name" placeholder="Имя">
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="Surname" id="surname" placeholder="Фамилия">
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="MiddleName" id="middleName" placeholder="Отчество">
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" asp-for="DateOfBirth" class="form-control item" id="birth-date" placeholder="Дата рождения">
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-block create-account" />
+            </div>
+            <div class="form-group">
+                <a  class="btn btn-block create-account" asp-area="" asp-controller="Home" asp-action="Index">Назад</a>
+            </div>
+        </form>
+    </div>
+</body>

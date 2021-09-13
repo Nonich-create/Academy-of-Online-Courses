@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.GroupViewModel>
+@{
+    ViewData["Title"] = "Страница групп";
+    Layout = "_Layout";
+}
+<body>
+    <table class="purpleHorizon">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.NumberGroup)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DateStart)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GroupStatus)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ManagerId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TeacherId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CourseId)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NumberGroup)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateStart)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GroupStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Manager.Surname)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Teacher.Surname)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Course.Name)
+                    </td>
+                    <td>  
+                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                           asp-action="Details" asp-route-id="@item.GroupId">Подробнее</a>
+                        @if (item.GroupStatus == "Обучение" || item.GroupStatus == "Закрыта")
+                        {
+                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                         asp-controller="Assessments" asp-action="Index" asp-route-Id="@item.GroupId">Оценки</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>

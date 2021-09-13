@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.AssessmentViewModel>
+
+@{
+    ViewData["Title"] = "Оценки";
+    Layout = "_Layout";
+}
+<body>
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StudentId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.LessonId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Score)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @item.Student.GetFullName;
+                        </td>
+                        <td>
+                            @item.Lesson.Name;
+                        </td>
+                        <td>
+                            @item.Score; 
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+</body>

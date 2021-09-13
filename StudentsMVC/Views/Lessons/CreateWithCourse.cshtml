@@ -1,0 +1,45 @@
+﻿@model Students.MVC.ViewModels.LessonViewModel
+@{
+    ViewData["Title"] = "Новая занятия";
+    Layout = "_LayoutAdditional";
+}
+<body>
+    <div class="registration-form">
+        <form asp-action="CreateWithCourse">
+            <div class="validation" asp-validation-summary="All"></div>
+            <div class="form-icon">
+                <span><i class="icon icon-user"></i></span>
+            </div>
+            <div class="form-group">
+                <select asp-for="CourseId" class="form-control item">
+                    @foreach (var item in Model.Courses)
+                    {
+                        <option value="@item.CourseId">@item.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="NumberLesson" id="numberLesson" placeholder="Номер занятия">
+                <span asp-validation-for="NumberLesson" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="Name" id="name" placeholder="название занятия">
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <textarea  class="form-control item" asp-for="Homework" id="homework" placeholder="Домашние занятия"></textarea>
+                <span asp-validation-for="Homework" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <textarea   class="form-control item" asp-for="Description" id="description" placeholder="Описание занятия"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-block create-account" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Назад" asp-action="Index" class="btn btn-block create-account" />
+            </div>
+        </form>
+    </div>
+</body>

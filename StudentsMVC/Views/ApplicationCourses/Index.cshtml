@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.ApplicationCourseViewModel>
+@using Students.BLL.Enum;
+
+@{
+    ViewData["Title"] = "Заявки";
+    Layout = "_Layout";
+}
+<body>
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ApplicationCourseId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CourseId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.StudentId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ApplicationStatus)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ApplicationCourseId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Course.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Student.Surname) @Html.DisplayFor(modelItem => item.Student.Name) @Html.DisplayFor(modelItem => item.Student.MiddleName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                    </td>
+                    <td>
+                        <div>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">Студент</a>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">Курс</a>
+                            @if (item.ApplicationStatus == EnumApplicationStatus.Закрыта.ToString())
+                            {
+                                <form method="post" asp-controller="ApplicationCoursesController" asp-action="Cancel">
+                                    <div>
+                                        <button class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                                                asp-action="Cancel" asp-route-ApplicationCourseId="@item.ApplicationCourseId">
+                                            Отменить
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-controller="ApplicationCoursesController" asp-action="Enroll">
+                                    <div>
+                                        <button class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                                                asp-action="Enroll" asp-route-ApplicationCourseId="@item.ApplicationCourseId">
+                                            Принять
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+</body>

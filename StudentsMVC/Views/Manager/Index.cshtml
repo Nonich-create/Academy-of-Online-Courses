@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.ManagerViewModel>
+
+@{
+    ViewData["Title"] = "Страница методистов";
+    Layout = "_Layout";
+}
+<body>
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Surname)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.MiddleName)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Surname)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MiddleName)
+                        </td>
+                        <td>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-action="Edit" asp-route-id="@item.ManagerId">Редактирование</a>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-action="Details" asp-route-id="@item.ManagerId">Подробнее</a>
+                            <form method="post" asp-controller="Manager" asp-action="Delete">
+                                <button class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
+                                        asp-controller="Manager" asp-action="Delete" asp-route-ManagerId="@item.ManagerId">
+                                    Удалить
+                                </button>
+                            </form>
+                            <a class="btn btn-success" style=" background: -moz-linear-gradient(top, #529d48 0%, #2f8923 66%, #187C0B 100%); background: -webkit-linear-gradient(top, #529d48 0%, #2f8923 66%, #187C0B 100%); background: linear-gradient(to bottom, #529d48 0%, #2f8923 66%, #187C0B 100%); border-bottom: 3px solid #432796"
+                               asp-action="Security" asp-controller="Security" asp-route-id="@item.UserId">Безопасность</a>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                           asp-action="Create">Регистрация методиста</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</body>

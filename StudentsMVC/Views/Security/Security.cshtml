@@ -1,0 +1,34 @@
+﻿@model Students.DAL.Models.ApplicationUser
+@{
+    Layout = "_LayoutAdditional";
+    ViewData["Title"] = "Редактирование профиля";
+}
+<body>
+    <div class="registration-form">
+        <form asp-action="Security" asp-controller="Security"> 
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="UserName" id="username" placeholder="Логин">
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control item" asp-for="Email" id="email" placeholder="Email">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="PhoneNumber" id="phoneNumber" placeholder="Номер телефона">
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <a asp-action="ChangePassword" asp-route-id="@Model.Id"  class="btn btn-block create-account">Смена пароля</a>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-block create-account" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Назад"asp-controller="Home" asp-action="Index" class="btn btn-block create-account" />
+            </div>
+        </form>
+    </div>
+</body>

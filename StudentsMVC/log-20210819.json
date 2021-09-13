@@ -1,0 +1,73 @@
+2021-08-19 21:40:42.632 +03:00 [INF] Starting up
+2021-08-19 21:40:44.036 +03:00 [WRN] No type was specified for the decimal property 'Price' on entity type 'Course'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2021-08-19 21:40:44.266 +03:00 [INF] Entity Framework Core 5.0.8 initialized 'Context' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: MigrationsAssembly=Students.BLL 
+2021-08-19 21:40:44.777 +03:00 [INF] Executed DbCommand (22ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2021-08-19 21:40:44.865 +03:00 [INF] Executed DbCommand (75ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2021-08-19 21:40:44.875 +03:00 [ERR] An error occurred while seeding the database.
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at Students.BLL.Models.ApplicationInitializer.InitializeAsync(UserManager`1 userManager, RoleManager`1 roleManager) in S:\.Net\Kurse\LessonTwoUnitTest\Stidents.BLL\Models\ApplicationInitializer.cs:line 25
+   at Students.MVC.Program.Main(String[] args) in S:\.Net\Kurse\LessonTwoUnitTest\StudentsMVC\Program.cs:line 45
+2021-08-19 21:40:44.966 +03:00 [INF] User profile is available. Using 'C:\Users\iogyr\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2021-08-19 21:40:45.274 +03:00 [INF] Now listening on: https://localhost:5001
+2021-08-19 21:40:45.277 +03:00 [INF] Now listening on: http://localhost:5000
+2021-08-19 21:40:45.279 +03:00 [FTL] Hosting startup assembly exception
+System.InvalidOperationException: Startup assembly Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation failed to execute. See the inner exception for more details.
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation, Culture=neutral, PublicKeyToken=null'. Не удается найти указанный файл.
+File name: 'Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(ObjectHandleOnStack assemblyName, ObjectHandleOnStack requestingAssembly, StackCrawlMarkHandle stackMark, Boolean throwOnFileNotFound, ObjectHandleOnStack assemblyLoadContext, ObjectHandleOnStack retAssembly)
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, RuntimeAssembly requestingAssembly, StackCrawlMark& stackMark, Boolean throwOnFileNotFound, AssemblyLoadContext assemblyLoadContext)
+   at System.Reflection.Assembly.Load(AssemblyName assemblyRef)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostBuilder.ExecuteHostingStartups()
+   --- End of inner exception stack trace ---
+2021-08-19 21:40:45.285 +03:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-08-19 21:40:45.285 +03:00 [INF] Hosting environment: Development
+2021-08-19 21:40:45.286 +03:00 [INF] Content root path: S:\.Net\Kurse\LessonTwoUnitTest\StudentsMVC
+2021-08-19 21:40:45.982 +03:00 [INF] Request starting HTTP/2 GET https://localhost:5001/ - -
+2021-08-19 21:40:46.073 +03:00 [INF] Executing endpoint 'Students.MVC.Controllers.HomeController.Index (Students.MVC)'
+2021-08-19 21:40:46.101 +03:00 [INF] Route matched with {action = "Index", controller = "Home"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller Students.MVC.Controllers.HomeController (Students.MVC).
+2021-08-19 21:40:46.118 +03:00 [INF] Entity Framework Core 5.0.8 initialized 'Context' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: MigrationsAssembly=Students.BLL 
+2021-08-19 21:40:46.126 +03:00 [INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2021-08-19 21:40:46.131 +03:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2021-08-19 21:40:46.141 +03:00 [INF] Hello world
+2021-08-19 21:40:46.529 +03:00 [INF] Executed DbCommand (21ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CourseId], [c].[Description], [c].[Duration], [c].[Name], [c].[Price], [c].[URLImagePhoto], [c].[Visible]
+FROM [Courses] AS [c]
+2021-08-19 21:40:46.686 +03:00 [INF] Executing ViewResult, running view Index.
+2021-08-19 21:40:46.851 +03:00 [INF] Executed ViewResult - view Index executed in 163.4293ms.
+2021-08-19 21:40:46.854 +03:00 [INF] Executed action Students.MVC.Controllers.HomeController.Index (Students.MVC) in 740.6769ms
+2021-08-19 21:40:46.859 +03:00 [INF] Executed endpoint 'Students.MVC.Controllers.HomeController.Index (Students.MVC)'
+2021-08-19 21:40:46.865 +03:00 [INF] Request finished HTTP/2 GET https://localhost:5001/ - - - 200 - text/html;+charset=utf-8 887.4963ms
+2021-08-19 21:40:47.032 +03:00 [INF] Request starting HTTP/2 GET https://localhost:5001/_framework/aspnetcore-browser-refresh.js - -
+2021-08-19 21:40:47.042 +03:00 [INF] Request finished HTTP/2 GET https://localhost:5001/_framework/aspnetcore-browser-refresh.js - - - 200 3087 application/javascript;+charset=utf-8 9.7864ms

@@ -1,0 +1,168 @@
+﻿@model Students.MVC.ViewModels.DetalisCourseViewModel
+@using Students.BLL.Enum;
+@{
+    ViewData["Title"] = "Подробнее";
+    Layout = "_Layout";
+}
+<body>
+    <div class="container"  style="color: #FFFFFF">
+            <img width="150" height="150" src="@Model.URLImagePhoto" alt="нет изображения" />
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Duration)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Duration)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Price)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Price)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.URLImagePhoto)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.URLImagePhoto)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Visible)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Visible)
+                </dd>
+            </dl>
+            <div>
+                <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                   asp-action="Edit" asp-route-id="@Model.CourseId">Редактировать</a>
+                <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                   asp-action="Index">Назад</a>
+            </div>
+            <table class="purpleHorizon">
+                <thead>
+                    <tr>
+                        <th>
+                            Номер группы
+                        </th>
+                        <th>
+                            Дата старта
+                        </th>
+                        <th>
+                            Статус группы
+                        </th>
+                        <th>
+                            Количество студентов
+                        </th>
+                        <th>
+                            Менеджер
+                        </th>
+                        <th>
+                            Преподователь
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Groups)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NumberGroup)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DateStart)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.GroupStatus)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CountMax)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Manager.Surname)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Teacher.Surname)
+                            </td>
+                            <td>
+                                <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                                   asp-controller="Groups" asp-action="Edit" asp-route-id="@item.GroupId">Редактирование</a>
+                                <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                                   asp-controller="Groups" asp-action="Details" asp-route-id="@item.GroupId">Подробнее</a>
+                                <a class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
+                                   asp-controller="Groups" asp-action="Delete" asp-route-id="@item.GroupId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>
+                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                               asp-controller="Groups" asp-action="Create">Новая группа</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="purpleHorizon">
+                <thead>
+                    <tr>
+                        <th>
+                            №
+                        </th>
+                        <th>
+                            фИО
+                        </th>
+                        <th>
+                            Статус заявки
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ApplicationCourseViewModels)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ApplicationCourseId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.Surname) @Html.DisplayFor(modelItem => item.Student.Name) @Html.DisplayFor(modelItem => item.Student.MiddleName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                            </td>
+                            <td>
+                                <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">Студент</a>
+                                @if (item.ApplicationStatus == EnumApplicationStatus.Закрыта.ToString())
+                                {
+                                    <form method="post" asp-controller="ApplicationCourses" asp-action="Cancel">
+                                        <div>
+                                            <button asp-controller="ApplicationCourses" asp-action="Cancel" asp-route-ApplicationCourseId="@item.ApplicationCourseId">Отменить</button>
+                                        </div>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-controller="ApplicationCourses" asp-action="Enroll">
+                                        <div>
+                                            <button asp-controller="ApplicationCourses" asp-action="Enroll" asp-route-ApplicationCourseId="@item.ApplicationCourseId">Принять</button>
+                                        </div>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+    </div>
+</body>

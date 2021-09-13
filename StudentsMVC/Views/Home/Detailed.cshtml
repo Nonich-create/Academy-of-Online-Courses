@@ -1,0 +1,26 @@
+﻿@model Students.MVC.ViewModels.CourseViewModel
+@{
+    ViewData["Title"] = "Подробнее";
+    Layout = "_LayoutAdditional";
+}
+<body>
+    <div style="color: #FFFFFF">
+        <div>
+            Название курса: @Model.Name
+        </div>
+        <div>
+            Описание курса: @Model.Description
+        </div>
+        <div>
+            Цена курса: @Model.Price
+        </div>
+    </div>
+    <br /><br />
+    <form method="post" asp-controller="Home" asp-action="PutRequest">
+        <div>
+            <button class="myButton" asp-action="PutRequest" asp-route-CourseId="@Model.CourseId">Оставить заявку</button>
+            <button  type="submit" asp-controller="Home" asp-action="Index" class="myButton">Назад</button>
+        </div>
+    </form>
+</body>
+

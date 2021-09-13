@@ -1,0 +1,45 @@
+﻿@model Students.MVC.ViewModels.LessonViewModel
+@{
+    Layout = "_LayoutAdditional";
+    ViewData["Title"] = "Редактирование урока";
+}
+<body>
+    <div class="registration-form">
+        <form asp-action="Edit">
+            <div class="validation" asp-validation-summary="All"></div>
+            <input type="hidden" asp-for="LessonId"/>
+            <input type="hidden" asp-for="ReturnUrl"/>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="NumberLesson" id="numberLesson" placeholder="Номер урока">
+                <span asp-validation-for="NumberLesson" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control item" asp-for="Name" id="Name" placeholder="Названия урока">
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control item" asp-for="Description" id="description" placeholder="Описание урока"> </textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control item" asp-for="Homework" id="homework" placeholder="Домашния работа"> </textarea>
+                <span asp-validation-for="Homework" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <select asp-for="CourseId" class="form-control item">
+                    @foreach (var item in Model.Courses)
+                    {
+                        <option value="@item.CourseId">@item.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-block create-account" />
+            </div>
+            <div class="form-group">
+                <a href="##" onClick="history.go(-1); return false;" class="btn btn-block create-account">Назад</a>
+            </div>
+        </form>
+    </div>
+</body>
+ 

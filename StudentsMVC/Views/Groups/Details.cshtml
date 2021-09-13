@@ -1,0 +1,102 @@
+﻿@model Students.MVC.ViewModels.DetalisGroupViewModel
+@{
+    ViewData["Title"] = "Подробнее";
+    Layout = "_Layout";
+}
+<body>
+    <div style="color: #FFFFFF">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.NumberGroup)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.NumberGroup)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DateStart)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DateStart)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.GroupStatus)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.GroupStatus)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Course.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Course.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.CountMax)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.CountMax)
+            </dd>
+            <dt class="col-sm-2">
+                Преподователь группы
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Teacher.Surname) @Html.DisplayFor(model => model.Teacher.Name) @Html.DisplayFor(model => model.Teacher.MiddleName)
+            </dd>
+            <dt class="col-sm-2">
+                Менеджер группы
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Manager.Surname) @Html.DisplayFor(model => model.Manager.Name) @Html.DisplayFor(model => model.Manager.MiddleName)
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+           asp-action="Edit" asp-route-id="@Model.GroupId">Редактировать</a>
+        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+           asp-action="Index">Назад</a>
+    </div>
+    <div class="card m-3">
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        Имя
+                    </th>
+                    <th>
+                        Фамилия
+                    </th>
+                    <th>
+                        Отчество
+                    </th>
+                    <th>
+                        Дата рождения
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.StudentsViewModels)
+                {
+
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Surname)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MiddleName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DateOfBirth)
+                        </td>
+                        <td>
+                            <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">Подробнее</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
