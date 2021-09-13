@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Stidents.BLL\Students.BLL.csproj" />
     <ProjectReference Include="..\StudentsMVC\Students.MVC.csproj" />
   </ItemGroup>
 
