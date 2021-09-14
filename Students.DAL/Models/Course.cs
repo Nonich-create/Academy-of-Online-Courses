@@ -14,8 +14,8 @@ namespace Students.DAL.Models
         public bool Visible { get; set; }
         public string URLImagePhoto { get; set; }
         public string Duration { get; set; }
-        public List<Lesson> Lessons { get; set; }
-        public List<Group> Groups { get; set; }
+        //public List<Lesson> Lessons { get; set; }
+        //public List<Group> Groups { get; set; }
     }
 }
  

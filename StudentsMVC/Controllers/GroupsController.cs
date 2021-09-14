@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using Students.BLL.Services;
 using Students.BLL.Classes;
 using Microsoft.AspNetCore.Authorization;
-using Students.BLL.Enum;
 using System;
 using Microsoft.AspNetCore.Identity;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {

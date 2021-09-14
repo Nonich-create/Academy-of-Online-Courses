@@ -41,7 +41,7 @@ namespace Students.MVC.Controllers
         {
             var id = _userManager.GetUserId(User);
             var students = await _studentService.GetAllAsync();
-            var studentId = students.Where(s => s.UserId == id).Select(s => s.StudentId).First();
+            var studentId = students.Single(s => s.UserId == id).StudentId;
             var assessments = await _assessmentService.GetAssessmentsByStudentId(studentId);
             var assessmentViewModels = Mapper.ConvertListViewModel<AssessmentViewModel, Assessment>(assessments);
             return View(assessmentViewModels);
@@ -49,24 +49,17 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int Id)
+        public async Task<IActionResult> Index(int groupId)
         {
             var teachers = await _teacherService.GetAllAsync();
-            var teacher = teachers.Where(t => t.UserId == _userManager.GetUserId(User)).First();
+            var teacher = teachers.First(t => t.UserId == _userManager.GetUserId(User));
             var groups = await _groupService.GetAllAsync();
-            groups = groups.Where(g => g.TeacherId == teacher.TeacherId && g.GroupId == Id).ToList();
+            groups = groups.Where(g => g.TeacherId == teacher.PersonId && g.GroupId == groupId).ToList();
             var assessments = await _assessmentService.GetAllAsync();
 
             List<AssessmentViewModel> assessmentViewModels = new();
             AssessmentViewModel assessmentViewModel;
-
-            foreach (var assessment in assessments)
-            {
-                assessmentViewModel = Mapper.ConvertViewModel<AssessmentViewModel, Assessment>(assessment);
-                assessmentViewModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(assessment.StudentId));
-                assessmentViewModel.Lesson = Mapper.ConvertViewModel<LessonViewModel, Lesson>(await _lessonService.GetAsync(assessment.LessonId));
-                assessmentViewModels.Add(assessmentViewModel);
-            }
+            assessmentViewModel = await MapList(assessments, assessmentViewModels);
 
             List<AssessmentViewModel> assessmentViewModelsSorted = new();
 
@@ -76,6 +69,20 @@ namespace Students.MVC.Controllers
             }
 
             return View(assessmentViewModelsSorted);
+        }
+
+        private async Task<AssessmentViewModel> MapList(List<Assessment> assessments, List<AssessmentViewModel> assessmentViewModels)
+        {
+            AssessmentViewModel assessmentViewModel;
+            foreach (var assessment in assessments)
+            {
+                assessmentViewModel = Mapper.ConvertViewModel<AssessmentViewModel, Assessment>(assessment);
+                assessmentViewModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(assessment.StudentId));
+                assessmentViewModel.Lesson = Mapper.ConvertViewModel<LessonViewModel, Lesson>(await _lessonService.GetAsync(assessment.LessonId));
+                assessmentViewModels.Add(assessmentViewModel);
+            }
+
+            return assessmentViewModel;
         }
         #endregion
         #region отображения деталей о оценки

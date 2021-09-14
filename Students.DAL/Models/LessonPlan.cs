@@ -7,10 +7,10 @@ namespace Students.DAL.Models
     {
         [Key]
         public int LessonPlanId { get; set; }
-        public DateTime DateOfTheLesson { get; set; }
-        public int? LessonId { get; set; }
+        public DateTime Occured { get; set; }
+        public int LessonId { get; set; }
         public Lesson Lesson { get; set; }
-        public int? GroupId { get; set; }
+        public int GroupId { get; set; }
         public Group Group { get; set; }
     }
 }

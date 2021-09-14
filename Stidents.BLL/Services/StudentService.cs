@@ -6,9 +6,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-using Students.BLL.Enum;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {

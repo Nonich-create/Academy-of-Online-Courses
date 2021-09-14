@@ -10,6 +10,6 @@ namespace Students.DAL.Models
         public Student Student { get; set; }
         public int LessonId { get; set; }
         public Lesson Lesson { get; set; }
-        public int? Score { get; set; }
+        public byte? Score { get; set; }
     }
 }

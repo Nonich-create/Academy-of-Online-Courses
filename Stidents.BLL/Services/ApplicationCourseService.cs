@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
+using Students.DAL.Enum;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Students.BLL.Services
 {
-    public class ApplicationCourseService: IApplicationCourseService
+    public class ApplicationCourseService : IApplicationCourseService
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly IMemoryCache cache;
@@ -24,11 +25,11 @@ namespace Students.BLL.Services
 
         public async Task Cancel(ApplicationCourse model)
         {
- 
+
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
             student.GroupId = null;
             await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = Enum.EnumApplicationStatus.Отменена.ToString();
+            model.ApplicationStatus = EnumApplicationStatus.Отменена.ToString();
             await _unitOfWork.ApplicationCourseRepository.Update(model);
             await _unitOfWork.Save();
         }
@@ -73,7 +74,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.ApplicationCourseRepository.DeleteAsyncAll(id);
+                await _unitOfWork.ApplicationCourseRepository.DeleteAllForStudentAsync(id);
                 _logger.LogInformation(id, "Заяки студента удалены"); ;
             }
             catch (Exception ex)
@@ -81,17 +82,22 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления заявок");
             }
         }
-        public async Task Enroll(ApplicationCourse model)
+        public async Task Enroll(ApplicationCourse applicationCourse)
         {
-            var group =  _unitOfWork.GroupRepository.GetAllAsync().Result.Where(g => g.CourseId == model.CourseId
-            && g.CountMax > _unitOfWork.StudentRepository.GetAllAsync().Result.Where(s => s.GroupId == g.GroupId).Count()).First();
-            if(group == null){ throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
-            var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
-            if(student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
+
+            var group = (await _unitOfWork.GroupRepository.GetAllAsync())
+                .First(g => g.CourseId == applicationCourse.CourseId
+                    && g.CountMax > _unitOfWork.StudentRepository.GetAllAsync().Result.Count(s => s.GroupId == g.GroupId));
+
+            if (group == null) { throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
+
+            var student = await _unitOfWork.StudentRepository.GetAsync(applicationCourse.StudentId);
+
+            if (student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
             student.GroupId = group.GroupId;
             await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = Enum.EnumApplicationStatus.Закрыта.ToString();
-            await _unitOfWork.ApplicationCourseRepository.Update(model);
+            applicationCourse.ApplicationStatus = EnumApplicationStatus.Закрыта;
+            await _unitOfWork.ApplicationCourseRepository.Update(applicationCourse);
             await _unitOfWork.Save();
         }
 
@@ -140,7 +146,7 @@ namespace Students.BLL.Services
                 return null;
             }
         }
-        
+
 
         public async Task Save() => await _unitOfWork.Save();
 
@@ -169,7 +175,7 @@ namespace Students.BLL.Services
                 return item;
             }
         }
-        
+
 
     }
 }
