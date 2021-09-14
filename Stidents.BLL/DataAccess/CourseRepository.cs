@@ -23,7 +23,7 @@ namespace Students.BLL.DataAccess
 
         public async Task<Course> Update(Course course)
         {
-            var courseEntity = await _db.Courses.AsNoTracking().FirstOrDefaultAsync(c=>c.CourseId ==course.CourseId);
+            var courseEntity = await _db.Courses.AsNoTracking().FirstOrDefaultAsync(c=>c.Id == course.Id);
             if (courseEntity != null)
             {
                _db.Entry(course).State = EntityState.Modified;

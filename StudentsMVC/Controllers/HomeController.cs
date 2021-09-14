@@ -66,7 +66,7 @@ namespace Students.MVC.Controllers
                     Name = course.Name,
                     Description = course.Description,
                     Duration = course.Duration,
-                    CourseId = course.CourseId,
+                    Id = course.Id,
                     Price = course.Price
                 };
                 return View(model);
@@ -81,7 +81,7 @@ namespace Students.MVC.Controllers
                 {     
                     var id = _userManager.GetUserId(User);
                     var student = await _studentService.GetAllAsync(); 
-                    await _studentService.PutRequest(student.Where(s => s.UserId == id).First().StudentId, CourseId);
+                    await _studentService.PutRequest(student.Where(s => s.UserId == id).First().Id, CourseId);
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
                 else

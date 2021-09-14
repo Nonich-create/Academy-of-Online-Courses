@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Students.DAL.Enum;
 
 namespace Students.DAL.Models
 {
-    public class Assessment
+    public class CourseApplication
     {
         [Key]
         public int Id { get; set; }
+        public EnumApplicationStatus ApplicationStatus { get; set; }
+        public int CourseId { get; set; }
+        public Course Course { get; set; }
         public int StudentId { get; set; }
         public Student Student { get; set; }
-        public int LessonId { get; set; }
-        public Lesson Lesson { get; set; }
-        public int? Score { get; set; }
     }
 }

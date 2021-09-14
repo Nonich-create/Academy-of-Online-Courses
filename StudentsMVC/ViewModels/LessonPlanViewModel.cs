@@ -10,7 +10,7 @@ namespace Students.MVC.ViewModels
     public class LessonPlanViewModel
     {
       
-        public int LessonPlanId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Не указана дата проведение занятия")]
         [DataType(DataType.Date)]

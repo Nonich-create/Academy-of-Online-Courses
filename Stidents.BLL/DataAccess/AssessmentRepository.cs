@@ -25,7 +25,7 @@ namespace Students.BLL.DataAccess
 
         public async Task<Assessment> Update(Assessment assessment)
         {
-            var assessmentEntity = await _db.Assessments.AsNoTracking().FirstOrDefaultAsync(a => a.AssessmentId == assessment.AssessmentId);
+            var assessmentEntity = await _db.Assessments.AsNoTracking().FirstOrDefaultAsync(a => a.Id == assessment.Id);
 
             if (assessmentEntity != null)
             {

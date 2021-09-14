@@ -7,8 +7,7 @@ namespace Students.MVC.ViewModels
  
     public class ManagerViewModel: PersonViewModel
     {
-        [Key]
-        public int ManagerId { get; set; }
+     
         public List<GroupViewModel> Groups { get; set; }
     }
 }

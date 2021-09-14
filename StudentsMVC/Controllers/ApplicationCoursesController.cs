@@ -18,10 +18,10 @@ namespace Students.MVC.Controllers
     {
         private readonly IStudentService _studentService;
         private readonly ICourseService _courseService;
-        private readonly IApplicationCourseService _applicationCourseService;
+        private readonly ICourseApplicationService _applicationCourseService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ApplicationCoursesController(UserManager<ApplicationUser> userManager, ICourseService courseService, IStudentService studentService, IApplicationCourseService applicationCourseService)
+        public ApplicationCoursesController(UserManager<ApplicationUser> userManager, ICourseService courseService, IStudentService studentService, ICourseApplicationService applicationCourseService)
         {
             _studentService = studentService;
             _courseService = courseService;
@@ -34,13 +34,13 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Index()
         {
                 var applicationCourses = await _applicationCourseService.GetAllAsync();
-                List<ApplicationCourseViewModel> models = new();
-                ApplicationCourseViewModel model;
+                List<CourseApplicationViewModel> models = new();
+                CourseApplicationViewModel model;
                 foreach (var item in applicationCourses)
                 {
-                    model = Mapper.ConvertViewModel<ApplicationCourseViewModel, ApplicationCourse>(item);
+                    model = Mapper.ConvertViewModel<CourseApplicationViewModel, CourseApplication>(item);
                     model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(item.CourseId));
-                    model.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.StudentId));
+                    model.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.Id));
                     models.Add(model);
                 }
                 return View(models);

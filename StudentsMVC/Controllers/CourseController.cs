@@ -14,13 +14,13 @@ namespace Students.MVC.Controllers
     public class CourseController : Controller
     {
         private readonly ICourseService _courseService;
-        private readonly IApplicationCourseService _applicationCourseService;
+        private readonly ICourseApplicationService _applicationCourseService;
         private readonly IStudentService _studentService;
         private readonly IGroupService _groupService;
         private readonly IManagerService _managerService;
         private readonly ITeacherService _teacherService;
 
-        public CourseController(ITeacherService teacherService, IManagerService managerService, IGroupService groupService, ICourseService courseService, IApplicationCourseService applicationCourseService, IStudentService studentService)
+        public CourseController(ITeacherService teacherService, IManagerService managerService, IGroupService groupService, ICourseService courseService, ICourseApplicationService applicationCourseService, IStudentService studentService)
         {
             _teacherService = teacherService;
             _managerService = managerService;
@@ -61,19 +61,19 @@ namespace Students.MVC.Controllers
             foreach (var group in groups.Where(g => g.CourseId == id))
             {
                 modelGroup = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                modelGroup.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
+                modelGroup.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.Id));
                 modelGroup.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
                 modelsGroups.Add(modelGroup);
             }
 
             var model = Mapper.ConvertViewModel<DetalisCourseViewModel, Course>(course);
             var applicationCourses = await _applicationCourseService.GetAllAsync();
-            List<ApplicationCourseViewModel> ApplicationModels = new();
-            ApplicationCourseViewModel ApplicationModel;
+            List<CourseApplicationViewModel> ApplicationModels = new();
+            CourseApplicationViewModel ApplicationModel;
             foreach (var item in applicationCourses.Where(a => a.CourseId == id))
             {
-                ApplicationModel = Mapper.ConvertViewModel<ApplicationCourseViewModel, ApplicationCourse>(item);
-                ApplicationModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.StudentId));
+                ApplicationModel = Mapper.ConvertViewModel<CourseApplicationViewModel, CourseApplication>(item);
+                ApplicationModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.Id));
                 ApplicationModels.Add(ApplicationModel);
             }
             model.Groups = modelsGroups;

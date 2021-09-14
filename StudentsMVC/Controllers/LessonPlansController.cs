@@ -69,32 +69,6 @@ namespace Students.MVC.Controllers
             return PartialView(lessons.Where(l => l.CourseId == id).ToList());
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LessonPlanId,DateOfTheLesson,LessonId,GroupId")] LessonPlan lessonPlan)
-        {
-     
-            return View();
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LessonPlanId,DateOfTheLesson,LessonId,GroupId")] LessonPlan lessonPlan)
-        {
-            return View();
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            return RedirectToAction(nameof(Index));
-        }
+    
     }
 }

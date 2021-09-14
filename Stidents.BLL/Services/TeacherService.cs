@@ -32,7 +32,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.TeacherId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -88,7 +88,7 @@ namespace Students.BLL.Services
                     teacher = await _unitOfWork.TeacherRepository.GetAsync(id);
                     if (teacher != null)
                     {
-                        cache.Set(teacher.TeacherId, teacher,
+                        cache.Set(teacher.Id, teacher,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -120,7 +120,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Преподователь добавлен в кэш");
-                    cache.Set(item.TeacherId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

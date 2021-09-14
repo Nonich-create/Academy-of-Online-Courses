@@ -21,18 +21,18 @@
             @Html.DisplayNameFor(model => model.Lesson)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Lesson.LessonId)
+            @Html.DisplayFor(model => model.Lesson.Id)
         </dd class>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Group)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Group.GroupId)
+            @Html.DisplayFor(model => model.Group.Id)
         </dd class>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="LessonPlanId" />
+        <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>

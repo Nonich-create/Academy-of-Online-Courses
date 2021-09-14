@@ -31,7 +31,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.CourseId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -86,7 +86,7 @@ namespace Students.BLL.Services
                     course = await _unitOfWork.CourseRepository.GetAsync(id);
                     if (course != null)
                     {
-                        cache.Set(course.CourseId, course,
+                        cache.Set(course.Id, course,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -118,7 +118,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Курс добавлена в кэш");
-                    cache.Set(item.CourseId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

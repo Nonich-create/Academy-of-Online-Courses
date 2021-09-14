@@ -6,7 +6,7 @@ namespace Students.MVC.ViewModels
 {
     public class DetalisGroupViewModel
     {
-        public int GroupId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Не указан номер группы")]
         [Display(Name = "Номер группы")]

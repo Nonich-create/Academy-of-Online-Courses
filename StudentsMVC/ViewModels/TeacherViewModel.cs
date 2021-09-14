@@ -6,8 +6,6 @@ namespace Students.MVC.ViewModels
 {
     public class TeacherViewModel: PersonViewModel
     {
-        [Key]
-        public int TeacherId { get; set; }
         public List<GroupViewModel> Groups { get; set; }
     }
 }

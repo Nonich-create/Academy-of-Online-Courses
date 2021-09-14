@@ -33,7 +33,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.AssessmentId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -91,7 +91,7 @@ namespace Students.BLL.Services
                     assessment = await _unitOfWork.AssessmentRepository.GetAsync(id);
                     if (assessment != null)
                     {
-                        cache.Set(assessment.AssessmentId, assessment,
+                        cache.Set(assessment.Id, assessment,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -120,7 +120,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Оценка добавлена в кэш");
-                    cache.Set(item.AssessmentId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

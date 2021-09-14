@@ -123,7 +123,7 @@ namespace Students.MVC.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (await _managerService.ExistsAsync(manager.ManagerId))
+                    if (await _managerService.ExistsAsync(manager.Id))
                     {
                         return NotFound();
                     }
@@ -141,14 +141,14 @@ namespace Students.MVC.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> DeleteConfirmed(int ManagerId)
+        public async Task<IActionResult> DeleteConfirmed(int Id)
         {
-            var manager = await _managerService.GetAsync(ManagerId);
+            var manager = await _managerService.GetAsync(Id);
             if (manager == null)
             {
                 return NotFound();
             }
-            await _managerService.DeleteAsync(ManagerId);
+            await _managerService.DeleteAsync(Id);
             await _managerService.Save();
             return RedirectToAction("Index");
         }

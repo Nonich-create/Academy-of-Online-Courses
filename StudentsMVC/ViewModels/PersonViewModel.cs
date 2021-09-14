@@ -5,6 +5,8 @@ namespace Students.MVC.ViewModels
 {
     public class PersonViewModel
     {
+        [Key]
+        public int Id { get; set; }
         [Required(ErrorMessage = "Не указан Email")]
         [Display(Name = "Email")]
         [DataType(DataType.EmailAddress)]

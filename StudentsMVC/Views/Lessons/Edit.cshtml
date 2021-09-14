@@ -7,7 +7,7 @@
     <div class="registration-form">
         <form asp-action="Edit">
             <div class="validation" asp-validation-summary="All"></div>
-            <input type="hidden" asp-for="LessonId"/>
+            <input type="hidden" asp-for="Id"/>
             <input type="hidden" asp-for="ReturnUrl"/>
             <div class="form-group">
                 <input type="text" class="form-control item" asp-for="NumberLesson" id="numberLesson" placeholder="Номер урока">
@@ -29,7 +29,7 @@
                 <select asp-for="CourseId" class="form-control item">
                     @foreach (var item in Model.Courses)
                     {
-                        <option value="@item.CourseId">@item.Name</option>
+                        <option value="@item.Id">@item.Name</option>
                     }
                 </select>
             </div>

@@ -9,7 +9,7 @@ namespace Students.MVC.ViewModels
     public class DetalisCourseViewModel
     {
         [Key]
-        public int CourseId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Не указано название курса")]
         [Display(Name = "Название курсов")]
@@ -35,7 +35,7 @@ namespace Students.MVC.ViewModels
         public bool Visible { get; set; } = false;
 
 
-        public List<ApplicationCourseViewModel> ApplicationCourseViewModels { get; set; } 
+        public List<CourseApplicationViewModel> ApplicationCourseViewModels { get; set; } 
         public List<LessonViewModel> Lessons { get; set; }
         public List<GroupViewModel> Groups { get; set; }
     }

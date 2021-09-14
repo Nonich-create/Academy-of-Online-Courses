@@ -6,34 +6,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
-    public class ApplicationCourseService: IApplicationCourseService
+    public class CourseApplicationService : ICourseApplicationService
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public ApplicationCourseService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<ApplicationCourse> logger)
+        public CourseApplicationService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<CourseApplication> logger)
         {
             _unitOfWork = unitOfWork;
             cache = memoryCache;
             _logger = logger;
         }
 
-        public async Task Cancel(ApplicationCourse model)
+        public async Task Cancel(CourseApplication model)
         {
  
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
             student.GroupId = null;
             await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = Enum.EnumApplicationStatus.Отменена.ToString();
+            model.ApplicationStatus = EnumApplicationStatus.Отменена;
             await _unitOfWork.ApplicationCourseRepository.Update(model);
             await _unitOfWork.Save();
         }
 
-        public async Task CreateAsync(ApplicationCourse item)
+        public async Task CreateAsync(CourseApplication item)
         {
             try
             {
@@ -43,7 +44,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.ApplicationCourseId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -81,16 +82,16 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления заявок");
             }
         }
-        public async Task Enroll(ApplicationCourse model)
+        public async Task Enroll(CourseApplication model) // посмотреть
         {
-            var group =  _unitOfWork.GroupRepository.GetAllAsync().Result.Where(g => g.CourseId == model.CourseId
-            && g.CountMax > _unitOfWork.StudentRepository.GetAllAsync().Result.Where(s => s.GroupId == g.GroupId).Count()).First();
+            var group =  ( await _unitOfWork.GroupRepository.GetAllAsync()).Where(g => g.CourseId == model.CourseId
+            && g.CountMax > _unitOfWork.StudentRepository.GetAllAsync().Result.Where(s => s.GroupId == g.Id).Count()).First();
             if(group == null){ throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
             if(student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
-            student.GroupId = group.GroupId;
+            student.GroupId = group.Id;
             await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = Enum.EnumApplicationStatus.Закрыта.ToString();
+            model.ApplicationStatus = EnumApplicationStatus.Закрыта;
             await _unitOfWork.ApplicationCourseRepository.Update(model);
             await _unitOfWork.Save();
         }
@@ -98,7 +99,7 @@ namespace Students.BLL.Services
         public async Task<bool> ExistsAsync(int id) => await _unitOfWork.ApplicationCourseRepository.ExistsAsync(id);
 
 
-        public async Task<List<ApplicationCourse>> GetAllAsync()
+        public async Task<List<CourseApplication>> GetAllAsync()
         {
             try
             {
@@ -113,18 +114,18 @@ namespace Students.BLL.Services
         }
 
 
-        public async Task<ApplicationCourse> GetAsync(int id)
+        public async Task<CourseApplication> GetAsync(int id)
         {
             try
             {
                 _logger.LogInformation("Получение заяки");
-                if (!cache.TryGetValue(id, out ApplicationCourse applicationCourse))
+                if (!cache.TryGetValue(id, out CourseApplication courseApplication))
                 {
                     _logger.LogInformation("Кэша нету");
-                    applicationCourse = await _unitOfWork.ApplicationCourseRepository.GetAsync(id);
-                    if (applicationCourse != null)
+                    courseApplication = await _unitOfWork.ApplicationCourseRepository.GetAsync(id);
+                    if (courseApplication != null)
                     {
-                        cache.Set(applicationCourse.ApplicationCourseId, applicationCourse,
+                        cache.Set(courseApplication.Id, courseApplication,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -132,7 +133,7 @@ namespace Students.BLL.Services
                 {
                     _logger.LogInformation("Кэш есть");
                 }
-                return applicationCourse;
+                return courseApplication;
             }
             catch (Exception ex)
             {
@@ -145,23 +146,23 @@ namespace Students.BLL.Services
         public async Task Save() => await _unitOfWork.Save();
 
 
-        public async Task<ApplicationCourse> Update(ApplicationCourse item)
+        public async Task<CourseApplication> Update(CourseApplication item)
         {
             try
             {
-                var applicationCourse = await _unitOfWork.ApplicationCourseRepository.Update(item);
+                var courseApplication = await _unitOfWork.ApplicationCourseRepository.Update(item);
                 _logger.LogInformation("Заявка изменена");
                 int n = await _unitOfWork.Save();
                 if (n > 0)
                 {
                     _logger.LogInformation("Оценка добавлена в кэш");
-                    cache.Set(item.ApplicationCourseId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
 
                 }
-                return applicationCourse;
+                return courseApplication;
             }
             catch (Exception ex)
             {

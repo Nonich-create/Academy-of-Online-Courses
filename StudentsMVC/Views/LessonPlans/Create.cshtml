@@ -3,9 +3,7 @@
     ViewData["Title"] = "Добавления расписания к занятию";
     Layout = "_LayoutAdditional";
 }
-@{
-    int x = 1;
-}
+
 <body>
     <div class="registration-form">
         <form asp-action="Create">
@@ -15,7 +13,7 @@
                     <select asp-for="GroupId" class="form-control item">
                         @foreach (var item in Model.Groups)
                         {
-                            <option value="@item.GroupId">@item.NumberGroup</option>
+                            <option value="@item.Id">@item.NumberGroup</option>
                             x = item.CourseId;
                         }
                     </select>
@@ -24,7 +22,7 @@
                     <select asp-for="GroupId" class="form-control item">
                         @foreach (var item in Model.Lessons.Where(l => l.CourseId == x))
                         {
-                            <option value="@item.LessonId">@item.NumberLesson @item.Name</option>
+                            <option value="@item.Id">@item.NumberLesson @item.Name</option>
                         }
                     </select>
                 </div>*@

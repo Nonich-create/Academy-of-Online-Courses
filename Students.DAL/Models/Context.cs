@@ -13,7 +13,7 @@ namespace Students.DAL.Models
         public DbSet<Assessment> Assessments { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
-        public DbSet<ApplicationCourse> ApplicationCourses { get; set; }
+        public DbSet<CourseApplication> ApplicationCourses { get; set; }
         public DbSet<LessonPlan> LessonPlans { set; get; }
 
         public Context(DbContextOptions<Context> options)

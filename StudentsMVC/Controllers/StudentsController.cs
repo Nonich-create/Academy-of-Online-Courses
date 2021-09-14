@@ -22,9 +22,9 @@ namespace Students.MVC.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
-        private readonly IApplicationCourseService _applicationCourse;
+        private readonly ICourseApplicationService _applicationCourse;
 
-        public StudentsController(IApplicationCourseService applicationCourse, IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IStudentService studentService, IGroupService groupService, ICourseService courseService)
+        public StudentsController(ICourseApplicationService courseApplication, IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IStudentService studentService, IGroupService groupService, ICourseService courseService)
         {
             _userService = userService;
             _studentService = studentService;
@@ -33,7 +33,7 @@ namespace Students.MVC.Controllers
             _courseService = courseService;
             _roleManager = roleManager;
             _signInManager = signInManager;
-            _applicationCourse = applicationCourse;
+            _applicationCourse = courseApplication;
         }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
@@ -145,7 +145,7 @@ namespace Students.MVC.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (await _studentService.ExistsAsync(student.StudentId))
+                    if (await _studentService.ExistsAsync(model.Id))
                     {
                         return NotFound();
                     }

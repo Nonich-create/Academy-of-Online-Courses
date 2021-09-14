@@ -23,7 +23,7 @@ namespace Students.BLL.DataAccess
         
         public async Task<Teacher> Update(Teacher teacher)
         {
-            var teacherEntity = await _db.Teachers.AsNoTracking().FirstOrDefaultAsync(t => t.TeacherId == teacher .TeacherId);
+            var teacherEntity = await _db.Teachers.AsNoTracking().FirstOrDefaultAsync(t => t.Id == teacher .Id);
 
             if (teacherEntity != null)
             {

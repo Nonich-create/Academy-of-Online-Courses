@@ -3,10 +3,8 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-using Students.BLL.Enum;
+using Students.DAL.Enum;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -42,11 +40,11 @@ namespace Students.BLL.Services
                 if (student == null) { throw new InvalidOperationException($"Такого пользователя не существует"); }
                 var course = await _unitOfWork.CourseRepository.GetAsync(СourseId);
                 if (course == null) { throw new InvalidOperationException($"Такого курса не существует"); }
-                ApplicationCourse model = new()
+                CourseApplication model = new()
                 {
                     StudentId = StudentId,
                     CourseId = СourseId,
-                    ApplicationStatus = EnumApplicationStatus.Открыта.ToString()
+                    ApplicationStatus = EnumApplicationStatus.Открыта
                 };
                 await _unitOfWork.ApplicationCourseRepository.CreateAsync(model);
                 await _unitOfWork.Save();
@@ -87,7 +85,7 @@ namespace Students.BLL.Services
                     student = await _unitOfWork.StudentRepository.GetAsync(id);
                     if (student != null)
                     {
-                        cache.Set(student.StudentId, student,
+                        cache.Set(student.Id, student,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -115,7 +113,7 @@ namespace Students.BLL.Services
                     student = await _unitOfWork.StudentRepository.GetAsync(id);
                     if (student != null)
                     {
-                        cache.Set(student.StudentId, student,
+                        cache.Set(student.Id, student,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -142,7 +140,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.StudentId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -164,7 +162,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Студент добавлен в кэш");
-                    cache.Set(item.StudentId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

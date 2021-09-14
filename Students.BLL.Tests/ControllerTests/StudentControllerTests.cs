@@ -22,7 +22,7 @@ namespace Students.DAL.Tests.ControllerTests
         public Mock<IStudentService> StudentServiceMock { get; } = new Mock<IStudentService>();
         public Mock<ICourseService> CourseServiceMock { get; } = new Mock<ICourseService>();
         public Mock<IGroupService> GroupServiceMock { get; } = new Mock<IGroupService>();
-        public Mock<IApplicationCourseService> ApplicationCourseServiceMock { get; } = new Mock<IApplicationCourseService>();
+        public Mock<ICourseApplicationService> ApplicationCourseServiceMock { get; } = new Mock<ICourseApplicationService>();
         public Fixture Fixture { get; set; } = new();
 
         public StudentControllerTests()

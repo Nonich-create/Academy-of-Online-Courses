@@ -39,15 +39,15 @@
                 <select asp-for="CourseId" class="form-control item">
                     @foreach (var item in Model.Courses)
                     {
-                        <option value="@item.CourseId">@item.Name</option>
+                        <option value="@item.Id">@item.Name</option>
                     }
                 </select>
             </div>
             <div class="form-group">
-                <select asp-for="ManagerId" class="form-control item">
+                <select asp-for="Id" class="form-control item">
                     @foreach (var item in Model.Manageres)
                     {
-                        <option value="@item.ManagerId">@item.Surname</option>
+                        <option value="@item.Id">@item.Surname</option>
                     }
                 </select>
             </div>
@@ -55,7 +55,7 @@
                 <select asp-for="TeacherId" class="form-control item">
                     @foreach (var item in Model.Teachers)
                     {
-                        <option value="@item.TeacherId">@item.Surname</option>
+                        <option value="@item.Id">@item.Surname</option>
                     }
                 </select>
             </div>

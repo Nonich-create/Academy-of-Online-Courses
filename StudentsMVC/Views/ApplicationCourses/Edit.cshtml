@@ -1,4 +1,4 @@
-﻿@model Students.DAL.Models.ApplicationCourse
+﻿@model Students.DAL.Models.CourseApplication
 
 @{
     ViewData["Title"] = "Редактирование";
@@ -9,7 +9,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ApplicationCourseId" />
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="ApplicationStatus" class="control-label"></label>
                 <input asp-for="ApplicationStatus" class="form-control" />

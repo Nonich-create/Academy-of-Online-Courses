@@ -8,8 +8,7 @@ using System.Collections.Generic;
 using Students.BLL.Services;
 using Students.BLL.Classes;
 using Microsoft.AspNetCore.Authorization;
-using Students.BLL.Enum;
-using System;
+using Students.DAL.Enum;
 using Microsoft.AspNetCore.Identity;
 
 namespace Students.MVC.Controllers
@@ -44,7 +43,7 @@ namespace Students.MVC.Controllers
             foreach (var group in groups)
             {
                 model = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
+                model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.Id));
                 model.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
                 model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(group.CourseId));
                 models.Add(model);
@@ -63,13 +62,13 @@ namespace Students.MVC.Controllers
                 var id = _userManager.GetUserId(User);
                 var teacher = await _teacherService.GetAllAsync();
                 var groups = await _groupService.GetAllAsync();
-                groups = groups.Where(g => g.TeacherId == teacher.Where(t => t.UserId == id).First().TeacherId).ToList();
+                groups = groups.Where(g => g.TeacherId == teacher.Where(t => t.UserId == id).First().Id).ToList();
                 List<GroupViewModel> models = new();
                 GroupViewModel model;
                 foreach (var group in groups)
                 {
                     model = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                    model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
+                    model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.Id));
                     model.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
                     model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(group.CourseId));
                     models.Add(model);
@@ -100,7 +99,7 @@ namespace Students.MVC.Controllers
             }
             DetalisGroupViewModel model;
             model = Mapper.ConvertViewModel<DetalisGroupViewModel, Group>(group);
-            model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
+            model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.Id));
             model.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
             model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(group.CourseId));
             model.StudentsViewModels = modelsstudents;
@@ -130,7 +129,7 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var group = Mapper.ConvertViewModel<Group, GroupViewModel>(model);
-                group.GroupStatus = EnumGroupStatus.Набор.ToString();
+                group.GroupStatus = EnumGroupStatus.Набор;
                 await _groupService.CreateAsync(group);
                 await _groupService.Save();
                 return Redirect(Request.Headers["Referer"].ToString());
@@ -177,7 +176,7 @@ namespace Students.MVC.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (await _groupService.ExistsAsync(group.GroupId))
+                    if (await _groupService.ExistsAsync(group.Id))
                     {
                         return NotFound();
                     }

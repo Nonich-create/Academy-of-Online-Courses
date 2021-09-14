@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Students.BLL.DataAccess   
 {
-    public class ApplicationCourseRepository : IRepository<ApplicationCourse>
+    public class ApplicationCourseRepository : IRepository<CourseApplication>
     {
         private readonly Context _db;
         
@@ -17,19 +17,19 @@ namespace Students.BLL.DataAccess
             this._db = db;
         }
         
-        public async Task<List<ApplicationCourse>> GetAllAsync() => await _db.ApplicationCourses.ToListAsync();      
+        public async Task<List<CourseApplication>> GetAllAsync() => await _db.ApplicationCourses.ToListAsync();      
         
-        public async Task<ApplicationCourse> GetAsync(int id) => await ExistsAsync(id) ? await _db.ApplicationCourses.FindAsync(id) : null;
+        public async Task<CourseApplication> GetAsync(int id) => await ExistsAsync(id) ? await _db.ApplicationCourses.FindAsync(id) : null;
         
-        public async Task CreateAsync(ApplicationCourse applicationCourse) => await _db.ApplicationCourses.AddAsync(applicationCourse);
+        public async Task CreateAsync(CourseApplication courseApplication) => await _db.ApplicationCourses.AddAsync(courseApplication);
              
-        public async Task<ApplicationCourse> Update(ApplicationCourse applicationCourse)
+        public async Task<CourseApplication> Update(CourseApplication courseApplication)
         {
             var applicationCoursesEntity = await _db.ApplicationCourses
-                .AsNoTracking().FirstOrDefaultAsync(a => a.ApplicationCourseId == applicationCourse.ApplicationCourseId);
+                .AsNoTracking().FirstOrDefaultAsync(a => a.Id == courseApplication.Id);
             if (applicationCoursesEntity != null)
             {
-                _db.Entry(applicationCourse).State = EntityState.Modified;
+                _db.Entry(courseApplication).State = EntityState.Modified;
         
                 return applicationCoursesEntity;
             }
@@ -38,10 +38,10 @@ namespace Students.BLL.DataAccess
         
         public async Task DeleteAsync(int id)
         {
-            ApplicationCourse applicationCourse = await GetAsync(id);
-            if (applicationCourse != null)
+            CourseApplication courseApplication = await GetAsync(id);
+            if (courseApplication != null)
             {
-                _db.ApplicationCourses.Remove(applicationCourse);
+                _db.ApplicationCourses.Remove(courseApplication);
             }
         }
         public async Task DeleteAsyncAll(int id)

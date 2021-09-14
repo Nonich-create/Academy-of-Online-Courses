@@ -6,7 +6,6 @@ namespace Students.MVC.ViewModels
 {
     public class StudentViewModel: PersonViewModel
     {
-        public int StudentId { get; set; }
         [DataType(DataType.Date)]
         [Display(Name = "Дата рождения")]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]

@@ -34,12 +34,12 @@
                         </td>
                         <td>
                             <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                               asp-action="Edit" asp-route-id="@item.ManagerId">Редактирование</a>
+                               asp-action="Edit" asp-route-id="@item.Id">Редактирование</a>
                             <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                               asp-action="Details" asp-route-id="@item.ManagerId">Подробнее</a>
+                               asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
                             <form method="post" asp-controller="Manager" asp-action="Delete">
                                 <button class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
-                                        asp-controller="Manager" asp-action="Delete" asp-route-ManagerId="@item.ManagerId">
+                                        asp-controller="Manager" asp-action="Delete" asp-route-Id="@item.Id">
                                     Удалить
                                 </button>
                             </form>

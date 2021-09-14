@@ -163,7 +163,7 @@ namespace Students.MVC.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (await _lessonService.ExistsAsync(lesson.LessonId))
+                    if (await _lessonService.ExistsAsync(lesson.Id))
                     {
                         return NotFound();
                     }

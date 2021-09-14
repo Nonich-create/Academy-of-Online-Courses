@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
@@ -33,7 +34,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.GroupId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -92,7 +93,7 @@ namespace Students.BLL.Services
                     group = await _unitOfWork.GroupRepository.GetAsync(id);
                     if (group != null)
                     {
-                        cache.Set(group.GroupId, group,
+                        cache.Set(group.Id, group,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -120,7 +121,7 @@ namespace Students.BLL.Services
                     group = await _unitOfWork.GroupRepository.GetAsync(id);
                     if (group != null)
                     {
-                        cache.Set(group.GroupId, group,
+                        cache.Set(group.Id, group,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -145,9 +146,9 @@ namespace Students.BLL.Services
         public async Task StartGroup(int id)
         {
             var group = await _unitOfWork.GroupRepository.GetAsync(id);
-            group.GroupStatus = Enum.EnumGroupStatus.Обучение.ToString();
+            group.GroupStatus = EnumGroupStatus.Обучение;
             var students = await _unitOfWork.StudentRepository.GetAllAsync();
-            students = students.Where(s => s.GroupId == group.GroupId).ToList();
+            students = students.Where(s => s.GroupId == group.Id).ToList();
             var lesson = await _unitOfWork.LessonRepository.GetAllAsync();
             lesson = lesson.Where(l => l.CourseId == group.CourseId).ToList();
             await _unitOfWork.GroupRepository.Update(group);
@@ -155,7 +156,7 @@ namespace Students.BLL.Services
             {
                 foreach (var itemStudent in students)
                 {
-                    Assessment assessment = new() { LessonId = itemLesson.LessonId, StudentId = itemStudent.StudentId };
+                    Assessment assessment = new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id };
                     await _unitOfWork.AssessmentRepository.CreateAsync(assessment);
                 }
             }
@@ -173,7 +174,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Группа добавлена в кэш");
-                    cache.Set(item.GroupId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

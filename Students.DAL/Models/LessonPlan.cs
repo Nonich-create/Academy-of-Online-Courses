@@ -6,7 +6,7 @@ namespace Students.DAL.Models
     public class LessonPlan
     {
         [Key]
-        public int LessonPlanId { get; set; }
+        public int Id { get; set; }
         public DateTime DateOfTheLesson { get; set; }
         public int? LessonId { get; set; }
         public Lesson Lesson { get; set; }

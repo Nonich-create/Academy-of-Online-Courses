@@ -32,7 +32,7 @@ namespace Students.BLL.DataAccess
         
         public async Task<Student> Update(Student student)
         {
-            var studentEntity = await _db.Students.AsNoTracking().FirstOrDefaultAsync(s => s.StudentId == student .StudentId);
+            var studentEntity = await _db.Students.AsNoTracking().FirstOrDefaultAsync(s => s.Id == student .Id);
 
             if (studentEntity != null)
             {

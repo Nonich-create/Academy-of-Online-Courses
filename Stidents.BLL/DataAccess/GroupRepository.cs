@@ -33,7 +33,7 @@ namespace Students.BLL.DataAccess
         
         public async Task<Group> Update(Group group)
         {
-            var groupEntity = await _db.Groups.AsNoTracking().FirstOrDefaultAsync(g => g.GroupId == group.GroupId);
+            var groupEntity = await _db.Groups.AsNoTracking().FirstOrDefaultAsync(g => g.Id == group.Id);
 
             if (groupEntity != null)
             {

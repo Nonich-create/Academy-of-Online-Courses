@@ -22,7 +22,7 @@ namespace Students.BLL.DataAccess
         
         public async Task<Manager> Update(Manager manager)
         {
-            var methodologistEntity = await _db.Manager.AsNoTracking().FirstOrDefaultAsync(a => a.ManagerId == manager.ManagerId);
+            var methodologistEntity = await _db.Manager.AsNoTracking().FirstOrDefaultAsync(a => a.Id == manager.Id);
 
             if (methodologistEntity != null)
             {

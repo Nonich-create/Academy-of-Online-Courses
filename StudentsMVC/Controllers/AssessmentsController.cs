@@ -41,7 +41,7 @@ namespace Students.MVC.Controllers
         {
             var id = _userManager.GetUserId(User);
             var students = await _studentService.GetAllAsync();
-            var studentId = students.Where(s => s.UserId == id).Select(s => s.StudentId).First();
+            var studentId = students.Where(s => s.UserId == id).Select(s => s.Id).First();
             var assessments = await _assessmentService.GetAssessmentsByStudentId(studentId);
             var assessmentViewModels = Mapper.ConvertListViewModel<AssessmentViewModel, Assessment>(assessments);
             return View(assessmentViewModels);
@@ -49,12 +49,12 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int Id)
+        public async Task<IActionResult> Index(int GroupId)
         {
             var teachers = await _teacherService.GetAllAsync();
             var teacher = teachers.Where(t => t.UserId == _userManager.GetUserId(User)).First();
             var groups = await _groupService.GetAllAsync();
-            groups = groups.Where(g => g.TeacherId == teacher.TeacherId && g.GroupId == Id).ToList();
+            groups = groups.Where(g => g.TeacherId == teacher.Id && g.Id == GroupId).ToList();
             var assessments = await _assessmentService.GetAllAsync();
 
             List<AssessmentViewModel> assessmentViewModels = new();
@@ -72,7 +72,7 @@ namespace Students.MVC.Controllers
 
             foreach (var group in groups)
             {
-                assessmentViewModelsSorted.AddRange(assessmentViewModels.Where(a => a.Student.GroupId == group.GroupId).ToList());
+                assessmentViewModelsSorted.AddRange(assessmentViewModels.Where(a => a.Student.GroupId == group.Id).ToList());
             }
 
             return View(assessmentViewModelsSorted);
@@ -140,7 +140,7 @@ namespace Students.MVC.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (await _assessmentService.ExistsAsync(assessment.AssessmentId))
+                    if (await _assessmentService.ExistsAsync(assessment.Id))
                     {
                         return NotFound();
                     }

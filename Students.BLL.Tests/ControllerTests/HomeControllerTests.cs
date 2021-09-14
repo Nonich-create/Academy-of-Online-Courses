@@ -64,10 +64,10 @@ namespace Students.DAL.Tests.ControllerTests
             {
                 students[i].UserId = users[i].Id;
             }
-            StudentServiceMock.Setup(s => s.PutRequest(students[1].StudentId, courses[1].CourseId));
+            StudentServiceMock.Setup(s => s.PutRequest(students[1].Id, courses[1].Id));
 
             // Act
-            var result = HomeController.PutRequest(courses[1].CourseId);
+            var result = HomeController.PutRequest(courses[1].Id);
 
             //Assert
             Assert.IsType<ViewResult>(result);

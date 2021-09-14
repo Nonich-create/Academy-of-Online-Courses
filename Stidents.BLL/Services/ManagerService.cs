@@ -31,7 +31,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.ManagerId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -86,7 +86,7 @@ namespace Students.BLL.Services
                     manager = await _unitOfWork.ManagerRepository.GetAsync(id);
                     if (manager != null)
                     {
-                        cache.Set(manager.ManagerId, manager,
+                        cache.Set(manager.Id, manager,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -118,7 +118,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Менаджер добавлен в кэш");
-                    cache.Set(item.ManagerId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

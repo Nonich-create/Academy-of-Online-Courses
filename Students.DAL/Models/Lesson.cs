@@ -7,7 +7,7 @@ namespace Students.DAL.Models
     public class Lesson
     {
         [Key]
-        public int LessonId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public int NumberLesson { get; set; }
         public string Homework { get; set; }

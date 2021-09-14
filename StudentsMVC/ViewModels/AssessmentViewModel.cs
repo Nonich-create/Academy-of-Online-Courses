@@ -5,7 +5,7 @@ namespace Students.MVC.ViewModels
 {
     public class AssessmentViewModel
     {
-        public int AssessmentId { get; set; }
+        public int Id { get; set; }
         [Display(Name = "Студент")]
         [Required(ErrorMessage = "Не указан студент")]
         public int StudentId { get; set; }
