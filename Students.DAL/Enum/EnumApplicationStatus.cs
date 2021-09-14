@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Students.BLL.Enum
+namespace Students.DAL.Enum
 {
-    public enum EnumGroupStatus
+    public enum EnumApplicationStatus
     {
-        Набор,
+        Открыта,
         Закрыта,
-        Отменена,
-        Обучение
+        Отменена
     }
 }

@@ -26,12 +26,11 @@ namespace Students.BLL.DataAccess
         public async Task<ApplicationCourse> Update(ApplicationCourse applicationCourse)
         {
             var applicationCoursesEntity = await _db.ApplicationCourses
-                .AsNoTracking().FirstOrDefaultAsync(a => a.ApplicationCourseId == applicationCourse.ApplicationCourseId);
+                .FirstOrDefaultAsync(a => a.ApplicationCourseId == applicationCourse.ApplicationCourseId);
             if (applicationCoursesEntity != null)
             {
-                _db.Entry(applicationCourse).State = EntityState.Modified;
-        
-                return applicationCoursesEntity;
+                //_db.Entry(applicationCourse).State = EntityState.Modified;   
+                _db.ApplicationCourses.Update(applicationCoursesEntity);
             }
             return applicationCoursesEntity;
         }
@@ -44,17 +43,16 @@ namespace Students.BLL.DataAccess
                 _db.ApplicationCourses.Remove(applicationCourse);
             }
         }
-        public async Task DeleteAsyncAll(int id)
+        public async Task DeleteAllForStudentAsync(int studentId)
         {
-            Student students = await _db.Students.FindAsync(id);
-            if (students != null)
+            Student student = await _db.Students.FindAsync(studentId);
+            if (student != null)
             {
-                var applicationCourses = await GetAllAsync();
-                applicationCourses = applicationCourses.Where(a => a.StudentId == id).ToList();
+                var applicationCourses = (await GetAllAsync()).Where(a => a.StudentId == studentId).ToList();
                 _db.ApplicationCourses.RemoveRange(applicationCourses);
             }
         }
 
-        public async Task<bool> ExistsAsync(int id) => await _db.ApplicationCourses.FindAsync(id) != null;
+        public async Task<bool> ExistsAsync(int id) => await _db.ApplicationCourses.AnyAsync(a => a.ApplicationCourseId == id);
     }
 }

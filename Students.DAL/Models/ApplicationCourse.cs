@@ -16,5 +16,7 @@ namespace Students.DAL.Models
         public Course Course { get; set; }
         public int StudentId { get; set; }
         public Student Student { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

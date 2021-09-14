@@ -49,11 +49,11 @@ namespace Students.MVC.Controllers
         #region Зачисления студента в группу
         [HttpPost]
         [Authorize(Roles = "manager,admin")]
-        public async Task<IActionResult> Enroll(int ApplicationCourseId)
+        public async Task<IActionResult> Enroll(int applicationCourseId)
         {
-                var model = await _applicationCourseService.GetAsync(ApplicationCourseId);
-                if(model == null) { return RedirectToAction(nameof(Index));}
-                await _applicationCourseService.Enroll(model);
+                var applicationCourse = await _applicationCourseService.GetAsync(applicationCourseId);
+                if(applicationCourse == null) { return RedirectToAction(nameof(Index));}
+                await _applicationCourseService.Enroll(applicationCourse);
                 return Redirect(Request.Headers["Referer"].ToString());
         }
         #endregion

@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
@@ -145,7 +146,7 @@ namespace Students.BLL.Services
         public async Task StartGroup(int id)
         {
             var group = await _unitOfWork.GroupRepository.GetAsync(id);
-            group.GroupStatus = Enum.EnumGroupStatus.Обучение.ToString();
+            group.GroupStatus = EnumGroupStatus.Обучение.ToString();
             var students = await _unitOfWork.StudentRepository.GetAllAsync();
             students = students.Where(s => s.GroupId == group.GroupId).ToList();
             var lesson = await _unitOfWork.LessonRepository.GetAllAsync();
