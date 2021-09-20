@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 
 namespace Students.BLL.DataAccess   
 {
-    public class ApplicationCourseRepository : IRepository<CourseApplication>
+    public class CourseApplicationRepository : IRepository<CourseApplication>
     {
         private readonly Context _db;
         
-        public ApplicationCourseRepository(Context db)
+        public CourseApplicationRepository(Context db)
         {
             this._db = db;
         }
         
-        public async Task<List<CourseApplication>> GetAllAsync() => await _db.ApplicationCourses.ToListAsync();      
+        public async Task<IEnumerable<CourseApplication>> GetAllAsync() => await _db.CourseApplication.ToListAsync();      
         
-        public async Task<CourseApplication> GetAsync(int id) => await ExistsAsync(id) ? await _db.ApplicationCourses.FindAsync(id) : null;
+        public async Task<CourseApplication> GetAsync(int id) => await ExistsAsync(id) ? await _db.CourseApplication.FindAsync(id) : null;
         
-        public async Task CreateAsync(CourseApplication courseApplication) => await _db.ApplicationCourses.AddAsync(courseApplication);
+        public async Task CreateAsync(CourseApplication courseApplication) => await _db.CourseApplication.AddAsync(courseApplication);
              
         public async Task<CourseApplication> Update(CourseApplication courseApplication)
         {
-            var applicationCoursesEntity = await _db.ApplicationCourses
+            var applicationCoursesEntity = await _db.CourseApplication
                 .AsNoTracking().FirstOrDefaultAsync(a => a.Id == courseApplication.Id);
             if (applicationCoursesEntity != null)
             {
@@ -41,7 +41,7 @@ namespace Students.BLL.DataAccess
             CourseApplication courseApplication = await GetAsync(id);
             if (courseApplication != null)
             {
-                _db.ApplicationCourses.Remove(courseApplication);
+                _db.CourseApplication.Remove(courseApplication);
             }
         }
         public async Task DeleteAsyncAll(int id)
@@ -49,12 +49,10 @@ namespace Students.BLL.DataAccess
             Student students = await _db.Students.FindAsync(id);
             if (students != null)
             {
-                var applicationCourses = await GetAllAsync();
-                applicationCourses = applicationCourses.Where(a => a.StudentId == id).ToList();
-                _db.ApplicationCourses.RemoveRange(applicationCourses);
+                _db.CourseApplication.RemoveRange((await GetAllAsync()).Where(a => a.StudentId == id));
             }
         }
 
-        public async Task<bool> ExistsAsync(int id) => await _db.ApplicationCourses.FindAsync(id) != null;
+        public async Task<bool> ExistsAsync(int id) => await _db.CourseApplication.FindAsync(id) != null;
     }
 }

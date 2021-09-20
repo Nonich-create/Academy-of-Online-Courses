@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Students.MVC.Models;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Students.MVC.Controllers
 {
@@ -29,23 +30,30 @@ namespace Students.MVC.Controllers
             _signInManager = signInManager;
         }
         #region Отображения витрины с курсами
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-                List<Course> courses = await _courseService.GetAllAsync();
-                if (courses is null)
+            var courses = await _courseService.GetAllAsync();
+            if (courses is null)
+            {
+                return null;
+            }
+            List<CourseViewModel> models = new();
+            foreach (var course in courses)
+            {
+                models.Add(Mapper.ConvertViewModel<CourseViewModel, Course>(course));
+            }
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                var cours = courses.First(c => c.Name.Contains(searchString));
+                if (cours != null)
                 {
-                    return null;
+                    return Redirect($"~/Home/Detailed/{cours.Id}");
                 }
-                List<CourseViewModel> models = new();
-                CourseViewModel model;
-                foreach (var course in courses)
-                {
-                    model = Mapper.ConvertViewModel<CourseViewModel, Course>(course);
-                    models.Add(model);
-                }
-                return View(models); ;      
+            }
+            return View(models); ;
         }
         #endregion
+   
         #region Вызов ошибки
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -56,20 +64,13 @@ namespace Students.MVC.Controllers
         #region Подробнее о курсе
         public async Task<IActionResult> Detailed(int id)
         {
-                var course = await _courseService.GetAsync(id);
-                if (course == null)
-                {
-                    return NotFound();
-                }
-                var model = new CourseViewModel()
-                {
-                    Name = course.Name,
-                    Description = course.Description,
-                    Duration = course.Duration,
-                    Id = course.Id,
-                    Price = course.Price
-                };
-                return View(model);
+            var course = await _courseService.GetAsync(id);
+            if (course == null)
+            {
+                return NotFound();
+            }
+            var courseViewModel = Mapper.ConvertViewModel<CourseViewModel, Course>(course);
+            return View(courseViewModel);
         }
         #endregion
         #region Оставления заявки на курс
@@ -77,18 +78,18 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "student")]
         public async Task<IActionResult> PutRequest(int CourseId)
         {
-                if (_signInManager.IsSignedIn(User))
-                {     
-                    var id = _userManager.GetUserId(User);
-                    var student = await _studentService.GetAllAsync(); 
-                    await _studentService.PutRequest(student.Where(s => s.UserId == id).First().Id, CourseId);
-                    return Redirect(Request.Headers["Referer"].ToString());
-                }
-                else
-                {
+            if (_signInManager.IsSignedIn(User))
+            {
+                var id = _userManager.GetUserId(User);
+                var student = await _studentService.GetAllAsync();
+                await _studentService.PutRequest(student.Where(s => s.UserId == id).First().Id, CourseId);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            else
+            {
                 return RedirectToAction("Authorization", "Security");
-                }
+            }
         }
-          #endregion
+        #endregion
     }
 }

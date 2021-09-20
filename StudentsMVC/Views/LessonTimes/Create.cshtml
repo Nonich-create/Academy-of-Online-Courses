@@ -10,22 +10,22 @@
             <div class="validation" asp-validation-summary="All"></div>
 
             @*<div class="form-group">
-                    <select asp-for="GroupId" class="form-control item">
-                        @foreach (var item in Model.Groups)
-                        {
-                            <option value="@item.Id">@item.NumberGroup</option>
-                            x = item.CourseId;
-                        }
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select asp-for="GroupId" class="form-control item">
-                        @foreach (var item in Model.Lessons.Where(l => l.CourseId == x))
-                        {
-                            <option value="@item.Id">@item.NumberLesson @item.Name</option>
-                        }
-                    </select>
-                </div>*@
+            <select asp-for="GroupId" class="form-control custom-select">
+                @foreach (var item in Model.Groups)
+                {
+                    <option value="@item.Id">@item.NumberGroup</option>
+                    x = item.CourseId;
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <select asp-for="GroupId" class="form-control custom-select">
+                @foreach (var item in Model.Lessons.Where(l => l.CourseId == x))
+                {
+                    <option value="@item.Id">@item.NumberLesson @item.Name</option>
+                }
+            </select>
+        </div>*@
 
             <h3>Выберите страну</h3>
             @Html.DropDownList("State", ViewBag.Groups as SelectList, new { id = "group" })

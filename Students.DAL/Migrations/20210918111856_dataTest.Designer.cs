@@ -10,7 +10,7 @@ using Students.DAL.Models;
 namespace Students.DAL.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210914095449_dataTest")]
+    [Migration("20210918111856_dataTest")]
     partial class dataTest
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -294,7 +294,7 @@ namespace Students.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("ApplicationCourses");
+                    b.ToTable("CourseApplication");
                 });
 
             modelBuilder.Entity("Students.DAL.Models.Group", b =>
@@ -365,14 +365,14 @@ namespace Students.DAL.Migrations
                     b.ToTable("Lessons");
                 });
 
-            modelBuilder.Entity("Students.DAL.Models.LessonPlan", b =>
+            modelBuilder.Entity("Students.DAL.Models.LessonTimes", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("DateOfTheLesson")
+                    b.Property<DateTime?>("DateOfTheLesson")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("GroupId")
@@ -387,7 +387,7 @@ namespace Students.DAL.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("LessonPlans");
+                    b.ToTable("LessonTimes");
                 });
 
             modelBuilder.Entity("Students.DAL.Models.Manager", b =>
@@ -612,7 +612,7 @@ namespace Students.DAL.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("Students.DAL.Models.LessonPlan", b =>
+            modelBuilder.Entity("Students.DAL.Models.LessonTimes", b =>
                 {
                     b.HasOne("Students.DAL.Models.Group", "Group")
                         .WithMany()

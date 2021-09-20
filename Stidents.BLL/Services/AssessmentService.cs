@@ -60,12 +60,12 @@ namespace Students.BLL.Services
 
         public async Task<bool> ExistsAsync(int id) => await _unitOfWork.AssessmentRepository.ExistsAsync(id);
 
-        public async Task<List<Assessment>> GetAllAsync()
+        public async Task<IEnumerable<Assessment>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Выполнения получения списка оценок");
-                return await _unitOfWork.AssessmentRepository.GetAllAsync();
+                return await  _unitOfWork.AssessmentRepository.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -74,11 +74,10 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<List<Assessment>> GetAssessmentsByStudentId(int studentId)
-        {
-            var assessmentList = await _unitOfWork.AssessmentRepository.GetAllAsync();
-            return (List<Assessment>)assessmentList.Where(x => x.StudentId == studentId);
-        }
+        public async Task<IEnumerable<Assessment>> GetAssessmentsByStudentId(int studentId)
+         => (await _unitOfWork.AssessmentRepository.GetAllAsync()).Where(x => x.StudentId == studentId);
+ 
+        
 
         public async Task<Assessment> GetAsync(int id)
         {

@@ -27,12 +27,12 @@ namespace Students.BLL.Services
         {
             await _unitOfWork.Save();
         }
-
+         
         public async Task PutRequest(int StudentId, int СourseId)
         {
             try
             {
-                if (_unitOfWork.ApplicationCourseRepository.GetAllAsync().Result.Any(a => a.CourseId == СourseId && a.StudentId == StudentId) == true)
+                if ((await _unitOfWork.CourseApplicationRepository.GetAllAsync()).Any(a => a.CourseId == СourseId && a.StudentId == StudentId))
                 {
                     throw new InvalidOperationException($"Вы уже подали заявку на этот курс");
                 }
@@ -46,7 +46,7 @@ namespace Students.BLL.Services
                     CourseId = СourseId,
                     ApplicationStatus = EnumApplicationStatus.Открыта
                 };
-                await _unitOfWork.ApplicationCourseRepository.CreateAsync(model);
+                await _unitOfWork.CourseApplicationRepository.CreateAsync(model);
                 await _unitOfWork.Save();
                 _logger.LogInformation($"Заявка принята Id Cтудента {StudentId}, Id Курса {СourseId}");
             }
@@ -56,7 +56,7 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<List<Student>> GetAllAsync()
+        public async Task<IEnumerable<Student>> GetAllAsync()
         {
             try
             {
@@ -135,8 +135,9 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.StudentRepository.CreateAsync(item);
-                _logger.LogInformation("Студент создан");
+
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Студент создан");
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
@@ -183,6 +184,9 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.StudentRepository.DeleteAsync(id);
+                await _unitOfWork.ApplicationUsers.DeleteAsync((await _unitOfWork.StudentRepository.GetAsync(id)).UserId);
+                await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
+                await _unitOfWork.Save();
                 _logger.LogInformation(id,"Студент удален"); ;
             }
             catch (Exception ex)

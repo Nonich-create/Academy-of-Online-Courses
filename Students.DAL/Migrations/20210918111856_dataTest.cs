@@ -277,26 +277,26 @@ namespace Students.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LessonPlans",
+                name: "LessonTimes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DateOfTheLesson = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateOfTheLesson = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LessonId = table.Column<int>(type: "int", nullable: true),
                     GroupId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LessonPlans", x => x.Id);
+                    table.PrimaryKey("PK_LessonTimes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LessonPlans_Groups_GroupId",
+                        name: "FK_LessonTimes_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_LessonPlans_Lessons_LessonId",
+                        name: "FK_LessonTimes_Lessons_LessonId",
                         column: x => x.LessonId,
                         principalTable: "Lessons",
                         principalColumn: "Id",
@@ -335,33 +335,6 @@ namespace Students.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationCourses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationStatus = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApplicationCourses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ApplicationCourses_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ApplicationCourses_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Assessments",
                 columns: table => new
                 {
@@ -388,15 +361,32 @@ namespace Students.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_ApplicationCourses_CourseId",
-                table: "ApplicationCourses",
-                column: "CourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ApplicationCourses_StudentId",
-                table: "ApplicationCourses",
-                column: "StudentId");
+            migrationBuilder.CreateTable(
+                name: "CourseApplication",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationStatus = table.Column<int>(type: "int", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseApplication", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CourseApplication_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseApplication_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -448,6 +438,16 @@ namespace Students.DAL.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseApplication_CourseId",
+                table: "CourseApplication",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseApplication_StudentId",
+                table: "CourseApplication",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Groups_CourseId",
                 table: "Groups",
                 column: "CourseId");
@@ -463,19 +463,19 @@ namespace Students.DAL.Migrations
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LessonPlans_GroupId",
-                table: "LessonPlans",
-                column: "GroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LessonPlans_LessonId",
-                table: "LessonPlans",
-                column: "LessonId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Lessons_CourseId",
                 table: "Lessons",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonTimes_GroupId",
+                table: "LessonTimes",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonTimes_LessonId",
+                table: "LessonTimes",
+                column: "LessonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Manager_UserId",
@@ -501,9 +501,6 @@ namespace Students.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApplicationCourses");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -522,7 +519,10 @@ namespace Students.DAL.Migrations
                 name: "Assessments");
 
             migrationBuilder.DropTable(
-                name: "LessonPlans");
+                name: "CourseApplication");
+
+            migrationBuilder.DropTable(
+                name: "LessonTimes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

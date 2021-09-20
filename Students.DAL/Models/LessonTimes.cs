@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Students.DAL.Models
 {
-    public class LessonPlan
+    public class LessonTimes
     {
         [Key]
         public int Id { get; set; }
-        public DateTime DateOfTheLesson { get; set; }
+        public DateTime? DateOfTheLesson { get; set; }
         public int? LessonId { get; set; }
         public Lesson Lesson { get; set; }
         public int? GroupId { get; set; }

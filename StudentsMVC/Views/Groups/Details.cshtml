@@ -1,4 +1,4 @@
-﻿@model Students.MVC.ViewModels.DetalisGroupViewModel
+﻿@model Students.MVC.ViewModels.DetailGroupViewModel
 @{
     ViewData["Title"] = "Подробнее";
     Layout = "_Layout";
@@ -40,13 +40,13 @@
                 Преподователь группы
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Teacher.Surname) @Html.DisplayFor(model => model.Teacher.Name) @Html.DisplayFor(model => model.Teacher.MiddleName)
+                @Html.DisplayFor(model => model.Teacher.GetFullName)
             </dd>
             <dt class="col-sm-2">
                 Менеджер группы
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Manager.Surname) @Html.DisplayFor(model => model.Manager.Name) @Html.DisplayFor(model => model.Manager.MiddleName)
+                @Html.DisplayFor(model => model.Manager.GetFullName)
             </dd>
         </dl>
     </div>
@@ -61,13 +61,7 @@
             <thead>
                 <tr>
                     <th>
-                        Имя
-                    </th>
-                    <th>
-                        Фамилия
-                    </th>
-                    <th>
-                        Отчество
+                         ФИО
                     </th>
                     <th>
                         Дата рождения
@@ -80,13 +74,7 @@
 
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Surname)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.MiddleName)
+                            @Html.DisplayFor(modelItem => item.GetFullName)
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.DateOfBirth)

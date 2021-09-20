@@ -7,11 +7,9 @@
     <div class="registration-form">
         <form asp-action="CreateWithCourse">
             <div class="validation" asp-validation-summary="All"></div>
-            <div class="form-icon">
-                <span><i class="icon icon-user"></i></span>
-            </div>
             <div class="form-group">
-                <select asp-for="CourseId" class="form-control item">
+                <label class="form_label">Курс</label><br />
+                <select asp-for="CourseId" class="form-control custom-select">
                     @foreach (var item in Model.Courses)
                     {
                         <option value="@item.Id">@item.Name</option>
@@ -19,19 +17,23 @@
                 </select>
             </div>
             <div class="form-group">
+                <label class="form_label">Номер занятия</label><br />
                 <input type="text" class="form-control item" asp-for="NumberLesson" id="numberLesson" placeholder="Номер занятия">
                 <span asp-validation-for="NumberLesson" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">название занятия</label><br />
                 <input type="text" class="form-control item" asp-for="Name" id="name" placeholder="название занятия">
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <textarea  class="form-control item" asp-for="Homework" id="homework" placeholder="Домашние занятия"></textarea>
+                <label class="form_label">Домашние занятия</label><br />
+                <textarea class="form-control item" asp-for="Homework" id="homework" placeholder="Домашние занятия"></textarea>
                 <span asp-validation-for="Homework" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <textarea   class="form-control item" asp-for="Description" id="description" placeholder="Описание занятия"></textarea>
+                <label class="form_label">Описание занятия</label><br />
+                <textarea class="form-control item" asp-for="Description" id="description" placeholder="Описание занятия"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">

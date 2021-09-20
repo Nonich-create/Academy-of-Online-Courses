@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using System;
+using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
@@ -28,18 +29,40 @@ namespace Students.MVC.Controllers
         }
         #region Отображения менеджеров
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortRecords;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
             var methodologists = await _managerService.GetAllAsync();
-            List<ManagerViewModel> models = new();
-            ManagerViewModel model;
+            List<ManagerViewModel> ManagerViewModels = new();
             foreach (var manager in methodologists)
             {
-                model = Mapper.ConvertViewModel<ManagerViewModel, Manager>(manager);
-                models.Add(model);
+                ManagerViewModels.Add(Mapper.ConvertViewModel<ManagerViewModel, Manager>(manager));
             }
-            return View(models);
-
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                ManagerViewModels = ManagerViewModels.FindAll(c => c.GetFullName.Contains(searchString));
+            }
+            switch (sortRecords)
+            {
+                case "name_desc":
+                    ManagerViewModels = ManagerViewModels.OrderByDescending(t => t.GetFullName).ToList();
+                    break;
+                default:
+                    ManagerViewModels = ManagerViewModels.OrderBy(s => s.GetFullName).ToList();
+                    break;
+            }
+            return View();// PaginatedList<ManagerViewModel>.Create(ManagerViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region Отображения подробностей о менеджере 

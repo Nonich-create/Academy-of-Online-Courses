@@ -5,7 +5,7 @@ using Moq;
 using Students.BLL.Services;
 using Students.DAL.Models;
 using Students.DAL.Tests.Classes;
-using Students.MVC.Classes;
+using Students.MVC.Helpers;
 using Students.MVC.Controllers;
 using Students.MVC.ViewModels;
 using System;

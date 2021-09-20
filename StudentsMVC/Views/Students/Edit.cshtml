@@ -10,22 +10,27 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="UserId" />
             <div class="form-group">
+                <label class="form_label">Имя</label><br />
                 <input type="text" class="form-control item" asp-for="Name" id="name" placeholder="Имя">
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">Фамилия</label><br />
                 <input type="text" class="form-control item" asp-for="Surname" id="surname" placeholder="Фамилия">
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">Отчество</label><br />
                 <input type="text" class="form-control item" asp-for="MiddleName" id="middleName" placeholder="Отчество">
                 <span asp-validation-for="MiddleName" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">Дата рождения</label><br />
                 <input type="text" asp-for="DateOfBirth" class="form-control item" id="birth-date" placeholder="Дата рождения">
                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">Сcылка на фотографию</label><br />
                 <input type="text" asp-for="URLImagePhoto" class="form-control item" id="url" placeholder="Сcылка на фотографию">
                 <span asp-validation-for="URLImagePhoto" class="text-danger"></span>
             </div>

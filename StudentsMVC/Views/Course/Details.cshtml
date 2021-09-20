@@ -145,17 +145,17 @@
                                 <a asp-controller="Students" asp-action="Details" asp-route-id="@item.Id">Студент</a>
                                 @if (item.ApplicationStatus == EnumApplicationStatus.Закрыта)
                                 {
-                                    <form method="post" asp-controller="ApplicationCourses" asp-action="Cancel">
+                                    <form method="post" asp-controller="CourseApplication" asp-action="Cancel">
                                         <div>
-                                            <button asp-controller="ApplicationCourses" asp-action="Cancel" asp-route-ApplicationCourseId="@item.Id">Отменить</button>
+                                            <button asp-controller="CourseApplication" asp-action="Cancel" asp-route-ApplicationCourseId="@item.Id">Отменить</button>
                                         </div>
                                     </form>
                                 }
                                 else
                                 {
-                                    <form method="post" asp-controller="ApplicationCourses" asp-action="Enroll">
+                                    <form method="post" asp-controller="CourseApplication" asp-action="Enroll">
                                         <div>
-                                            <button asp-controller="ApplicationCourses" asp-action="Enroll" asp-route-ApplicationCourseId="@item.Id">Принять</button>
+                                            <button asp-controller="CourseApplication" asp-action="Enroll" asp-route-ApplicationCourseId="@item.Id">Принять</button>
                                         </div>
                                     </form>
                                 }

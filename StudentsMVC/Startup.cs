@@ -57,7 +57,7 @@ namespace Students.MVC
             services.AddScoped<ILessonService, LessonService>();
             services.AddScoped<IManagerService, ManagerService>();
             services.AddScoped<ITeacherService, TeacherService>();
-            services.AddScoped<ILessonPlanService, LessonPlanService>();
+            services.AddScoped<ILessonTimesService, LessonTimesService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<UnitOfWork>();
 

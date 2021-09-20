@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Students.MVC.ViewModels
 {
-    public class LessonPlanViewModel
+    public class LessonTimesViewModel
     {
       
         public int Id { get; set; }
@@ -16,7 +16,7 @@ namespace Students.MVC.ViewModels
         [DataType(DataType.Date)]
         [Display(Name = "Дата проведение занятия")]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime DateOfTheLesson { get; set; }
+        public DateTime? DateOfTheLesson { get; set; }
 
         public int LessonId { get; set; }
         public LessonViewModel Lesson { get; set; }

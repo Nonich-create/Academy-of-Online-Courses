@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class DetalisGroupViewModel
+    public class DetailGroupViewModel
     {
         public int Id { get; set; }
 

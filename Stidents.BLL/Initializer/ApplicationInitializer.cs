@@ -17,8 +17,6 @@ namespace Students.DAL.Models
             EmailAdminOptions emailAdmin = emailAdminOptions.Value;
             GenerateTestData GenerateTestdata = new();
             Random rnd = new();
-            //string adminEmail = Resources.admin;
-            //string password = Resources.adminPassword;
             if (await roleManager.FindByNameAsync("admin") == null)
             {
                 await roleManager.CreateAsync(new IdentityRole("admin"));
@@ -172,7 +170,7 @@ namespace Students.DAL.Models
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,               
+                        CourseId = 2,               
                     });
                 }
                 for (int i = 0; i < 90; i++)
@@ -192,11 +190,11 @@ namespace Students.DAL.Models
                     lessons.Add(
                     new Lesson
                     {
-                        Name = $"Урок №{i} C",
+                        Name = $"Урок №{i} 1C",
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,
+                        CourseId = 3,
                     });
                 }
                 for (int i = 0; i < 50; i++)
@@ -208,7 +206,7 @@ namespace Students.DAL.Models
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,
+                        CourseId = 4,
                     });
                 }
                 for (int i = 0; i < 360; i++)
@@ -220,7 +218,7 @@ namespace Students.DAL.Models
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,
+                        CourseId = 5,
                     });
                 }
                 await context.Lessons.AddRangeAsync(lessons);
@@ -233,7 +231,7 @@ namespace Students.DAL.Models
                     new Group
                     {
                         CourseId = 2,
-                        Id = 1,
+                        ManagerId = 1,
                         TeacherId = 1,
                         NumberGroup = "С# 101",
                         DateStart = new DateTime(2022, 01, 07),
@@ -243,7 +241,7 @@ namespace Students.DAL.Models
                     new Group
                     {
                         CourseId = 2,
-                        Id = 1,
+                        ManagerId = 1,
                         TeacherId = 1,
                         NumberGroup = "С# 201",
                         DateStart = new DateTime(2022, 01, 07),
@@ -253,19 +251,19 @@ namespace Students.DAL.Models
                     new Group
                     {
                         CourseId = 1,
-                        Id = 2,
+                        ManagerId = 2,
                         TeacherId = 2,
                         NumberGroup = "С++ 101",
                         DateStart = new DateTime(2022, 01, 07),
                         GroupStatus = EnumGroupStatus.Набор,
-                        CountMax = 20
+                        CountMax = 20,
                     },
                     new Group
                     {
-                        CourseId = 1,
-                        Id = 2,
+                        CourseId = 3,
+                        ManagerId = 2,
                         TeacherId = 2,
-                        NumberGroup = "С++ 102",
+                        NumberGroup = "1C 101",
                         DateStart = new DateTime(2021, 11, 01),
                         GroupStatus = EnumGroupStatus.Набор,
                         CountMax = 15
@@ -273,7 +271,7 @@ namespace Students.DAL.Models
                     new Group
                     {
                         CourseId = 4,
-                        Id = 3,
+                        ManagerId = 3,
                         TeacherId = 3,
                         NumberGroup = "English 101",
                         DateStart = new DateTime(2021, 11, 01),
@@ -283,7 +281,7 @@ namespace Students.DAL.Models
                         new Group
                     {
                         CourseId = 5,
-                        Id =3,
+                        ManagerId =3,
                         TeacherId = 3,
                         NumberGroup = "Java 101",
                         DateStart = new DateTime(2020, 10, 01),
@@ -321,7 +319,7 @@ namespace Students.DAL.Models
                 }
                 context.SaveChanges();
             }
-            if (!context.ApplicationCourses.Any())
+            if (!context.CourseApplication.Any())
             {
                 for (int i = 1; i < 30; i++)
                 {
@@ -331,7 +329,7 @@ namespace Students.DAL.Models
                         CourseId = 1,
                         StudentId = i                       
                     };
-                    context.ApplicationCourses.Add(courseApplication);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 30; i < 45; i++)
                 {
@@ -341,7 +339,7 @@ namespace Students.DAL.Models
                         CourseId = 2,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(courseApplication);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 45; i < 77; i++)
                 {
@@ -351,7 +349,7 @@ namespace Students.DAL.Models
                         CourseId = 3,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(courseApplication);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 77; i < 100; i++)
                 {
@@ -361,7 +359,7 @@ namespace Students.DAL.Models
                         CourseId = 4,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(courseApplication);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 100; i < 150; i++)
                 {
@@ -371,7 +369,7 @@ namespace Students.DAL.Models
                         CourseId = 5,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(courseApplication);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 context.SaveChanges();
             }

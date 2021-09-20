@@ -4,10 +4,11 @@ using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using System.Collections.Generic;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System;
+using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
@@ -32,17 +33,40 @@ namespace Students.MVC.Controllers
 
         #region отображения курсов
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortRecords;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
             var courses = await _courseService.GetAllAsync();
-            List<CourseViewModel> models = new();
-            CourseViewModel model;
+            List<CourseViewModel> CourseViewModels = new();
             foreach (var cours in courses)
             {
-                model = Mapper.ConvertViewModel<CourseViewModel, Course>(cours);
-                models.Add(model);
+                CourseViewModels.Add(Mapper.ConvertViewModel<CourseViewModel, Course>(cours));
             }
-            return View(models);
+            if(!String.IsNullOrEmpty(searchString))
+            {
+                CourseViewModels = CourseViewModels.FindAll(c => c.Name.Contains(searchString));
+            }
+            switch (sortRecords)
+            {
+                case "name_desc":
+                    CourseViewModels = CourseViewModels.OrderByDescending(c => c.Name).ToList();
+                    break;
+                default:
+                    CourseViewModels = CourseViewModels.OrderBy(c => c.Name).ToList();
+                    break;
+            }
+            return View();//PaginatedList<CourseViewModel>.Create(CourseViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region отображения деталей курса
@@ -61,7 +85,7 @@ namespace Students.MVC.Controllers
             foreach (var group in groups.Where(g => g.CourseId == id))
             {
                 modelGroup = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                modelGroup.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.Id));
+                modelGroup.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
                 modelGroup.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
                 modelsGroups.Add(modelGroup);
             }

@@ -4,6 +4,7 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Students.BLL.Services
@@ -24,11 +25,11 @@ namespace Students.BLL.Services
 
         public async Task CreateAsync(Lesson item)
         {
-            try
+            try 
             {
                 await _unitOfWork.LessonRepository.CreateAsync(item);
-                _logger.LogInformation("Урок создан");
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Урок создан");
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
@@ -59,18 +60,15 @@ namespace Students.BLL.Services
 
         public async Task<bool> ExistsAsync(int id)
         {
-
             return await _unitOfWork.LessonRepository.ExistsAsync(id);
         }
 
-        public async Task<List<Lesson>> GetAllAsync()
+        public async Task<IEnumerable<Lesson>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Выполнения получения списка уроков");
-                List<Lesson> lessons = null;
-                lessons = await _unitOfWork.LessonRepository.GetAllAsync();
-                return lessons;
+                return await _unitOfWork.LessonRepository.GetAllAsync(); 
             }
             catch (Exception ex)
             {
@@ -117,8 +115,8 @@ namespace Students.BLL.Services
             try
             {
                 var lesson = await _unitOfWork.LessonRepository.Update(item);
-                _logger.LogInformation("Урок изменен");
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Урок изменен");
                 if (n > 0)
                 {
                     _logger.LogInformation("Урок добавлен в кэш");

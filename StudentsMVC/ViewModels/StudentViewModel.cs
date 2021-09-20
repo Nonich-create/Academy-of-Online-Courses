@@ -14,7 +14,7 @@ namespace Students.MVC.ViewModels
         public int? GroupId { get; set; }
         public GroupViewModel Group { get; set; }
         public List<AssessmentViewModel> Assessments { get; set; }
+        public List<StudentViewModel> StudentViewModels { get; set; }
 
-        public string GetFullName => $"{Surname} {Name} {MiddleName}";
     }
 }

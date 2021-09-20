@@ -24,23 +24,34 @@ namespace Students.BLL.Services
         }
 
         public async Task Cancel(CourseApplication model)
-        {
- 
+        { 
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
-            student.GroupId = null;
-            await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = EnumApplicationStatus.Отменена;
-            await _unitOfWork.ApplicationCourseRepository.Update(model);
-            await _unitOfWork.Save();
+            var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId
+            && g.Id == (int)student.GroupId 
+            && g.GroupStatus == EnumGroupStatus.Обучение);
+            if (group == null)
+            {
+                student.GroupId = null;
+                await _unitOfWork.StudentRepository.Update(student);
+                model.ApplicationStatus = EnumApplicationStatus.Отменена;
+                await _unitOfWork.CourseApplicationRepository.Update(model);
+                await _unitOfWork.Save();
+                _logger.LogInformation($"Заявка студента {student.Id} на курс {model.CourseId} отменена");
+            }
+            else 
+            {
+                _logger.LogInformation($"На данный момент студент {student.Id} обучается в группе {group.Id}");
+                throw new InvalidOperationException($"На данный момент студент {student.Id} обучается в группе {group.Id}");
+            }
         }
 
         public async Task CreateAsync(CourseApplication item)
         {
             try
             {
-                await _unitOfWork.ApplicationCourseRepository.CreateAsync(item);
-                _logger.LogInformation("Заявка создана");
+                await _unitOfWork.CourseApplicationRepository.CreateAsync(item);   
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Заявка создана");
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
@@ -61,7 +72,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.ApplicationCourseRepository.DeleteAsync(id);
+                await _unitOfWork.CourseApplicationRepository.DeleteAsync(id);
                 _logger.LogInformation(id, "Заяка удалена"); ;
             }
             catch (Exception ex)
@@ -74,7 +85,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.ApplicationCourseRepository.DeleteAsyncAll(id);
+                await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
                 _logger.LogInformation(id, "Заяки студента удалены"); ;
             }
             catch (Exception ex)
@@ -82,29 +93,32 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления заявок");
             }
         }
-        public async Task Enroll(CourseApplication model) // посмотреть
+        public async Task Enroll(CourseApplication model) 
         {
-            var group =  ( await _unitOfWork.GroupRepository.GetAllAsync()).Where(g => g.CourseId == model.CourseId
-            && g.CountMax > _unitOfWork.StudentRepository.GetAllAsync().Result.Where(s => s.GroupId == g.Id).Count()).First();
-            if(group == null){ throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
+            var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null );
+            var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId && 
+            g.GroupStatus == EnumGroupStatus.Набор &&
+            g.CountMax > students.Count(s =>s.GroupId == g.Id));
+            if (group == null){ throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
             if(student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
             student.GroupId = group.Id;
             await _unitOfWork.StudentRepository.Update(student);
             model.ApplicationStatus = EnumApplicationStatus.Закрыта;
-            await _unitOfWork.ApplicationCourseRepository.Update(model);
+            await _unitOfWork.CourseApplicationRepository.Update(model);
             await _unitOfWork.Save();
+            _logger.LogInformation($"Студент {model.StudentId} зачислен в группу {group.Id}"); ;
         }
 
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.ApplicationCourseRepository.ExistsAsync(id);
+        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.CourseApplicationRepository.ExistsAsync(id);
 
 
-        public async Task<List<CourseApplication>> GetAllAsync()
+        public async Task<IEnumerable<CourseApplication>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Выполнения получения списка заявок");
-                return await _unitOfWork.ApplicationCourseRepository.GetAllAsync();
+                return await _unitOfWork.CourseApplicationRepository.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -122,7 +136,7 @@ namespace Students.BLL.Services
                 if (!cache.TryGetValue(id, out CourseApplication courseApplication))
                 {
                     _logger.LogInformation("Кэша нету");
-                    courseApplication = await _unitOfWork.ApplicationCourseRepository.GetAsync(id);
+                    courseApplication = await _unitOfWork.CourseApplicationRepository.GetAsync(id);
                     if (courseApplication != null)
                     {
                         cache.Set(courseApplication.Id, courseApplication,
@@ -150,7 +164,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                var courseApplication = await _unitOfWork.ApplicationCourseRepository.Update(item);
+                var courseApplication = await _unitOfWork.CourseApplicationRepository.Update(item);
                 _logger.LogInformation("Заявка изменена");
                 int n = await _unitOfWork.Save();
                 if (n > 0)

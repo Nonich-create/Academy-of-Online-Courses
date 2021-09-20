@@ -13,13 +13,13 @@ namespace Students.DAL.Models
         public DbSet<Assessment> Assessments { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
-        public DbSet<CourseApplication> ApplicationCourses { get; set; }
-        public DbSet<LessonPlan> LessonPlans { set; get; }
+        public DbSet<CourseApplication> CourseApplication { get; set; }
+        public DbSet<LessonTimes> LessonTimes { set; get; }
 
         public Context(DbContextOptions<Context> options)
         : base(options)
         {
-          //Database.EnsureDeleted();
+           //Database.EnsureDeleted();
           //Database.EnsureCreated();
         }
     } 

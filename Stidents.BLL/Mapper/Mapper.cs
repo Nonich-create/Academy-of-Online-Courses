@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-
-namespace Students.BLL.Classes
+namespace Students.BLL.Mapper
 {
     public static class Mapper
     {
@@ -34,7 +35,7 @@ namespace Students.BLL.Classes
             return output;
         }
 
-        public static List<T> ConvertListViewModel<T, U>(List<U> model) where T : new()
+        public static  List<T> ConvertListViewModel<T, U>(List<U> model) where T : new()
         {
             List<T> output = new();
             T entry = new();
@@ -75,5 +76,6 @@ namespace Students.BLL.Classes
 
             return output;
         }
+ 
     }
 }

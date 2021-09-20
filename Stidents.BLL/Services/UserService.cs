@@ -4,6 +4,7 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 
 namespace Students.BLL.Services
 {
@@ -54,7 +55,7 @@ namespace Students.BLL.Services
             return await _unitOfWork.ApplicationUsers.ExistsAsync(id);
         }
 
-        public async Task<List<ApplicationUser>> GetAllAsync()
+        public async Task<IEnumerable<ApplicationUser>> GetAllAsync()
         {
             return await _unitOfWork.ApplicationUsers.GetAllAsync();
         }

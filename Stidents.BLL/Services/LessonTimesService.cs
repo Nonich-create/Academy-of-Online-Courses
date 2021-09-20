@@ -4,30 +4,31 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Students.BLL.Services
 {
-    public class LessonPlanService : ILessonPlanService
+    public class LessonTimesService : ILessonTimesService
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public LessonPlanService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<LessonPlan> logger)
+        public LessonTimesService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<LessonTimes> logger)
         {
             _unitOfWork = unitOfWork;
             cache = memoryCache;
             _logger = logger;
         }
 
-        public async Task CreateAsync(LessonPlan item)
+        public async Task CreateAsync(LessonTimes item)
         {
             try
             {
-                await _unitOfWork.LessonPlanRepository.CreateAsync(item);
-                _logger.LogInformation("План добавлен");
+                await _unitOfWork.LessonTimesRepository.CreateAsync(item);
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Время урока добавлена");
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
@@ -39,7 +40,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка создания плана");
+                _logger.LogInformation(ex, "Ошибка создания времени урока");
             }
         }
 
@@ -47,46 +48,44 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.LessonPlanRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Урок план"); ;
+                await _unitOfWork.LessonTimesRepository.DeleteAsync(id);
+                _logger.LogInformation(id, "Время занятия удалена"); ;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка удаления плана");
+                _logger.LogInformation(ex, "Ошибка удаления времени занятия");
             }
         }
 
         public async Task<bool> ExistsAsync(int id)
         {
 
-            return await _unitOfWork.LessonPlanRepository.ExistsAsync(id);
+            return await _unitOfWork.LessonTimesRepository.ExistsAsync(id);
         }
 
-        public async Task<List<LessonPlan>> GetAllAsync()
+        public async Task<IEnumerable<LessonTimes>> GetAllAsync()
         {
             try
             {
-                _logger.LogInformation("Выполнения получения списка планов");
-                List<LessonPlan> lessons = null;
-                lessons = await _unitOfWork.LessonPlanRepository.GetAllAsync();
-                return lessons;
+                _logger.LogInformation("Выполнения получения списка времени проведния занятий");
+                return await _unitOfWork.LessonTimesRepository.GetAllAsync(); 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка получение списка планов");
+                _logger.LogError(ex, "Ошибка получение списка времени проведния занятий");
                 return null;
             }
         }
 
-        public async Task<LessonPlan> GetAsync(int id)
+        public async Task<LessonTimes> GetAsync(int id)
         {
             try
             {
-                _logger.LogInformation("Получение плана");
-                if (!cache.TryGetValue(id, out LessonPlan lesson))
+                _logger.LogInformation("Получение времени проведния занятия");
+                if (!cache.TryGetValue(id, out LessonTimes lesson))
                 {
                     _logger.LogInformation("Кэша нету");
-                    lesson = await _unitOfWork.LessonPlanRepository.GetAsync(id);
+                    lesson = await _unitOfWork.LessonTimesRepository.GetAsync(id);
                     if (lesson != null)
                     {
                         cache.Set(lesson.Id, lesson,
@@ -101,7 +100,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка при получение плана");
+                _logger.LogInformation(ex, "Ошибка при получение времени проведения занятия");
                 return null;
             }
         }
@@ -111,29 +110,29 @@ namespace Students.BLL.Services
             await _unitOfWork.Save();
         }
 
-        public async Task<LessonPlan> Update(LessonPlan item)
+        public async Task<LessonTimes> Update(LessonTimes item)
         {
             try
             {
-                var lessonPlan = await _unitOfWork.LessonPlanRepository.Update(item);
-                _logger.LogInformation("План изменен");
+                var lessonTimes = await _unitOfWork.LessonTimesRepository.Update(item);
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Время проведения занятия изменено");
                 if (n > 0)
                 {
-                    _logger.LogInformation("План добавлен в кэш");
                     cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
 
                 }
-                return lessonPlan;
+                return lessonTimes;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка редактирования плана");
+                _logger.LogInformation(ex, "Ошибка редактирования времени проведения занятия");
                 return item;
             }
         }
     }
 }
+ 

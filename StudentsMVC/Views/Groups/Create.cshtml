@@ -1,42 +1,31 @@
 ﻿@model Students.MVC.ViewModels.GroupViewModel
-
 @{
 
     ViewData["Title"] = "Новая группа";
-    Layout = "";
+    Layout = "_LayoutAdditional";
 }
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Новая группа</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="~/css/style.css">
-</head>
-
 <body>
     <div class="registration-form">
         <form asp-action="Create">
             <div class="validation" asp-validation-summary="All"></div>
-            <div class="form-icon">
-                <span><i class="icon icon-user"></i></span>
-            </div>
             <div class="form-group">
+                <label class="form_label">Номер группы</label><br />
                 <input type="text" class="form-control item" asp-for="NumberGroup" id="numberGroup" placeholder="Номер группы">
                 <span asp-validation-for="NumberGroup" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">Дата старта группы</label><br />
                 <input type="text" class="form-control item" asp-for="DateStart" id="dateStart" placeholder="Дата старта группы">
                 <span asp-validation-for="DateStart" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="form_label">Количество студентов</label><br />
                 <input type="text" class="form-control item" asp-for="CountMax" id="countMax" placeholder="Количество студентов">
                 <span asp-validation-for="CountMax" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <select asp-for="CourseId" class="form-control item">
+                <label class="form_label">Курс</label><br />
+                <select asp-for="CourseId" class="form-control custom-select">
                     @foreach (var item in Model.Courses)
                     {
                         <option value="@item.Id">@item.Name</option>
@@ -44,7 +33,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <select asp-for="Id" class="form-control item">
+                <label class="form_label">Менеджер</label><br />
+                <select asp-for="ManagerId" class="form-control custom-select">
                     @foreach (var item in Model.Manageres)
                     {
                         <option value="@item.Id">@item.Surname</option>
@@ -52,7 +42,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <select asp-for="TeacherId" class="form-control item">
+                <label class="form_label">Преподователь</label><br />
+                <select asp-for="TeacherId" class="form-control custom-select">
                     @foreach (var item in Model.Teachers)
                     {
                         <option value="@item.Id">@item.Surname</option>
@@ -67,8 +58,4 @@
             </div>
         </form>
     </div>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
-    <script src="~/js/script.js"></script>
 </body>
-</html>

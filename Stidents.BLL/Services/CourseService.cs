@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Linq;
 
 namespace Students.BLL.Services
 {
@@ -61,7 +62,7 @@ namespace Students.BLL.Services
             return await _unitOfWork.CourseRepository.ExistsAsync(id);
         }
 
-        public async Task<List<Course>> GetAllAsync()
+        public async Task<IEnumerable<Course>> GetAllAsync()
         {
             try
             {

@@ -40,5 +40,8 @@ namespace Students.MVC.ViewModels
         public string URLImagePhoto { get; set; }
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
+
+        [Display(Name = "ФИО")]
+        public string GetFullName => $"{Surname} {Name} {MiddleName}";
     }
 }

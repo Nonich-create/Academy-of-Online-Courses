@@ -14,7 +14,7 @@ namespace Students.BLL.DataAccess
             this._db = db;
         }
 
-        public async Task<List<Lesson>> GetAllAsync() => await _db.Lessons.ToListAsync();
+        public async Task<IEnumerable<Lesson>> GetAllAsync() => await _db.Lessons.ToListAsync();
         
 
         public async Task<Lesson> GetAsync(int id) => await ExistsAsync(id) ? await _db.Lessons.FindAsync(id) : null;

@@ -6,10 +6,11 @@ using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using System.Collections.Generic;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System;
+using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
@@ -27,17 +28,39 @@ namespace Students.MVC.Controllers
         }
         #region Отображения преподователей
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortRecords;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
             var teachers = await _teacherService.GetAllAsync();
-            List<TeacherViewModel> models = new();
-            TeacherViewModel model;
+            List<TeacherViewModel> TeacherViewModels = new();
             foreach (var teacher in teachers)
             {
-                model = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(teacher);
-                models.Add(model);
+                TeacherViewModels.Add(Mapper.ConvertViewModel<TeacherViewModel, Teacher>(teacher));
             }
-            return View(models);
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                TeacherViewModels = TeacherViewModels.FindAll(c => c.GetFullName.Contains(searchString));
+            }
+            switch (sortRecords)
+            {
+                case "name_desc":
+                    TeacherViewModels = TeacherViewModels.OrderByDescending(t => t.GetFullName).ToList();
+                    break;
+                default:
+                    TeacherViewModels = TeacherViewModels.OrderBy(s => s.GetFullName).ToList();
+                    break;
+            }
+            return View();// PaginatedList<TeacherViewModel>.Create(TeacherViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region Отображения дополнительной информации о преподователях

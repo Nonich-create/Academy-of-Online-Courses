@@ -6,14 +6,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 
 namespace Students.MVC.Controllers
 {
-    public class AssessmentsController : Controller
+    public class AssessmentsController : Controller // Добавить дату создания заявки
     {
 
         private readonly ICourseService _courseService;
@@ -40,33 +40,22 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> StudentAssessments()
         {
             var id = _userManager.GetUserId(User);
-            var students = await _studentService.GetAllAsync();
-            var studentId = students.Where(s => s.UserId == id).Select(s => s.Id).First();
-            var assessments = await _assessmentService.GetAssessmentsByStudentId(studentId);
-            var assessmentViewModels = Mapper.ConvertListViewModel<AssessmentViewModel, Assessment>(assessments);
+            var students = (await _studentService.GetAllAsync()).First(s => s.UserId == _userManager.GetUserId(User));
+            var assessments = await _assessmentService.GetAssessmentsByStudentId(students.Id);
+            var assessmentViewModels = Mapper.ConvertListViewModel<AssessmentViewModel, Assessment>((await _assessmentService.GetAssessmentsByStudentId(students.Id)).ToList());
             return View(assessmentViewModels);
         }
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int GroupId)
+        public async Task<IActionResult> Index(int GroupId)  // order by
         {
             var teachers = await _teacherService.GetAllAsync();
             var teacher = teachers.Where(t => t.UserId == _userManager.GetUserId(User)).First();
-            var groups = await _groupService.GetAllAsync();
-            groups = groups.Where(g => g.TeacherId == teacher.Id && g.Id == GroupId).ToList();
+            var groups = (await _groupService.GetAllAsync()).Where(g => g.TeacherId == teacher.Id && g.Id == GroupId);
             var assessments = await _assessmentService.GetAllAsync();
 
             List<AssessmentViewModel> assessmentViewModels = new();
-            AssessmentViewModel assessmentViewModel;
-
-            foreach (var assessment in assessments)
-            {
-                assessmentViewModel = Mapper.ConvertViewModel<AssessmentViewModel, Assessment>(assessment);
-                assessmentViewModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(assessment.StudentId));
-                assessmentViewModel.Lesson = Mapper.ConvertViewModel<LessonViewModel, Lesson>(await _lessonService.GetAsync(assessment.LessonId));
-                assessmentViewModels.Add(assessmentViewModel);
-            }
 
             List<AssessmentViewModel> assessmentViewModelsSorted = new();
 

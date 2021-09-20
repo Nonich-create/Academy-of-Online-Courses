@@ -34,7 +34,7 @@
                         @Html.DisplayFor(modelItem => item.Course.Name)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Student.Surname) @Html.DisplayFor(modelItem => item.Student.Name) @Html.DisplayFor(modelItem => item.Student.MiddleName)
+                        @Html.DisplayFor(modelItem => item.Student.GetFullName)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.ApplicationStatus)
@@ -42,15 +42,15 @@
                     <td>
                         <div>
                             <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                               asp-controller="Students" asp-action="Details" asp-route-id="@item.Id">Студент</a>
+                               asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">Студент</a>
                             <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                               asp-controller="Course" asp-action="Details" asp-route-id="@item.Id">Курс</a>
+                               asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">Курс</a>
                             @if (item.ApplicationStatus == EnumApplicationStatus.Закрыта)
                             {
-                                <form method="post" asp-controller="ApplicationCoursesController" asp-action="Cancel">
+                                <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
                                     <div>
                                         <button class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                                                asp-action="Cancel" asp-route-ApplicationCourseId="@item.Id">
+                                                asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
                                             Отменить
                                         </button>
                                     </div>
@@ -58,10 +58,10 @@
                             }
                             else
                             {
-                                <form method="post" asp-controller="ApplicationCoursesController" asp-action="Enroll">
+                                <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
                                     <div>
                                         <button class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                                                asp-action="Enroll" asp-route-ApplicationCourseId="@item.Id">
+                                                asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
                                             Принять
                                         </button>
                                     </div>

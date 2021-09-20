@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Students.DAL.Models;
 using Students.BLL.Services;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,7 +28,7 @@ namespace StudentsAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<List<StudentViewModel>>> Get()
         {
-            List<Student> students = await _studentService.GetAllAsync();
+            var students = await _studentService.GetAllAsync();
             List<StudentViewModel> models = new();
             StudentViewModel model;
             foreach (var student in students)
