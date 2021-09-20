@@ -28,6 +28,7 @@ namespace Students.BLL.DataAccess
             }
             return await ExistsAsync((int)id) ? await _db.Students.FindAsync(id) : null;
         }
+
         public async Task CreateAsync(Student student)=> await _db.Students.AddAsync(student);
         
         public async Task<Student> Update(Student student)
@@ -52,6 +53,7 @@ namespace Students.BLL.DataAccess
                 _db.Students.Remove(student);
             }
         }
+
         public async Task<bool> ExistsAsync(int id) => await _db.Students.FindAsync(id) != null;
     }
 }

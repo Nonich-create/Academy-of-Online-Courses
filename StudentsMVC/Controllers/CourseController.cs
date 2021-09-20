@@ -66,7 +66,7 @@ namespace Students.MVC.Controllers
                     CourseViewModels = CourseViewModels.OrderBy(c => c.Name).ToList();
                     break;
             }
-            return View();//PaginatedList<CourseViewModel>.Create(CourseViewModels, pageNumber ?? 1, 10));
+            return View(CourseViewModels);//PaginatedList<CourseViewModel>.Create(CourseViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region отображения деталей курса

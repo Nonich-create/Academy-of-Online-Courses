@@ -1,12 +1,12 @@
 ﻿@using Students.MVC.Helpers;
-@model PaginatedList<Students.MVC.ViewModels.LessonViewModel>
+@model List<Students.MVC.ViewModels.LessonViewModel>
 
 @{
     ViewData["Title"] = $"Занятия";
     Layout = "_Layout";
 }
 <body>
-    <form asp-controller="Students" asp-action="Index">
+    <form asp-controller="Lessons" asp-action="Index">
         <p>
             <input type="text" name="SearchString" size="40" />
             <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
@@ -77,22 +77,5 @@
             </tr>
         </tbody>
     </table>
-    @{
-        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-    }
-    <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
-       asp-route-pageNumber="@(Model.PageIndex - 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%) @prevDisabled">
-        Предыдущие
-    </a>
-    <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
-       asp-route-pageNumber="@(Model.PageIndex + 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%) @nextDisabled">
-        Следующие
-    </a>
+ 
 </body>

@@ -60,7 +60,7 @@ namespace Students.MVC.Controllers
                     TeacherViewModels = TeacherViewModels.OrderBy(s => s.GetFullName).ToList();
                     break;
             }
-            return View();// PaginatedList<TeacherViewModel>.Create(TeacherViewModels, pageNumber ?? 1, 10));
+            return View(TeacherViewModels);// PaginatedList<TeacherViewModel>.Create(TeacherViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region Отображения дополнительной информации о преподователях
