@@ -75,7 +75,7 @@ namespace Students.MVC.Controllers
                    GroupViewModels = GroupViewModels.OrderBy(g => g.NumberGroup).ToList();
                    break;
            }
-            return View();//PaginatedList<GroupViewModel>.Create(GroupViewModels, pageNumber ?? 1, 10));
+            return View(GroupViewModels);//PaginatedList<GroupViewModel>.Create(GroupViewModels, pageNumber ?? 1, 10));
         }
         #endregion
 

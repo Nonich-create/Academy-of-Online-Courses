@@ -77,5 +77,14 @@ namespace Students.BLL.Properties {
                 return ResourceManager.GetString("adminPassword", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на 10.
+        /// </summary>
+        internal static string numberRecordsBy {
+            get {
+                return ResourceManager.GetString("numberRecordsBy", resourceCulture);
+            }
+        }
     }
 }

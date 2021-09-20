@@ -62,7 +62,7 @@ namespace Students.MVC.Controllers
                     ManagerViewModels = ManagerViewModels.OrderBy(s => s.GetFullName).ToList();
                     break;
             }
-            return View();// PaginatedList<ManagerViewModel>.Create(ManagerViewModels, pageNumber ?? 1, 10));
+            return View(ManagerViewModels);// PaginatedList<ManagerViewModel>.Create(ManagerViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region Отображения подробностей о менеджере 

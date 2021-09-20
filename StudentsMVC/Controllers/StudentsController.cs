@@ -36,62 +36,49 @@ namespace Students.MVC.Controllers
         }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber, int elem)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int elem)
         {
  
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            if (pageNumber == null)
-            {
-                elem = 0;
-                pageNumber = 0;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var students = (await _studentService.GetAllAsync()).AsQueryable().Skip(elem).Take(10);
-            elem = students.Max(s => s.Id);
-            List<StudentViewModel> studentViewModels = new();
-            StudentViewModel model;
-            foreach (var student in students)
-            {
-                model = Mapper.ConvertViewModel<StudentViewModel, Student>(student);
-
-                if (student.GroupId != null)
-                {
-                    GroupViewModel groups = Mapper.ConvertViewModel<GroupViewModel, Group>(await _groupService.GetAsync(student.GroupId));
-                    groups.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(groups.CourseId));
-                    model.Group = groups;
-                }
-                studentViewModels.Add(model);
-            }
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                studentViewModels = studentViewModels.FindAll(c => c.GetFullName.Contains(searchString));
-            }
-            switch (sortRecords)
-            {
-                case "name_desc":
-                    studentViewModels = studentViewModels.OrderByDescending(s => s.GetFullName).ToList();
-                    break;
-                case "Date":
-                    studentViewModels = studentViewModels.OrderBy(s => s.DateOfBirth).ToList();
-                    break;
-                case "date_desc":
-                    studentViewModels = studentViewModels.OrderByDescending(s => s.DateOfBirth).ToList();
-                    break;
-                default:
-                    studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
-                    break;
-            }
-            return View(PaginatedList<StudentViewModel>.Create(studentViewModels, pageNumber ?? 1, elem));
+           // ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+           // ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+           //
+           // var students = (await _studentService.GetAllAsync()).AsQueryable().Skip(elem).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy));
+           // List<StudentViewModel> studentViewModels = new();
+           // StudentViewModel model;
+           // foreach (var student in students)
+           // {
+           //     model = Mapper.ConvertViewModel<StudentViewModel, Student>(student);
+           //
+           //     if (student.GroupId != null)
+           //     {
+           //         GroupViewModel groups = Mapper.ConvertViewModel<GroupViewModel, Group>(await _groupService.GetAsync(student.GroupId));
+           //         groups.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(groups.CourseId));
+           //         model.Group = groups;
+           //     }
+           //     studentViewModels.Add(model);
+           // }
+           // if (!String.IsNullOrEmpty(searchString))
+           // {
+           //     studentViewModels = studentViewModels.FindAll(c => c.GetFullName.Contains(searchString));
+           // }
+           // switch (sortRecords)
+           // {
+           //     case "name_desc":
+           //         studentViewModels = studentViewModels.OrderByDescending(s => s.GetFullName).ToList();
+           //         break;
+           //     case "Date":
+           //         studentViewModels = studentViewModels.OrderBy(s => s.DateOfBirth).ToList();
+           //         break;
+           //     case "date_desc":
+           //         studentViewModels = studentViewModels.OrderByDescending(s => s.DateOfBirth).ToList();
+           //         break;
+           //     default:
+           //         studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
+           //         break;
+           // }
+            var sd = await _studentService.DisplayingData(sortRecords, searchString, elem);
+            var model11 = Mapper.ConvertListViewModel<StudentViewModel, Student>(sd.ToList());
+            return View(model11);
         }
         #endregion
 

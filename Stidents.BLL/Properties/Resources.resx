@@ -123,4 +123,7 @@
   <data name="adminPassword" xml:space="preserve">
     <value>_Aa123456</value>
   </data>
+  <data name="numberRecordsBy" xml:space="preserve">
+    <value>10</value>
+  </data>
 </root>

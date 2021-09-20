@@ -195,6 +195,39 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task<List<Student>> DisplayingData(string sortRecords, string searchString, int idRecord)
+        {
+            List<Student> students = new();
+            if (!String.IsNullOrEmpty(searchString) || cache.TryGetValue("keySearchString", out searchString))
+            {
+                cache.Set("keySearchString", searchString, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+                students = (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Skip(idRecord).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy)).ToList().FindAll(c => c.Surname.Contains(searchString));
+                if(students.Count <= 0)
+                {
+                    //Вывод что записей не найдена
+                    cache.Remove("keySearchString");
+                    students = (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Skip(idRecord).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy)).ToList();
+                }
+            }
+            else
+            {
+               students = (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Skip(idRecord).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy)).ToList();
+            }
+            foreach (var student in students)
+            {
+                if (student.GroupId != null)
+                {
+                    var groups = (await _unitOfWork.GroupRepository.GetAsync(student.GroupId));
+                    groups.Course = await _unitOfWork.CourseRepository.GetAsync(groups.CourseId);
+                    student.Group = groups;
+                }
+            }
+            return students;
+        }
+        private string GetFullName(string Surname, string Name, string MiddleName) => $"{Surname} {Name} {MiddleName}";
         public async Task<bool> ExistsAsync(int id)
         {
             return await _unitOfWork.StudentRepository.ExistsAsync(id);

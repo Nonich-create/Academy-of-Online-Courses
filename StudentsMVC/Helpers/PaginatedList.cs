@@ -32,7 +32,7 @@ namespace Students.MVC.Helpers
         {
             get
             {
-                return (PageIndex < TotalPages);
+                return (PageIndex < 10);
             }
         }
 
