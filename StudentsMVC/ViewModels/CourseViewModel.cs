@@ -7,7 +7,7 @@ namespace Students.MVC.ViewModels
     public class CourseViewModel
     {
         [Key]
-        public int CourseId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Не указано название курса")]
         [Display(Name = "Название курсов")]

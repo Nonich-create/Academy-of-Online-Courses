@@ -5,26 +5,26 @@ using System.Threading.Tasks;
 
 namespace Students.BLL.DataAccess
 {
-    public class LessonPlanRepository : IRepository<LessonPlan>
+    public class LessonTimesRepository : IRepository<LessonTimes>
     {
         private readonly Context _db;
 
-        public LessonPlanRepository(Context db)
+        public LessonTimesRepository(Context db)
         {
             this._db = db;
         }
 
-        public async Task<List<LessonPlan>> GetAllAsync() => await _db.LessonPlans.ToListAsync();
+        public async Task<IEnumerable<LessonTimes>> GetAllAsync() => await _db.LessonTimes.ToListAsync();
 
 
-        public async Task<LessonPlan> GetAsync(int id) => await ExistsAsync(id) ? await _db.LessonPlans.FindAsync(id) : null;
+        public async Task<LessonTimes> GetAsync(int id) => await ExistsAsync(id) ? await _db.LessonTimes.FindAsync(id) : null;
 
 
-        public async Task CreateAsync(LessonPlan lesson) => await _db.LessonPlans.AddAsync(lesson);
+        public async Task CreateAsync(LessonTimes lesson) => await _db.LessonTimes.AddAsync(lesson);
 
-        public async Task<LessonPlan> Update(LessonPlan lessonPlan)
+        public async Task<LessonTimes> Update(LessonTimes lessonPlan)
         {
-            var lessonEntity = await _db.LessonPlans.AsNoTracking().FirstOrDefaultAsync(l => l.LessonPlanId == lessonPlan.LessonId);
+            var lessonEntity = await _db.LessonTimes.AsNoTracking().FirstOrDefaultAsync(l => l.Id == lessonPlan.Id);
 
             if (lessonEntity != null)
             {
@@ -38,12 +38,12 @@ namespace Students.BLL.DataAccess
 
         public async Task DeleteAsync(int id)
         {
-            LessonPlan lessonPlan = await GetAsync(id);
+            LessonTimes lessonPlan = await GetAsync(id);
             if (lessonPlan != null)
             {
-                _db.LessonPlans.Remove(lessonPlan);
+                _db.LessonTimes.Remove(lessonPlan);
             }
         }
-        public async Task<bool> ExistsAsync(int id) => await _db.LessonPlans.FindAsync(id) != null;
+        public async Task<bool> ExistsAsync(int id) => await _db.LessonTimes.FindAsync(id) != null;
     }
 }

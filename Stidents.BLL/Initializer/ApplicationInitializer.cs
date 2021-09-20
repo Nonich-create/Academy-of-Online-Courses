@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Students.DAL.Enum;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Students.BLL.Options;
@@ -17,8 +17,6 @@ namespace Students.DAL.Models
             EmailAdminOptions emailAdmin = emailAdminOptions.Value;
             GenerateTestData GenerateTestdata = new();
             Random rnd = new();
-            //string adminEmail = Resources.admin;
-            //string password = Resources.adminPassword;
             if (await roleManager.FindByNameAsync("admin") == null)
             {
                 await roleManager.CreateAsync(new IdentityRole("admin"));
@@ -172,7 +170,7 @@ namespace Students.DAL.Models
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,               
+                        CourseId = 2,               
                     });
                 }
                 for (int i = 0; i < 90; i++)
@@ -192,11 +190,11 @@ namespace Students.DAL.Models
                     lessons.Add(
                     new Lesson
                     {
-                        Name = $"Урок №{i} C",
+                        Name = $"Урок №{i} 1C",
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,
+                        CourseId = 3,
                     });
                 }
                 for (int i = 0; i < 50; i++)
@@ -208,7 +206,7 @@ namespace Students.DAL.Models
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,
+                        CourseId = 4,
                     });
                 }
                 for (int i = 0; i < 360; i++)
@@ -220,7 +218,7 @@ namespace Students.DAL.Models
                         NumberLesson = i,
                         Homework = $"Домашние задание №{i}",
                         Description = $"Тема урока №{i}",
-                        CourseId = 1,
+                        CourseId = 5,
                     });
                 }
                 await context.Lessons.AddRangeAsync(lessons);
@@ -237,7 +235,7 @@ namespace Students.DAL.Models
                         TeacherId = 1,
                         NumberGroup = "С# 101",
                         DateStart = new DateTime(2022, 01, 07),
-                        GroupStatus = "Набор",
+                        GroupStatus = EnumGroupStatus.Набор,
                         CountMax = 25
                     },
                     new Group
@@ -247,7 +245,7 @@ namespace Students.DAL.Models
                         TeacherId = 1,
                         NumberGroup = "С# 201",
                         DateStart = new DateTime(2022, 01, 07),
-                        GroupStatus = "Набор",
+                        GroupStatus = EnumGroupStatus.Набор,
                         CountMax = 25
                     },
                     new Group
@@ -257,17 +255,17 @@ namespace Students.DAL.Models
                         TeacherId = 2,
                         NumberGroup = "С++ 101",
                         DateStart = new DateTime(2022, 01, 07),
-                        GroupStatus = "Набор",
-                        CountMax = 20
+                        GroupStatus = EnumGroupStatus.Набор,
+                        CountMax = 20,
                     },
                     new Group
                     {
-                        CourseId = 1,
+                        CourseId = 3,
                         ManagerId = 2,
                         TeacherId = 2,
-                        NumberGroup = "С++ 102",
+                        NumberGroup = "1C 101",
                         DateStart = new DateTime(2021, 11, 01),
-                        GroupStatus = "Набор",
+                        GroupStatus = EnumGroupStatus.Набор,
                         CountMax = 15
                     },
                     new Group
@@ -277,7 +275,7 @@ namespace Students.DAL.Models
                         TeacherId = 3,
                         NumberGroup = "English 101",
                         DateStart = new DateTime(2021, 11, 01),
-                        GroupStatus = "Набор",
+                        GroupStatus = EnumGroupStatus.Набор,
                         CountMax = 40
                     },
                         new Group
@@ -287,7 +285,7 @@ namespace Students.DAL.Models
                         TeacherId = 3,
                         NumberGroup = "Java 101",
                         DateStart = new DateTime(2020, 10, 01),
-                        GroupStatus = "Набор",
+                        GroupStatus = EnumGroupStatus.Набор,
                         CountMax = 30
                     }
 
@@ -321,57 +319,57 @@ namespace Students.DAL.Models
                 }
                 context.SaveChanges();
             }
-            if (!context.ApplicationCourses.Any())
+            if (!context.CourseApplication.Any())
             {
                 for (int i = 1; i < 30; i++)
                 {
-                    ApplicationCourse applicationCourse = new()
+                    CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus = "Открыта",
+                        ApplicationStatus = EnumApplicationStatus.Открыта,
                         CourseId = 1,
                         StudentId = i                       
                     };
-                    context.ApplicationCourses.Add(applicationCourse);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 30; i < 45; i++)
                 {
-                    ApplicationCourse applicationCourse = new()
+                    CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus = "Открыта",
+                        ApplicationStatus =EnumApplicationStatus.Открыта,
                         CourseId = 2,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(applicationCourse);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 45; i < 77; i++)
                 {
-                    ApplicationCourse applicationCourse = new()
+                    CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus = "Открыта",
+                        ApplicationStatus =EnumApplicationStatus.Открыта,
                         CourseId = 3,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(applicationCourse);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 77; i < 100; i++)
                 {
-                    ApplicationCourse applicationCourse = new()
+                    CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus = "Открыта",
+                        ApplicationStatus =EnumApplicationStatus.Открыта,
                         CourseId = 4,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(applicationCourse);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 for (int i = 100; i < 150; i++)
                 {
-                    ApplicationCourse applicationCourse = new()
+                    CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus = "Открыта",
+                        ApplicationStatus =EnumApplicationStatus.Открыта,
                         CourseId = 5,
                         StudentId = i
                     };
-                    context.ApplicationCourses.Add(applicationCourse);
+                    context.CourseApplication.Add(courseApplication);
                 }
                 context.SaveChanges();
             }

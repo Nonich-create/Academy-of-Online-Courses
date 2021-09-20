@@ -9,7 +9,7 @@ namespace Students.BLL.Services
 {
     public interface IBaseService<T> where T : class
     {
-        Task<List<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetAsync(int id);
         Task CreateAsync(T item);
         Task<T> Update(T item);

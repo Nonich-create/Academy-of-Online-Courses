@@ -44,7 +44,7 @@ namespace Students.MVC
             services.AddIdentity<ApplicationUser, IdentityRole>()      
                 .AddEntityFrameworkStores<Context>();
 
-            services.AddScoped<IApplicationCourseService, ApplicationCourseService>();
+            services.AddScoped<ICourseApplicationService, CourseApplicationService>();
             services.AddScoped<IRepository<ApplicationUser>, ApplicationUserRepository>();
             services.AddScoped<IRepository<Student>, StudentRepository>();
             services.AddScoped<IRepository<Teacher>, TeacherRepository>();
@@ -57,7 +57,7 @@ namespace Students.MVC
             services.AddScoped<ILessonService, LessonService>();
             services.AddScoped<IManagerService, ManagerService>();
             services.AddScoped<ITeacherService, TeacherService>();
-            services.AddScoped<ILessonPlanService, LessonPlanService>();
+            services.AddScoped<ILessonTimesService, LessonTimesService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<UnitOfWork>();
 

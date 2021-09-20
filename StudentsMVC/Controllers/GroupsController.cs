@@ -6,11 +6,12 @@ using Students.DAL.Models;
 using System.Linq;
 using System.Collections.Generic;
 using Students.BLL.Services;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Microsoft.AspNetCore.Authorization;
-using Students.BLL.Enum;
-using System;
+using Students.DAL.Enum;
 using Microsoft.AspNetCore.Identity;
+using Students.MVC.Helpers;
+using System;
 
 namespace Students.MVC.Controllers
 {
@@ -36,20 +37,45 @@ namespace Students.MVC.Controllers
         }
         #region отображения групп
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortRecords;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
             var groups = await _groupService.GetAllAsync();
-            List<GroupViewModel> models = new();
-            GroupViewModel model;
+            List<GroupViewModel> GroupViewModels = new();
             foreach (var group in groups)
             {
-                model = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
-                model.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
-                model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(group.CourseId));
-                models.Add(model);
+                GroupViewModels.Add(group.GroupToGroupViewModelMapping(await _managerService.GetAsync(group.ManagerId), await _teacherService.GetAsync(group.TeacherId), await _courseService.GetAsync(group.CourseId)));
             }
-            return View(models);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                GroupViewModels = GroupViewModels.FindAll(g => g.NumberGroup.Contains(searchString)
+              //  || g.Course.Name.Contains(searchString)
+              // || g.Manager.GetFullName.Contains(searchString)
+              //  || g.Teacher.GetFullName.Contains(searchString)
+                );
+            }
+           switch (sortRecords)
+           {
+               case "name_desc":
+                   GroupViewModels = GroupViewModels.OrderByDescending(g => g.NumberGroup).ToList();
+                   break;
+               default:
+                   GroupViewModels = GroupViewModels.OrderBy(g => g.NumberGroup).ToList();
+                   break;
+           }
+            return View();//PaginatedList<GroupViewModel>.Create(GroupViewModels, pageNumber ?? 1, 10));
         }
         #endregion
 
@@ -62,17 +88,11 @@ namespace Students.MVC.Controllers
             {
                 var id = _userManager.GetUserId(User);
                 var teacher = await _teacherService.GetAllAsync();
-                var groups = await _groupService.GetAllAsync();
-                groups = groups.Where(g => g.TeacherId == teacher.Where(t => t.UserId == id).First().TeacherId).ToList();
+                var groups = (await _groupService.GetAllAsync()).Where(g => g.TeacherId == teacher.Where(t => t.UserId == id).First().Id);
                 List<GroupViewModel> models = new();
-                GroupViewModel model;
                 foreach (var group in groups)
                 {
-                    model = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                    model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
-                    model.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
-                    model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(group.CourseId));
-                    models.Add(model);
+                    models.Add(group.GroupToGroupViewModelMapping(await _managerService.GetAsync(group.ManagerId), await _teacherService.GetAsync(group.TeacherId), await _courseService.GetAsync(group.CourseId)));
                 }
                 return View(models);
             }
@@ -85,41 +105,24 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var group = await _groupService.GetAsync(id);
-
             if (group == null)
             {
                 return NotFound();
             }
-            var students = await _studentService.GetAllAsync();
-            List<StudentViewModel> modelsstudents = new();
-            StudentViewModel modelStudent;
-            foreach (var student in students.Where(s => s.GroupId == id))
+            List<StudentViewModel> studentViewModels = new();
+            foreach (var student in (await _studentService.GetAllAsync()).Where(s => s.GroupId == id))
             {
-                modelStudent = Mapper.ConvertViewModel<StudentViewModel, Student>(student);
-                modelsstudents.Add(modelStudent);
+                studentViewModels.Add(Mapper.ConvertViewModel<StudentViewModel, Student>(student));
             }
-            DetalisGroupViewModel model;
-            model = Mapper.ConvertViewModel<DetalisGroupViewModel, Group>(group);
-            model.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
-            model.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
-            model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(group.CourseId));
-            model.StudentsViewModels = modelsstudents;
+            DetailGroupViewModel model = group.GroupToDetailGroupViewModelMapping(await _managerService.GetAsync(group.ManagerId), await _teacherService.GetAsync(group.TeacherId), await _courseService.GetAsync(group.CourseId));
+            model.StudentsViewModels = studentViewModels;
             return View(model);
         }
         #endregion
         #region отображения добавления группы
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Create()
-        {
-            GroupViewModel model = new()
-            {
-                Manageres = Mapper.ConvertListViewModel<ManagerViewModel, Manager>(await _managerService.GetAllAsync()),
-                Teachers = Mapper.ConvertListViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAllAsync()),
-                Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>(await _courseService.GetAllAsync())
-            };
-
-            return View(model);
-        }
+        public async Task<IActionResult> Create() => View(ExtensionMethods.GroupToGroupViewModelMapping(new Group(), (await _managerService.GetAllAsync()).ToList(), (await _teacherService.GetAllAsync()).ToList(), (await _courseService.GetAllAsync()).ToList()));
+        
         #endregion
         #region добавления группы
         [HttpPost]
@@ -130,17 +133,12 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var group = Mapper.ConvertViewModel<Group, GroupViewModel>(model);
-                group.GroupStatus = EnumGroupStatus.Набор.ToString();
+                group.GroupStatus = EnumGroupStatus.Набор;
                 await _groupService.CreateAsync(group);
-                await _groupService.Save();
-                return Redirect(Request.Headers["Referer"].ToString());
+                return RedirectToAction("Index");
             }
-            model = new()
-            {
-                Manageres = Mapper.ConvertListViewModel<ManagerViewModel, Manager>(await _managerService.GetAllAsync()),
-                Teachers = Mapper.ConvertListViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAllAsync()),
-                Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>(await _courseService.GetAllAsync())
-            };
+     
+            model = ExtensionMethods.GroupToGroupViewModelMapping(null, (await _managerService.GetAllAsync()).ToList(), (await _teacherService.GetAllAsync()).ToList(), (await _courseService.GetAllAsync()).ToList());
             return View(model);
         }
         #endregion
@@ -153,10 +151,7 @@ namespace Students.MVC.Controllers
             {
                 return NotFound();
             }
-            var model = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-            model.Manageres = Mapper.ConvertListViewModel<ManagerViewModel, Manager>(await _managerService.GetAllAsync());
-            model.Teachers = Mapper.ConvertListViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAllAsync());
-            model.Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>(await _courseService.GetAllAsync());
+            var model = group.GroupToGroupViewModelMapping((await _managerService.GetAllAsync()).ToList(), (await _teacherService.GetAllAsync()).ToList(), (await _courseService.GetAllAsync()).ToList());
             return View(model);
         }
         #endregion
@@ -171,13 +166,11 @@ namespace Students.MVC.Controllers
                 var group = Mapper.ConvertViewModel<Group, GroupViewModel>(model);
                 try
                 {
-
                     await _groupService.Update(group);
-                    await _groupService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (await _groupService.ExistsAsync(group.GroupId))
+                    if (await _groupService.ExistsAsync(group.Id))
                     {
                         return NotFound();
                     }
@@ -186,7 +179,7 @@ namespace Students.MVC.Controllers
                         throw;
                     }
                 }
-                return Redirect(Request.Headers["Referer"].ToString());
+                return RedirectToAction("Index");
             }
             return View(model);
         }

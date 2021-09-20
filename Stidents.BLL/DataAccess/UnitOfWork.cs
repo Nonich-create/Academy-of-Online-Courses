@@ -15,8 +15,8 @@ namespace Students.BLL.DataAccess
         private LessonRepository _lessonRepository;
         private CourseRepository _courseRepository;
         private AssessmentRepository _assessmentRepository;
-        private ApplicationCourseRepository _applicationCourseRepository;
-        private LessonPlanRepository _lessonPlanRepository;
+        private CourseApplicationRepository _courseApplicationRepository;
+        private LessonTimesRepository _lessonTimesRepository;
 
         private bool disposed = false;
 
@@ -26,13 +26,13 @@ namespace Students.BLL.DataAccess
          
         }
 
-        public ApplicationCourseRepository ApplicationCourseRepository
+        public CourseApplicationRepository CourseApplicationRepository
         {
             get
             {
-                if (_applicationCourseRepository == null)
-                    _applicationCourseRepository = new ApplicationCourseRepository(_db);
-                return _applicationCourseRepository;
+                if (_courseApplicationRepository == null)
+                    _courseApplicationRepository = new CourseApplicationRepository(_db);
+                return _courseApplicationRepository;
             }
         }
 
@@ -113,13 +113,13 @@ namespace Students.BLL.DataAccess
             }
         }
 
-        public LessonPlanRepository LessonPlanRepository
+        public LessonTimesRepository LessonTimesRepository
         {
             get
             {
-                if (_lessonPlanRepository == null)
-                    _lessonPlanRepository = new LessonPlanRepository(_db);
-                return _lessonPlanRepository;
+                if (_lessonTimesRepository == null)
+                    _lessonTimesRepository = new LessonTimesRepository(_db);
+                return _lessonTimesRepository;
             }
         }
         public async Task<int> Save()

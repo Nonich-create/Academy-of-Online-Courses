@@ -4,23 +4,24 @@ using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using System.Collections.Generic;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System;
+using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
     public class CourseController : Controller
     {
         private readonly ICourseService _courseService;
-        private readonly IApplicationCourseService _applicationCourseService;
+        private readonly ICourseApplicationService _applicationCourseService;
         private readonly IStudentService _studentService;
         private readonly IGroupService _groupService;
         private readonly IManagerService _managerService;
         private readonly ITeacherService _teacherService;
 
-        public CourseController(ITeacherService teacherService, IManagerService managerService, IGroupService groupService, ICourseService courseService, IApplicationCourseService applicationCourseService, IStudentService studentService)
+        public CourseController(ITeacherService teacherService, IManagerService managerService, IGroupService groupService, ICourseService courseService, ICourseApplicationService applicationCourseService, IStudentService studentService)
         {
             _teacherService = teacherService;
             _managerService = managerService;
@@ -32,17 +33,40 @@ namespace Students.MVC.Controllers
 
         #region отображения курсов
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortRecords;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
             var courses = await _courseService.GetAllAsync();
-            List<CourseViewModel> models = new();
-            CourseViewModel model;
+            List<CourseViewModel> CourseViewModels = new();
             foreach (var cours in courses)
             {
-                model = Mapper.ConvertViewModel<CourseViewModel, Course>(cours);
-                models.Add(model);
+                CourseViewModels.Add(Mapper.ConvertViewModel<CourseViewModel, Course>(cours));
             }
-            return View(models);
+            if(!String.IsNullOrEmpty(searchString))
+            {
+                CourseViewModels = CourseViewModels.FindAll(c => c.Name.Contains(searchString));
+            }
+            switch (sortRecords)
+            {
+                case "name_desc":
+                    CourseViewModels = CourseViewModels.OrderByDescending(c => c.Name).ToList();
+                    break;
+                default:
+                    CourseViewModels = CourseViewModels.OrderBy(c => c.Name).ToList();
+                    break;
+            }
+            return View();//PaginatedList<CourseViewModel>.Create(CourseViewModels, pageNumber ?? 1, 10));
         }
         #endregion
         #region отображения деталей курса
@@ -68,12 +92,12 @@ namespace Students.MVC.Controllers
 
             var model = Mapper.ConvertViewModel<DetalisCourseViewModel, Course>(course);
             var applicationCourses = await _applicationCourseService.GetAllAsync();
-            List<ApplicationCourseViewModel> ApplicationModels = new();
-            ApplicationCourseViewModel ApplicationModel;
+            List<CourseApplicationViewModel> ApplicationModels = new();
+            CourseApplicationViewModel ApplicationModel;
             foreach (var item in applicationCourses.Where(a => a.CourseId == id))
             {
-                ApplicationModel = Mapper.ConvertViewModel<ApplicationCourseViewModel, ApplicationCourse>(item);
-                ApplicationModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.StudentId));
+                ApplicationModel = Mapper.ConvertViewModel<CourseApplicationViewModel, CourseApplication>(item);
+                ApplicationModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.Id));
                 ApplicationModels.Add(ApplicationModel);
             }
             model.Groups = modelsGroups;

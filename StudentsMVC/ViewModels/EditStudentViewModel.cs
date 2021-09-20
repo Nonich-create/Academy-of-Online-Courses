@@ -7,7 +7,7 @@ namespace Students.MVC.ViewModels
 {
     public class EditStudentViewModel
     {
-        public int StudentId { get; set; }
+        public int Id { get; set; }
         [Display(Name = "Имя")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Не указана фамилия")]

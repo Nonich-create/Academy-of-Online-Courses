@@ -1,59 +1,78 @@
-﻿@model IEnumerable<Students.MVC.ViewModels.LessonViewModel>
+﻿@using Students.MVC.Helpers;
+@model PaginatedList<Students.MVC.ViewModels.LessonViewModel>
 
 @{
     ViewData["Title"] = $"Занятия";
     Layout = "_Layout";
 }
 <body>
-        <table class="purpleHorizon">
-            <thead>
-                <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.NumberLesson)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Name)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Homework)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Description)
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.NumberLesson)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Homework)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Description)
-                        </td>
-                        <td>
-                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                               asp-action="Edit" asp-route-id="@item.LessonId">Редактирование</a>
-                            <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                               asp-action="Details" asp-route-id="@item.LessonId">Подробнее</a>
-                            <a class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
-                               asp-action="Delete" asp-route-id="@item.LessonId">Удалить</a>
-                        </td>
-                    </tr>
-                }
+    <table class="purpleHorizon">
+        <thead>
+            <tr>
+                <th>
+             №
+                </th>
+                <th>
+                 Названия урока
+                </th>
+                <th>
+                  Домашния задания
+                </th>
+                <th>
+                   Описания урока
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
                 <tr>
                     <td>
+                        @Html.DisplayFor(modelItem => item.NumberLesson)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Homework)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
                         <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                           asp-action="CreateWithCourse">Добавить занятия</a>
+                           asp-action="Edit" asp-route-id="@item.Id">Редактирование</a>
+                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                           asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
+                        <a class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
+                           asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+            }
+            <tr>
+                <td>
+                    <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                       asp-action="CreateWithCourse">Добавить занятия</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%) @prevDisabled">
+        Предыдущие
+    </a>
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%) @nextDisabled">
+        Следующие
+    </a>
 </body>

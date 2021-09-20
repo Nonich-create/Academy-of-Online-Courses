@@ -14,7 +14,7 @@ namespace Students.BLL.DataAccess
             this._db = db;
         }
 
-        public async Task<List<Manager>> GetAllAsync() => await _db.Manager.ToListAsync();
+        public async Task<IEnumerable<Manager>> GetAllAsync() => await _db.Manager.ToListAsync();
         
         public async Task<Manager> GetAsync(int id) => await ExistsAsync(id) ? await _db.Manager.FindAsync(id) : null;
         
@@ -22,7 +22,7 @@ namespace Students.BLL.DataAccess
         
         public async Task<Manager> Update(Manager manager)
         {
-            var methodologistEntity = await _db.Manager.AsNoTracking().FirstOrDefaultAsync(a => a.ManagerId == manager.ManagerId);
+            var methodologistEntity = await _db.Manager.AsNoTracking().FirstOrDefaultAsync(a => a.Id == manager.Id);
 
             if (methodologistEntity != null)
             {

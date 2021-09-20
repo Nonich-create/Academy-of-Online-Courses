@@ -1,0 +1,9 @@
+﻿@model IEnumerable<Students.MVC.ViewModels.LessonViewModel>
+<div class="form-group">
+    <select id="LessonId" name="Name" class="form-control item">
+        @foreach (var item in Model)
+        {
+            <option value="@item.Id"> @item.Name</option>
+        }
+    </select>
+</div>

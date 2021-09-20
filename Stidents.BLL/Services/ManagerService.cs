@@ -4,6 +4,7 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Students.BLL.Services
@@ -26,12 +27,12 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.ManagerRepository.CreateAsync(item);
-                _logger.LogInformation("Менеджер создан");
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Менеджер создан");
                 if (n > 0)
-                {
+                {       
                     _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.ManagerId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -61,7 +62,7 @@ namespace Students.BLL.Services
             return await _unitOfWork.ManagerRepository.ExistsAsync(id);
         }
 
-        public async Task<List<Manager>> GetAllAsync()
+        public async Task<IEnumerable<Manager>> GetAllAsync()
         {
             try
             {
@@ -86,7 +87,7 @@ namespace Students.BLL.Services
                     manager = await _unitOfWork.ManagerRepository.GetAsync(id);
                     if (manager != null)
                     {
-                        cache.Set(manager.ManagerId, manager,
+                        cache.Set(manager.Id, manager,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -107,18 +108,18 @@ namespace Students.BLL.Services
         {
             await _unitOfWork.Save();
         }
-
+        
         public async Task<Manager> Update(Manager item)
         {
             try
             {
                 var manager = await _unitOfWork.ManagerRepository.Update(item);
-                _logger.LogInformation("Менеджер изменен");
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Менеджер изменен");
                 if (n > 0)
                 {
                     _logger.LogInformation("Менаджер добавлен в кэш");
-                    cache.Set(item.ManagerId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

@@ -33,7 +33,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.AssessmentId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -60,12 +60,12 @@ namespace Students.BLL.Services
 
         public async Task<bool> ExistsAsync(int id) => await _unitOfWork.AssessmentRepository.ExistsAsync(id);
 
-        public async Task<List<Assessment>> GetAllAsync()
+        public async Task<IEnumerable<Assessment>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Выполнения получения списка оценок");
-                return await _unitOfWork.AssessmentRepository.GetAllAsync();
+                return await  _unitOfWork.AssessmentRepository.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -74,11 +74,10 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<List<Assessment>> GetAssessmentsByStudentId(int studentId)
-        {
-            var assessmentList = await _unitOfWork.AssessmentRepository.GetAllAsync();
-            return (List<Assessment>)assessmentList.Where(x => x.StudentId == studentId);
-        }
+        public async Task<IEnumerable<Assessment>> GetAssessmentsByStudentId(int studentId)
+         => (await _unitOfWork.AssessmentRepository.GetAllAsync()).Where(x => x.StudentId == studentId);
+ 
+        
 
         public async Task<Assessment> GetAsync(int id)
         {
@@ -91,7 +90,7 @@ namespace Students.BLL.Services
                     assessment = await _unitOfWork.AssessmentRepository.GetAsync(id);
                     if (assessment != null)
                     {
-                        cache.Set(assessment.AssessmentId, assessment,
+                        cache.Set(assessment.Id, assessment,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -120,7 +119,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Оценка добавлена в кэш");
-                    cache.Set(item.AssessmentId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

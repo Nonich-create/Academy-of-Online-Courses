@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Linq;
 
 namespace Students.BLL.Services
 {
@@ -31,7 +32,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.CourseId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -61,7 +62,7 @@ namespace Students.BLL.Services
             return await _unitOfWork.CourseRepository.ExistsAsync(id);
         }
 
-        public async Task<List<Course>> GetAllAsync()
+        public async Task<IEnumerable<Course>> GetAllAsync()
         {
             try
             {
@@ -86,7 +87,7 @@ namespace Students.BLL.Services
                     course = await _unitOfWork.CourseRepository.GetAsync(id);
                     if (course != null)
                     {
-                        cache.Set(course.CourseId, course,
+                        cache.Set(course.Id, course,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -118,7 +119,7 @@ namespace Students.BLL.Services
                 if (n > 0)
                 {
                     _logger.LogInformation("Курс добавлена в кэш");
-                    cache.Set(item.CourseId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

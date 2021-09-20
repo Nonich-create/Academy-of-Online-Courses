@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Students.BLL.Classes;
+using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
+using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
@@ -22,9 +23,8 @@ namespace Students.MVC.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
-        private readonly IApplicationCourseService _applicationCourse;
 
-        public StudentsController(IApplicationCourseService applicationCourse, IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IStudentService studentService, IGroupService groupService, ICourseService courseService)
+        public StudentsController(IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IStudentService studentService, IGroupService groupService, ICourseService courseService)
         {
             _userService = userService;
             _studentService = studentService;
@@ -33,14 +33,32 @@ namespace Students.MVC.Controllers
             _courseService = courseService;
             _roleManager = roleManager;
             _signInManager = signInManager;
-            _applicationCourse = applicationCourse;
         }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber, int elem)
         {
-            List<Student> students = await _studentService.GetAllAsync();
-            List<StudentViewModel> models = new();
+ 
+            ViewData["CurrentSort"] = sortRecords;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            if (pageNumber == null)
+            {
+                elem = 0;
+                pageNumber = 0;
+            }
+            ViewData["CurrentFilter"] = searchString;
+            var students = (await _studentService.GetAllAsync()).AsQueryable().Skip(elem).Take(10);
+            elem = students.Max(s => s.Id);
+            List<StudentViewModel> studentViewModels = new();
             StudentViewModel model;
             foreach (var student in students)
             {
@@ -52,12 +70,31 @@ namespace Students.MVC.Controllers
                     groups.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(groups.CourseId));
                     model.Group = groups;
                 }
-
-                models.Add(model);
+                studentViewModels.Add(model);
             }
-            return View(models);
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                studentViewModels = studentViewModels.FindAll(c => c.GetFullName.Contains(searchString));
+            }
+            switch (sortRecords)
+            {
+                case "name_desc":
+                    studentViewModels = studentViewModels.OrderByDescending(s => s.GetFullName).ToList();
+                    break;
+                case "Date":
+                    studentViewModels = studentViewModels.OrderBy(s => s.DateOfBirth).ToList();
+                    break;
+                case "date_desc":
+                    studentViewModels = studentViewModels.OrderByDescending(s => s.DateOfBirth).ToList();
+                    break;
+                default:
+                    studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
+                    break;
+            }
+            return View(PaginatedList<StudentViewModel>.Create(studentViewModels, pageNumber ?? 1, elem));
         }
         #endregion
+
         #region Отображения подробной информации о студенте
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Details(int id)
@@ -97,7 +134,6 @@ namespace Students.MVC.Controllers
                     var student = Mapper.ConvertViewModel<Student, StudentViewModel>(model);
                     student.UserId = user.Id;
                     await _studentService.CreateAsync(student);
-                    await _studentService.Save();
                     await Authenticate(model.Email, model.Password);
                     return RedirectToAction("Index", "Home");
                 }
@@ -122,7 +158,7 @@ namespace Students.MVC.Controllers
             {
                 return NotFound();
             }
-            List<GroupViewModel> groups = Mapper.ConvertListViewModel<GroupViewModel, Group>(await _groupService.GetAllAsync());
+            List<GroupViewModel> groups = Mapper.ConvertListViewModel<GroupViewModel, Group>((await _groupService.GetAllAsync()).ToList());
             var model = Mapper.ConvertViewModel<EditStudentViewModel, Student>(student);
             model.Groups = groups;
             return View(model);
@@ -138,22 +174,7 @@ namespace Students.MVC.Controllers
             {
                 var student = Mapper.ConvertViewModel<Student, EditStudentViewModel>(model);
                 student.GroupId = model.GroupId;
-                try
-                {
-                    await _studentService.Update(student);
-                    await _studentService.Save();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _studentService.ExistsAsync(student.StudentId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _studentService.Update(student);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             return View(model);
@@ -170,11 +191,7 @@ namespace Students.MVC.Controllers
             {
                 return NotFound();
             }
-            var user = await _userManager.FindByIdAsync(student.UserId);
-            await _applicationCourse.DeleteAsyncAll(StudentId);
             await _studentService.DeleteAsync(StudentId);
-            await _userManager.DeleteAsync(user);
-            await _studentService.Save();
             return RedirectToAction("Index");
         }
         #endregion

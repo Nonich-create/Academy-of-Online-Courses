@@ -17,7 +17,7 @@ namespace Students.BLL.DataAccess
             this._db = db;
         }
 
-        public async Task<List<Group>> GetAllAsync() => await _db.Groups.ToListAsync();
+        public async Task<IEnumerable<Group>> GetAllAsync() => await _db.Groups.ToListAsync();
         
         public async Task<Group> GetAsync(int id) => await ExistsAsync(id) ? await _db.Groups.FindAsync(id) : null;
         
@@ -33,7 +33,7 @@ namespace Students.BLL.DataAccess
         
         public async Task<Group> Update(Group group)
         {
-            var groupEntity = await _db.Groups.AsNoTracking().FirstOrDefaultAsync(g => g.GroupId == group.GroupId);
+            var groupEntity = await _db.Groups.AsNoTracking().FirstOrDefaultAsync(g => g.Id == group.Id);
 
             if (groupEntity != null)
             {

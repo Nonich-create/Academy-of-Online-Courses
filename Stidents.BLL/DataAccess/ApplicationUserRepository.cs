@@ -14,7 +14,7 @@ namespace Students.BLL.DataAccess
             _db = db;
         }
 
-        public async Task<List<ApplicationUser>> GetAllAsync() => await _db.ApplicationUsers.ToListAsync();
+        public async Task<IEnumerable<ApplicationUser>> GetAllAsync() => await _db.ApplicationUsers.ToListAsync();
 
         public async Task<ApplicationUser> GetAsync(int id) => await _db.ApplicationUsers.FindAsync(id.ToString());
 

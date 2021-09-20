@@ -14,7 +14,7 @@ namespace Students.BLL.DataAccess
             this._db = db;
         }
 
-        public async Task<List<Lesson>> GetAllAsync() => await _db.Lessons.ToListAsync();
+        public async Task<IEnumerable<Lesson>> GetAllAsync() => await _db.Lessons.ToListAsync();
         
 
         public async Task<Lesson> GetAsync(int id) => await ExistsAsync(id) ? await _db.Lessons.FindAsync(id) : null;
@@ -24,7 +24,7 @@ namespace Students.BLL.DataAccess
 
         public async Task<Lesson> Update(Lesson lesson)
         {
-            var lessonEntity = await _db.Lessons.AsNoTracking().FirstOrDefaultAsync(l => l.LessonId == lesson.LessonId);
+            var lessonEntity = await _db.Lessons.AsNoTracking().FirstOrDefaultAsync(l => l.Id == lesson.Id);
 
             if (lessonEntity != null)
             {

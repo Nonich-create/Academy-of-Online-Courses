@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -21,18 +22,18 @@ namespace Students.BLL.Services
             cache = memoryCache;
             _logger = logger;
         }
-
+        
         public async Task CreateAsync(Teacher item)
         {
             try
             {
                 await _unitOfWork.TeacherRepository.CreateAsync(item);
-                _logger.LogInformation("Преподователь создан");
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Преподователь создан");
                 if (n > 0)
                 {
                     _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.TeacherId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });
@@ -63,7 +64,7 @@ namespace Students.BLL.Services
             return await _unitOfWork.TeacherRepository.ExistsAsync(id);
         }
 
-        public async Task<List<Teacher>> GetAllAsync()
+        public async Task<IEnumerable<Teacher>> GetAllAsync()
         {
             try
             {
@@ -76,7 +77,7 @@ namespace Students.BLL.Services
                 return null;
             }
         }
-
+         
         public async Task<Teacher> GetAsync(int id)
         {
             try
@@ -88,7 +89,7 @@ namespace Students.BLL.Services
                     teacher = await _unitOfWork.TeacherRepository.GetAsync(id);
                     if (teacher != null)
                     {
-                        cache.Set(teacher.TeacherId, teacher,
+                        cache.Set(teacher.Id, teacher,
                             new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
                     }
                 }
@@ -109,18 +110,18 @@ namespace Students.BLL.Services
         {
             await _unitOfWork.Save();
         }
-
+         
         public async Task<Teacher> Update(Teacher item)
         {
             try
             {
                 var teacher = await _unitOfWork.TeacherRepository.Update(item);
-                _logger.LogInformation("Преподователь изменен");
                 int n = await _unitOfWork.Save();
+                _logger.LogInformation("Преподователь изменен");
                 if (n > 0)
                 {
                     _logger.LogInformation("Преподователь добавлен в кэш");
-                    cache.Set(item.TeacherId, item, new MemoryCacheEntryOptions
+                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     });

@@ -11,7 +11,7 @@
                 <th>
                     ФИО
                 </th>
-                @foreach (var mark in Model.GroupBy(l => l.Lesson.LessonId).Select(y => y.First()))
+                @foreach (var mark in Model.GroupBy(l => l.Lesson.Id).Select(y => y.First()))
                 {
                     <th>
                         <ul id="nav" style="width:35px;"> 
@@ -29,13 +29,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.GroupBy(l => l.Student.StudentId).Select(y => y.First()))
+            @foreach (var item in Model.GroupBy(l => l.Student.Id).Select(y => y.First()))
             {
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => item.Student.Surname)   @Html.DisplayFor(modelItem => item.Student.Name)   @Html.DisplayFor(modelItem => item.Student.MiddleName)
                     </td>
-                    @foreach (var mark in Model.Where(m => m.StudentId == item.StudentId))
+                    @foreach (var mark in Model.Where(m => m.StudentId == item.Id))
                     {
                         <td>
                             @mark.Score
