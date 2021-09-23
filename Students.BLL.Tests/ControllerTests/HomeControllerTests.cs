@@ -29,10 +29,10 @@ namespace Students.DAL.Tests.ControllerTests
 
         public HomeControllerTests()
         {
-            var fakeUser = new FakeUserManager();
-            var signInManager = new FakeSignInManager();
-            HomeController = new HomeController(CourseServiceMock.Object, StudentServiceMock.Object,
-                fakeUser, signInManager);
+           // var fakeUser = new FakeUserManager();
+           // var signInManager = new FakeSignInManager();
+           // HomeController = new HomeController(CourseServiceMock.Object, StudentServiceMock.Object,
+           //     fakeUser, signInManager);
             Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
             Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }

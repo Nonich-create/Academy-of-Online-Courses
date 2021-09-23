@@ -30,15 +30,6 @@ namespace Students.BLL.Services
             {
                 await _unitOfWork.GroupRepository.CreateAsync(item);
                 _logger.LogInformation("Группа создана");
-                int n = await _unitOfWork.Save();
-                if (n > 0)
-                {
-                    _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -138,11 +129,6 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task Save()
-        {
-            await _unitOfWork.Save();
-        }
-
         public async Task StartGroup(int id)
         {
             try
@@ -161,7 +147,6 @@ namespace Students.BLL.Services
                     await _unitOfWork.LessonTimesRepository.CreateAsync(new() { GroupId = group.Id, LessonId = itemLesson.Id });
                 }
                 _logger.LogInformation($"Группа {group.Id} начала обучение");
-                await _unitOfWork.Save();
             }
             catch(Exception ex)
             {
@@ -174,17 +159,7 @@ namespace Students.BLL.Services
             try
             {
                 var group = await _unitOfWork.GroupRepository.Update(item);
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Группа изменена");
-                if (n > 0)
-                {
-                    _logger.LogInformation("Группа добавлена в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-
-                }
                 return group;
             }
             catch (Exception ex)
@@ -192,6 +167,26 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка редактирования группы");
                 return item;
             }
+        }
+
+        public async Task<IEnumerable<Group>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+            return await _unitOfWork.GroupRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.GroupRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+        }
+
+        public async Task<IEnumerable<Group>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        {
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+            }
+            return await GetAllTakeSkipAsync(take, action, skip);
         }
     }
 

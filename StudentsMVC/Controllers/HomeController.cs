@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AutoMapper;
 
 namespace Students.MVC.Controllers
 {
@@ -22,26 +23,19 @@ namespace Students.MVC.Controllers
         private readonly IStudentService _studentService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        public HomeController(ICourseService courseService, IStudentService studentService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly IMapper _mapper;
+        public HomeController(IMapper mapper,ICourseService courseService, IStudentService studentService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _courseService = courseService;
             _studentService = studentService;
             _userManager = userManager;
             _signInManager = signInManager;
+            _mapper = mapper;
         }
         #region Отображения витрины с курсами
         public async Task<IActionResult> Index(string searchString)
         {
-            var courses = await _courseService.GetAllAsync();
-            if (courses is null)
-            {
-                return null;
-            }
-            List<CourseViewModel> models = new();
-            foreach (var course in courses)
-            {
-                models.Add(Mapper.ConvertViewModel<CourseViewModel, Course>(course));
-            }
+            var courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             if (!String.IsNullOrEmpty(searchString))
             {
                 var cours = courses.First(c => c.Name.Contains(searchString));
@@ -50,7 +44,7 @@ namespace Students.MVC.Controllers
                     return Redirect($"~/Home/Detailed/{cours.Id}");
                 }
             }
-            return View(models); ;
+            return View(courses); 
         }
         #endregion
    
@@ -64,13 +58,7 @@ namespace Students.MVC.Controllers
         #region Подробнее о курсе
         public async Task<IActionResult> Detailed(int id)
         {
-            var course = await _courseService.GetAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-            var courseViewModel = Mapper.ConvertViewModel<CourseViewModel, Course>(course);
-            return View(courseViewModel);
+            return View(_mapper.Map<CourseViewModel>(await _courseService.GetAsync(id)));
         }
         #endregion
         #region Оставления заявки на курс

@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
+using AutoMapper;
 
 namespace Students.MVC.Controllers
 {
@@ -23,8 +23,9 @@ namespace Students.MVC.Controllers
         private readonly IGroupService _groupService;
         private readonly ITeacherService _teacherService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
-        public AssessmentsController(ITeacherService teacherService, IGroupService groupService, IAssessmentService assessmentService, ICourseService courseService, ILessonService lessonService, IStudentService studentService, UserManager<ApplicationUser> userManager)
+        public AssessmentsController(ITeacherService teacherService, IGroupService groupService, IAssessmentService assessmentService, ICourseService courseService, ILessonService lessonService, IStudentService studentService, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _teacherService = teacherService;
             _groupService = groupService;
@@ -33,6 +34,7 @@ namespace Students.MVC.Controllers
             _studentService = studentService;
             _assessmentService = assessmentService;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         #region отображения оценок студента
@@ -42,7 +44,7 @@ namespace Students.MVC.Controllers
             var id = _userManager.GetUserId(User);
             var students = (await _studentService.GetAllAsync()).First(s => s.UserId == _userManager.GetUserId(User));
             var assessments = await _assessmentService.GetAssessmentsByStudentId(students.Id);
-            var assessmentViewModels = Mapper.ConvertListViewModel<AssessmentViewModel, Assessment>((await _assessmentService.GetAssessmentsByStudentId(students.Id)).ToList());
+            var assessmentViewModels = _mapper.Map<IEnumerable<AssessmentViewModel>>((await _assessmentService.GetAssessmentsByStudentId(students.Id)).ToList());
             return View(assessmentViewModels);
         }
         #endregion
@@ -76,7 +78,7 @@ namespace Students.MVC.Controllers
             {
                 return NotFound();
             }
-            var model = Mapper.ConvertViewModel<AssessmentViewModel, Assessment>(assessment);
+            var model = _mapper.Map<AssessmentViewModel>(assessment);
             return View(model);
         }
         #endregion
@@ -92,9 +94,8 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var assessment = Mapper.ConvertViewModel<Assessment, AssessmentViewModel>(model);
+                var assessment = _mapper.Map<Assessment>(model);
                 await _assessmentService.CreateAsync(assessment);
-                await _assessmentService.Save();
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             return View(model);
@@ -109,7 +110,7 @@ namespace Students.MVC.Controllers
             {
                 return NotFound();
             }
-            var model = Mapper.ConvertViewModel<AssessmentViewModel, Assessment>(assessment);
+            var model = _mapper.Map<AssessmentViewModel>(assessment);
             return View(model);
         }
         #endregion
@@ -121,11 +122,10 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var assessment = Mapper.ConvertViewModel<Assessment, AssessmentViewModel>(model);
+                var assessment = _mapper.Map<Assessment>(model);
                 try
                 {
                     await _assessmentService.Update(assessment);
-                    await _assessmentService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -155,7 +155,6 @@ namespace Students.MVC.Controllers
                 return NotFound();
             }
             await _assessmentService.DeleteAsync(id);
-            await _assessmentService.Save();
             return RedirectToAction(nameof(Index));
         }
         #endregion

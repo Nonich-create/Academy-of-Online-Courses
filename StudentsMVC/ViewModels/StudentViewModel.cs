@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Students.DAL.Enum;
 
 namespace Students.MVC.ViewModels
 {

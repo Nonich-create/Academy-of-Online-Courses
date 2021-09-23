@@ -6,7 +6,6 @@ namespace Students.BLL.Services
 {
     public interface IGroupService : IBaseService<Group>
     {
-        Task Save();
         Task<Group> GetAsync(int? id);
         Task StartGroup(int id);
     }

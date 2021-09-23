@@ -35,7 +35,6 @@ namespace Students.BLL.Services
                 await _unitOfWork.StudentRepository.Update(student);
                 model.ApplicationStatus = EnumApplicationStatus.Отменена;
                 await _unitOfWork.CourseApplicationRepository.Update(model);
-                await _unitOfWork.Save();
                 _logger.LogInformation($"Заявка студента {student.Id} на курс {model.CourseId} отменена");
             }
             else 
@@ -50,16 +49,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.CourseApplicationRepository.CreateAsync(item);   
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Заявка создана");
-                if (n > 0)
-                {
-                    _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -106,7 +96,6 @@ namespace Students.BLL.Services
             await _unitOfWork.StudentRepository.Update(student);
             model.ApplicationStatus = EnumApplicationStatus.Закрыта;
             await _unitOfWork.CourseApplicationRepository.Update(model);
-            await _unitOfWork.Save();
             _logger.LogInformation($"Студент {model.StudentId} зачислен в группу {group.Id}"); ;
         }
 
@@ -155,27 +144,13 @@ namespace Students.BLL.Services
                 return null;
             }
         }
-        
-
-        public async Task Save() => await _unitOfWork.Save();
-
-
+       
         public async Task<CourseApplication> Update(CourseApplication item)
         {
             try
             {
                 var courseApplication = await _unitOfWork.CourseApplicationRepository.Update(item);
                 _logger.LogInformation("Заявка изменена");
-                int n = await _unitOfWork.Save();
-                if (n > 0)
-                {
-                    _logger.LogInformation("Оценка добавлена в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-
-                }
                 return courseApplication;
             }
             catch (Exception ex)
@@ -184,7 +159,25 @@ namespace Students.BLL.Services
                 return item;
             }
         }
-        
 
+        public async Task<IEnumerable<CourseApplication>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+            return await _unitOfWork.CourseApplicationRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.CourseApplicationRepository.SearchAllAsync(searchString, searchParameter,action, take, skip);
+        }
+
+        public async Task<IEnumerable<CourseApplication>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        {
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+            }
+            return await GetAllTakeSkipAsync(take, action, skip);
+        }
     }
 }

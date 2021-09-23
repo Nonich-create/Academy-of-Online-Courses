@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System;
 using Students.MVC.Helpers;
+using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -16,93 +18,45 @@ namespace Students.MVC.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly ICourseApplicationService _applicationCourseService;
-        private readonly IStudentService _studentService;
         private readonly IGroupService _groupService;
-        private readonly IManagerService _managerService;
-        private readonly ITeacherService _teacherService;
+        private readonly IMapper _mapper;
 
-        public CourseController(ITeacherService teacherService, IManagerService managerService, IGroupService groupService, ICourseService courseService, ICourseApplicationService applicationCourseService, IStudentService studentService)
+        public CourseController(IMapper mapper,IGroupService groupService, ICourseService courseService, ICourseApplicationService applicationCourseService)
         {
-            _teacherService = teacherService;
-            _managerService = managerService;
             _courseService = courseService;
             _applicationCourseService = applicationCourseService;
-            _studentService = studentService;
             _groupService = groupService;
+            _mapper = mapper;
         }
 
         #region отображения курсов
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersCourse serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var courses = await _courseService.GetAllAsync();
-            List<CourseViewModel> CourseViewModels = new();
-            foreach (var cours in courses)
-            {
-                CourseViewModels.Add(Mapper.ConvertViewModel<CourseViewModel, Course>(cours));
-            }
-            if(!String.IsNullOrEmpty(searchString))
-            {
-                CourseViewModels = CourseViewModels.FindAll(c => c.Name.Contains(searchString));
-            }
-            switch (sortRecords)
-            {
-                case "name_desc":
-                    CourseViewModels = CourseViewModels.OrderByDescending(c => c.Name).ToList();
-                    break;
-                default:
-                    CourseViewModels = CourseViewModels.OrderBy(c => c.Name).ToList();
-                    break;
-            }
-            return View(CourseViewModels);//PaginatedList<CourseViewModel>.Create(CourseViewModels, pageNumber ?? 1, 10));
+            ViewData["searchString"] = searchString;
+            //ViewData["CurrentSort"] = sortRecords;
+            //ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
+            //ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
+            //switch (sortRecords)
+            //{
+            //    case "name_desc":
+            //        courses = courses.OrderByDescending(c => c.Name).ToList();
+            //        break;
+            //    default:
+            //        courses = courses.OrderBy(c => c.Name).ToList();
+            //        break;
+            //}
+            return View(_mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
         #region отображения деталей курса
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Details(int id)
         {
-            var course = await _courseService.GetAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-
-            var groups = await _groupService.GetAllAsync();
-            List<GroupViewModel> modelsGroups = new();
-            GroupViewModel modelGroup;
-            foreach (var group in groups.Where(g => g.CourseId == id))
-            {
-                modelGroup = Mapper.ConvertViewModel<GroupViewModel, Group>(group);
-                modelGroup.Manager = Mapper.ConvertViewModel<ManagerViewModel, Manager>(await _managerService.GetAsync(group.ManagerId));
-                modelGroup.Teacher = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(await _teacherService.GetAsync(group.TeacherId));
-                modelsGroups.Add(modelGroup);
-            }
-
-            var model = Mapper.ConvertViewModel<DetalisCourseViewModel, Course>(course);
-            var applicationCourses = await _applicationCourseService.GetAllAsync();
-            List<CourseApplicationViewModel> ApplicationModels = new();
-            CourseApplicationViewModel ApplicationModel;
-            foreach (var item in applicationCourses.Where(a => a.CourseId == id))
-            {
-                ApplicationModel = Mapper.ConvertViewModel<CourseApplicationViewModel, CourseApplication>(item);
-                ApplicationModel.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.Id));
-                ApplicationModels.Add(ApplicationModel);
-            }
-            model.Groups = modelsGroups;
-            model.ApplicationCourseViewModels = ApplicationModels;
-            return View(model);
+            var course = _mapper.Map<DetalisCourseViewModel>(await _courseService.GetAsync(id));
+            course.Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).AsQueryable().Where(g => g.CourseId == id)).ToList();
+            course.CourseApplications = _mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _applicationCourseService.GetAllAsync()).AsQueryable().Where(c => c.CourseId == id)).ToList();
+            return View(course);
         }
         #endregion
         #region отображения создания курса
@@ -117,28 +71,20 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Create(CourseCreateViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var course = Mapper.ConvertViewModel<Course, CourseCreateViewModel>(model);
-                course.Price = (decimal)model.Price;
+               if (ModelState.IsValid)
+               {
+                var course = _mapper.Map<Course>(model);
                 await _courseService.CreateAsync(course);
-                await _courseService.Save();
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-            return View(model);
+            return RedirectToAction("Index");
+               }
+               return View(model);
         }
         #endregion
         #region отображения редактирование курса
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Edit(int id)
         {
-            var course = await _courseService.GetAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-            var model = Mapper.ConvertViewModel<CourseViewModel, Course>(course);
-            return View(model);
+            return View(_mapper.Map<CourseViewModel>(await _courseService.GetAsync(id)));
         }
         #endregion
         #region редактирование курса
@@ -149,9 +95,8 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var course = Mapper.ConvertViewModel<Course, CourseViewModel>(model);
-                await _courseService.Update(course);
-                await _courseService.Save();
+                await _courseService.Update(_mapper.Map<Course>(model));
+                return RedirectToAction("Index");
             }
             return View(model);
         }
@@ -174,13 +119,7 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int CourseId)
         {
-            var course = await _courseService.GetAsync(CourseId);
-            if (course == null)
-            {
-                return NotFound();
-            }
             await _courseService.DeleteAsync(CourseId);
-            await _courseService.Save();
             return RedirectToAction("Index");
         }
         #endregion

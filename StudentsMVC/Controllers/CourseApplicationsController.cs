@@ -11,6 +11,8 @@ using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -20,30 +22,24 @@ namespace Students.MVC.Controllers
         private readonly ICourseService _courseService;
         private readonly ICourseApplicationService _courseApplicationService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
-        public CourseApplicationsController(UserManager<ApplicationUser> userManager, ICourseService courseService, IStudentService studentService, ICourseApplicationService courseApplicationService)
+        public CourseApplicationsController(IMapper mapper,UserManager<ApplicationUser> userManager, ICourseService courseService, IStudentService studentService, ICourseApplicationService courseApplicationService)
         {
             _studentService = studentService;
             _courseService = courseService;
             _userManager = userManager;
             _courseApplicationService = courseApplicationService;
+            _mapper = mapper;
         }
 
         #region Отображения заявок
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersCourseApplication serachParameter)
         {
-                var courseApplications = await _courseApplicationService.GetAllAsync();
-                List<CourseApplicationViewModel> CourseApplicationViewModels = new();
-                CourseApplicationViewModel model;
-                foreach (var item in courseApplications)
-                {
-                    model = Mapper.ConvertViewModel<CourseApplicationViewModel, CourseApplication>(item);
-                    model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(item.CourseId));
-                    model.Student = Mapper.ConvertViewModel<StudentViewModel, Student>(await _studentService.GetAsync(item.StudentId));
-                    CourseApplicationViewModels.Add(model);
-                }
-                return View(CourseApplicationViewModels);
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = serachParameter;
+            return View(_mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _courseApplicationService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
         #region Зачисления студента в группу

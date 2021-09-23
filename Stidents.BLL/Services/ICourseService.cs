@@ -6,6 +6,5 @@ namespace Students.BLL.Services
 {
     public interface ICourseService : IBaseService<Course>
     {
-        Task Save();
     }
 }

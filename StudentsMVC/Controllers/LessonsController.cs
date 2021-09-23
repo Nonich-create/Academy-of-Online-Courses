@@ -10,6 +10,8 @@ using Students.BLL.Services;
 using System.Linq;
 using System;
 using Students.MVC.Helpers;
+using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -17,52 +19,21 @@ namespace Students.MVC.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly ILessonService _lessonService;
-        public LessonsController(ICourseService courseService, ILessonService lessonService)
+        private readonly IMapper _mapper;
+        public LessonsController(ICourseService courseService, ILessonService lessonService, IMapper mapper)
         {
             _lessonService = lessonService;
             _courseService = courseService;
+            _mapper = mapper;
         }
         #region Отображения уроков
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersLesson serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var lessonses = await _lessonService.GetAllAsync();
-            List<LessonViewModel> LessonViewModels = new();
-            LessonViewModel model;
-            foreach (var lesson in lessonses)
-            {
-                model = Mapper.ConvertViewModel<LessonViewModel, Lesson>(lesson);
-                model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(lesson.CourseId));
-                LessonViewModels.Add(model);
-            }
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                LessonViewModels = LessonViewModels.FindAll(l => l.Name.Contains(searchString)
-                || l.Course.Name.Contains(searchString));
-            }
-            switch (sortRecords)
-            {
-                case "name_desc":
-                    LessonViewModels = LessonViewModels.OrderByDescending(l => l.Course.Name).ToList();
-                    break;
-                default:
-                    LessonViewModels = LessonViewModels.OrderBy(l => l.Course.Name).ToList();
-                    break;
-            }
-            return View(LessonViewModels);//PaginatedList<LessonViewModel>.Create(LessonViewModels, pageNumber ?? 1, 10));
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = serachParameter;
+            return View(_mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
         #region Отображения уроков определенного курса
@@ -87,8 +58,8 @@ namespace Students.MVC.Controllers
             LessonViewModel model;
             foreach (var lesson in lessonses.Where(l => l.CourseId == id))
             {
-                model = Mapper.ConvertViewModel<LessonViewModel, Lesson>(lesson);
-                model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(lesson.CourseId));
+                model = _mapper.Map<LessonViewModel>(lesson);
+                model.Course = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(lesson.CourseId));
                 LessonViewModels.Add(model);
             }
             if (!String.IsNullOrEmpty(searchString))
@@ -96,15 +67,7 @@ namespace Students.MVC.Controllers
                 LessonViewModels = LessonViewModels.FindAll(l => l.Name.Contains(searchString)
                 || l.Course.Name.Contains(searchString));
             }
-            switch (sortRecords)
-            {
-                case "name_desc":
-                    LessonViewModels = LessonViewModels.OrderByDescending(l => l.Course.Name).ToList();
-                    break;
-                default:
-                    LessonViewModels = LessonViewModels.OrderBy(l => l.Course.Name).ToList();
-                    break;
-            }
+          
             return View();//PaginatedList<LessonViewModel>.Create(LessonViewModels, pageNumber ?? 1, 10));
         }
         #endregion
@@ -118,8 +81,8 @@ namespace Students.MVC.Controllers
                 return NotFound();
             }
             LessonViewModel model;
-            model = Mapper.ConvertViewModel<LessonViewModel, Lesson>(lesson);
-            model.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(lesson.CourseId));
+            model = _mapper.Map<LessonViewModel>(lesson);
+            model.Course = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(lesson.CourseId));
             model.ReturnUrl = Url;
             return View(model);
         }
@@ -139,9 +102,8 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var lesson = Mapper.ConvertViewModel<Lesson, LessonViewModel>(model);
+                var lesson = _mapper.Map<Lesson>(model);
                 await _lessonService.CreateAsync(lesson);
-                await _lessonService.Save();
                 return RedirectPermanent("~/Course/Index");
             }
             return View(model);
@@ -153,7 +115,7 @@ namespace Students.MVC.Controllers
         {
             LessonViewModel model = new()
             {
-                Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>((await _courseService.GetAllAsync()).ToList())
+                Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync())
             };
 
             return View(model);
@@ -172,14 +134,13 @@ namespace Students.MVC.Controllers
             }
             if (ModelState.IsValid)
             {
-                var lesson = Mapper.ConvertViewModel<Lesson, LessonViewModel>(model);
+                var lesson = _mapper.Map<Lesson>(model);
                 await _lessonService.CreateAsync(lesson);
-                await _lessonService.Save();
                 return RedirectPermanent("~/Lessons/Index");
             }
             model = new()
             {
-                Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>((await _courseService.GetAllAsync()).ToList())
+                Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()).ToList())
             };
             return View(model);
         }
@@ -194,8 +155,8 @@ namespace Students.MVC.Controllers
                 return NotFound();
             }
 
-            var model = Mapper.ConvertViewModel<LessonViewModel, Lesson>(lesson);
-            model.Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>((await _courseService.GetAllAsync()).ToList());
+            var model = _mapper.Map<LessonViewModel>(lesson);
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()).ToList());
             model.ReturnUrl = Url;
             return View(model);
         }
@@ -208,11 +169,10 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var lesson = Mapper.ConvertViewModel<Lesson, LessonViewModel>(model);
+                var lesson = _mapper.Map<Lesson>(model);
                 try
                 {
                     await _lessonService.Update(lesson);
-                    await _lessonService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -227,7 +187,7 @@ namespace Students.MVC.Controllers
                 }
                 return RedirectPermanent($"~{model.ReturnUrl}");
             }
-            model.Courses = Mapper.ConvertListViewModel<CourseViewModel, Course>((await _courseService.GetAllAsync()).ToList());
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()).ToList());
             return View(model);
         }
         #endregion
@@ -243,7 +203,6 @@ namespace Students.MVC.Controllers
                 return NotFound();
             }
             await _lessonService.DeleteAsync(LessonId);
-            await _lessonService.Save();
             return RedirectToAction("Index");
         }
         #endregion

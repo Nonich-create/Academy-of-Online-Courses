@@ -32,7 +32,7 @@ namespace Students.MVC.ViewModels
         [Display(Name = "Отображения курса на витрине")]
         public bool Visible { get; set; } = false;
 
-        public List<LessonViewModel> Lessons { get; set; }
-        public List<GroupViewModel> Groups { get; set; }
+        public IEnumerable<LessonViewModel> Lessons { get; set; }
+        public IEnumerable<GroupViewModel> Groups { get; set; }
     }
 }

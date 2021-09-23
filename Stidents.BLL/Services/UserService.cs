@@ -5,6 +5,7 @@ using Students.DAL.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
@@ -70,14 +71,29 @@ namespace Students.BLL.Services
             return await _unitOfWork.ApplicationUsers.GetAsync(id);
         }
 
-        public async Task Save()
-        {
-            await _unitOfWork.Save();
-        }
-
         public async Task<ApplicationUser> Update(ApplicationUser item)
         {
             return await _unitOfWork.ApplicationUsers.Update(item);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+            return await _unitOfWork.ApplicationUsers.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.ApplicationUsers.SearchAllAsync(searchString,searchParameter,action, take, skip);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        {
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+            }
+            return await GetAllTakeSkipAsync(take, action, skip);
         }
     }
 
