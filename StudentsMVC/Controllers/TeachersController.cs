@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System;
 using Students.MVC.Helpers;
+using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -18,64 +20,32 @@ namespace Students.MVC.Controllers
     {
         private readonly ITeacherService _teacherService;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-
-        public TeachersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ITeacherService teacherService)
+        private readonly IMapper _mapper;
+        public TeachersController(IMapper mapper,UserManager<ApplicationUser> userManager, ITeacherService teacherService)
         {
             _userManager = userManager;
             _teacherService = teacherService;
-            _roleManager = roleManager;
+            _mapper = mapper;
         }
+
         #region Отображения преподователей
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersTeacher serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var teachers = await _teacherService.GetAllAsync();
-            List<TeacherViewModel> TeacherViewModels = new();
-            foreach (var teacher in teachers)
-            {
-                TeacherViewModels.Add(Mapper.ConvertViewModel<TeacherViewModel, Teacher>(teacher));
-            }
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                TeacherViewModels = TeacherViewModels.FindAll(c => c.GetFullName.Contains(searchString));
-            }
-            switch (sortRecords)
-            {
-                case "name_desc":
-                    TeacherViewModels = TeacherViewModels.OrderByDescending(t => t.GetFullName).ToList();
-                    break;
-                default:
-                    TeacherViewModels = TeacherViewModels.OrderBy(s => s.GetFullName).ToList();
-                    break;
-            }
-            return View(TeacherViewModels);// PaginatedList<TeacherViewModel>.Create(TeacherViewModels, pageNumber ?? 1, 10));
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = serachParameter;
+            return View(_mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
+
         #region Отображения дополнительной информации о преподователях
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Details(int id)
         {
-            var teacher = await _teacherService.GetAsync(id);
-            if (teacher == null)
-            {
-                return NotFound();
-            }
-            TeacherViewModel model = Mapper.ConvertViewModel<TeacherViewModel, Teacher>(teacher);
-            return View(model);
+            return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id)));
         }
         #endregion
+
         #region Отображения регистрации преподователя
         public IActionResult Create()
         {
@@ -95,11 +65,10 @@ namespace Students.MVC.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "teacher");
-                    var teacher = Mapper.ConvertViewModel<Teacher, TeacherViewModel>(model);
+                    var teacher = _mapper.Map<Teacher>(model);
                     teacher.UserId = user.Id;
                     await _teacherService.CreateAsync(teacher);
-                    await _teacherService.Save();
-                    return Redirect(Request.Headers["Referer"].ToString());
+                    return RedirectToAction("Index");
                 }
                 else
                 {
@@ -117,42 +86,19 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Edit(int id)
         {
-            var teacher = await _teacherService.GetAsync(id);
-            if (teacher == null)
-            {
-                return NotFound();
-            }
-            var model = Mapper.ConvertViewModel<EditTeacherViewModel, Teacher>(teacher);
-            return View(model);
+            return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id)));
         }
         #endregion
         #region Редактирования пользователя
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(EditTeacherViewModel model)
+        public async Task<IActionResult> Edit(TeacherViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var teacher = Mapper.ConvertViewModel<Teacher, EditTeacherViewModel>(model);
-                try
-                {
-                    await _teacherService.Update(teacher);
-                    await _teacherService.Save();
-
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _teacherService.ExistsAsync(teacher.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return Redirect(Request.Headers["Referer"].ToString());
+                await _teacherService.Update(_mapper.Map<Teacher>(model));
+                return RedirectToAction("Index");
             }
             return View(model);
         }
@@ -165,16 +111,11 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Delete(int TeacherId)
         {
             var teacher = await _teacherService.GetAsync(TeacherId);
-            if (teacher == null)
-            {
-                return NotFound();
-            }
             var user = await _userManager.FindByIdAsync(teacher.UserId);
             if (teacher != null)
             {
                 await _teacherService.DeleteAsync(TeacherId);
                 await _userManager.DeleteAsync(user);
-                await _teacherService.Save();
             }
             return RedirectToAction("Index");
         }

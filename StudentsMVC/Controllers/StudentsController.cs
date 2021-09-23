@@ -11,6 +11,8 @@ using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using Students.MVC.Helpers;
+using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -19,66 +21,43 @@ namespace Students.MVC.Controllers
         private readonly IStudentService _studentService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IGroupService _groupService;
-        private readonly ICourseService _courseService;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
-
-        public StudentsController(IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IStudentService studentService, IGroupService groupService, ICourseService courseService)
+        private readonly IMapper _mapper;
+        public StudentsController(IMapper mapper,IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService, IGroupService groupService)
         {
             _userService = userService;
             _studentService = studentService;
             _userManager = userManager;
             _groupService = groupService;
-            _courseService = courseService;
-            _roleManager = roleManager;
             _signInManager = signInManager;
+            _mapper = mapper;
         }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int elem)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersStudent serachParameter)
         {
  
-           // ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-           // ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-           //
-           // var students = (await _studentService.GetAllAsync()).AsQueryable().Skip(elem).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy));
-           // List<StudentViewModel> studentViewModels = new();
-           // StudentViewModel model;
-           // foreach (var student in students)
-           // {
-           //     model = Mapper.ConvertViewModel<StudentViewModel, Student>(student);
-           //
-           //     if (student.GroupId != null)
-           //     {
-           //         GroupViewModel groups = Mapper.ConvertViewModel<GroupViewModel, Group>(await _groupService.GetAsync(student.GroupId));
-           //         groups.Course = Mapper.ConvertViewModel<CourseViewModel, Course>(await _courseService.GetAsync(groups.CourseId));
-           //         model.Group = groups;
-           //     }
-           //     studentViewModels.Add(model);
-           // }
-           // if (!String.IsNullOrEmpty(searchString))
-           // {
-           //     studentViewModels = studentViewModels.FindAll(c => c.GetFullName.Contains(searchString));
-           // }
-           // switch (sortRecords)
-           // {
-           //     case "name_desc":
-           //         studentViewModels = studentViewModels.OrderByDescending(s => s.GetFullName).ToList();
-           //         break;
-           //     case "Date":
-           //         studentViewModels = studentViewModels.OrderBy(s => s.DateOfBirth).ToList();
-           //         break;
-           //     case "date_desc":
-           //         studentViewModels = studentViewModels.OrderByDescending(s => s.DateOfBirth).ToList();
-           //         break;
-           //     default:
-           //         studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
-           //         break;
-           // }
-            var sd = await _studentService.DisplayingData(sortRecords, searchString, elem);
-            var model11 = Mapper.ConvertListViewModel<StudentViewModel, Student>(sd.ToList());
-            return View(model11);
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = serachParameter;
+  
+            // switch (sortRecords)
+            // {
+            //     case "name_desc":
+            //         studentViewModels = studentViewModels.OrderByDescending(s => s.GetFullName).ToList();
+            //         break;
+            //     case "Date":
+            //         studentViewModels = studentViewModels.OrderBy(s => s.DateOfBirth).ToList();
+            //         break;
+            //     case "date_desc":
+            //         studentViewModels = studentViewModels.OrderByDescending(s => s.DateOfBirth).ToList();
+            //         break;
+            //     default:
+            //         studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
+            //         break;
+            // }
+  
+            return View(_mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
 
@@ -93,7 +72,7 @@ namespace Students.MVC.Controllers
             }
             StudentViewModel model;
             var user = await _userService.GetAsync(student.UserId);
-            model = Mapper.ConvertViewModel<StudentViewModel, Student>(student);
+            model = _mapper.Map<StudentViewModel>(student);
             model.Email = user.Email;
             model.PhoneNumber = user.PhoneNumber;
             return View(model);
@@ -118,7 +97,7 @@ namespace Students.MVC.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "student");
-                    var student = Mapper.ConvertViewModel<Student, StudentViewModel>(model);
+                    var student = _mapper.Map<Student>(model);
                     student.UserId = user.Id;
                     await _studentService.CreateAsync(student);
                     await Authenticate(model.Email, model.Password);
@@ -145,8 +124,8 @@ namespace Students.MVC.Controllers
             {
                 return NotFound();
             }
-            List<GroupViewModel> groups = Mapper.ConvertListViewModel<GroupViewModel, Group>((await _groupService.GetAllAsync()).ToList());
-            var model = Mapper.ConvertViewModel<EditStudentViewModel, Student>(student);
+            var groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()));
+            var model = _mapper.Map<EditStudentViewModel>(student);
             model.Groups = groups;
             return View(model);
         }
@@ -159,7 +138,7 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var student = Mapper.ConvertViewModel<Student, EditStudentViewModel>(model);
+                var student = _mapper.Map<Student>(model);
                 student.GroupId = model.GroupId;
                 await _studentService.Update(student);
                 return Redirect(Request.Headers["Referer"].ToString());

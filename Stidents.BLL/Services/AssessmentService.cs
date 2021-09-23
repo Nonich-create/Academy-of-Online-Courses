@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
@@ -29,15 +30,6 @@ namespace Students.BLL.Services
             {
                 await _unitOfWork.AssessmentRepository.CreateAsync(item);
                 _logger.LogInformation("Оценка создана");
-                int n = await _unitOfWork.Save();
-                if (n > 0)
-                {
-                    _logger.LogInformation("Добавлена в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -74,6 +66,8 @@ namespace Students.BLL.Services
             }
         }
 
+   
+
         public async Task<IEnumerable<Assessment>> GetAssessmentsByStudentId(int studentId)
          => (await _unitOfWork.AssessmentRepository.GetAllAsync()).Where(x => x.StudentId == studentId);
  
@@ -107,24 +101,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task Save() => await _unitOfWork.Save();
-
         public async Task<Assessment> Update(Assessment item)
         {
             try
             {
                 var assessment = await _unitOfWork.AssessmentRepository.Update(item);
                 _logger.LogInformation("Оценка изменена");
-                int n = await _unitOfWork.Save();
-                if (n > 0)
-                {
-                    _logger.LogInformation("Оценка добавлена в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-
-                }
                 return assessment;
             }
             catch (Exception ex)
@@ -132,6 +114,26 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка редактирования оценки");
                 return item;
             }
+        }
+
+        public async Task<IEnumerable<Assessment>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+           return await _unitOfWork.AssessmentRepository.GetAllTakeSkipAsync(take,action, skip);
+        }
+
+        public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.AssessmentRepository.SearchAllAsync(searchString, searchParametr,action, take, skip);
+        }
+
+        public async Task<IEnumerable<Assessment>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        {
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+            }
+            return await GetAllTakeSkipAsync(take, action, skip);
         }
     }
 }

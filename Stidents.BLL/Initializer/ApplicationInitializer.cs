@@ -240,7 +240,7 @@ namespace Students.DAL.Models
                     },
                     new Group
                     {
-                        CourseId = 2,
+                        CourseId = 2,   
                         ManagerId = 1,
                         TeacherId = 1,
                         NumberGroup = "С# 201",

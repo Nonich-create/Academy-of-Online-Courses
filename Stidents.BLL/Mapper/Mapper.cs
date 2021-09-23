@@ -62,8 +62,13 @@ namespace Students.BLL.Mapper
 
                             if (tempType.IsGenericType && tempType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                             {
+                                if (entry == null)
+                                {
+                                    colOutput.SetValue(entry, default(T));
+                                }
+
                                 tempType = Nullable.GetUnderlyingType(tempType);
-                            }
+                            }      
 
                             colOutput.SetValue(entry, colModel.GetValue(model[i]) != null ? Convert.ChangeType(colModel.GetValue(model[i]), colOutput.PropertyType) : null);
                             break;

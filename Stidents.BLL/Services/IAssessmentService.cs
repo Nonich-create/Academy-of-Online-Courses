@@ -8,7 +8,7 @@ namespace Students.BLL.Services
 {
     public interface IAssessmentService : IBaseService<Assessment>
     {
-        Task Save();
+ 
         Task <IEnumerable<Assessment>> GetAssessmentsByStudentId(int studentId);
     }
 }

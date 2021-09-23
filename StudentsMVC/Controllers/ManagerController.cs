@@ -11,6 +11,8 @@ using Students.DAL.Models;
 using Students.BLL.Services;
 using System;
 using Students.MVC.Helpers;
+using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -19,64 +21,27 @@ namespace Students.MVC.Controllers
 
         private readonly IManagerService _managerService;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-
-        public ManagerController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IManagerService managerService)
+        private readonly IMapper _mapper;
+        public ManagerController(IMapper mapper, UserManager<ApplicationUser> userManager,IManagerService managerService)
         {
             _managerService = managerService;
             _userManager = userManager;
-            _roleManager = roleManager;
+            _mapper = mapper;
         }
         #region Отображения менеджеров
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersManager serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var methodologists = await _managerService.GetAllAsync();
-            List<ManagerViewModel> ManagerViewModels = new();
-            foreach (var manager in methodologists)
-            {
-                ManagerViewModels.Add(Mapper.ConvertViewModel<ManagerViewModel, Manager>(manager));
-            }
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                ManagerViewModels = ManagerViewModels.FindAll(c => c.GetFullName.Contains(searchString));
-            }
-            switch (sortRecords)
-            {
-                case "name_desc":
-                    ManagerViewModels = ManagerViewModels.OrderByDescending(t => t.GetFullName).ToList();
-                    break;
-                default:
-                    ManagerViewModels = ManagerViewModels.OrderBy(s => s.GetFullName).ToList();
-                    break;
-            }
-            return View(ManagerViewModels);// PaginatedList<ManagerViewModel>.Create(ManagerViewModels, pageNumber ?? 1, 10));
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = serachParameter;
+            return View(_mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
         #region Отображения подробностей о менеджере 
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Details(int id)
         {
-            var manager = await _managerService.GetAsync(id);
-            if (manager == null)
-            {
-                return NotFound();
-            }
-            ManagerViewModel model = Mapper.ConvertViewModel<ManagerViewModel, Manager>(manager);
-            return View(model);
-
+            return View(_mapper.Map<ManagerViewModel>(await _managerService.GetAsync(id)));
         }
         #endregion
         #region Отображения регистрации менеджера
@@ -99,11 +64,10 @@ namespace Students.MVC.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "manager");
-                    var manager = Mapper.ConvertViewModel<Manager, ManagerViewModel>(model);
+                    var manager = _mapper.Map<Manager>(model);
                     manager.UserId = user.Id;
                     await _managerService.CreateAsync(manager);
-                    await _managerService.Save();
-                    return Redirect(Request.Headers["Referer"].ToString());
+                    return RedirectToAction("Index");
                 }
                 else
                 {
@@ -121,41 +85,19 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Edit(int id)
         {
-            var manager = await _managerService.GetAsync(id);
-            if (manager == null)
-            {
-                return NotFound();
-            }
-            var model = Mapper.ConvertViewModel<EditManagerViewModel, Manager>(manager);
-            return View(model);
+            return View(_mapper.Map<ManagerViewModel>(await _managerService.GetAsync(id)));
         }
         #endregion
         #region Редактирования менеджера
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Edit(EditManagerViewModel model)
+        public async Task<IActionResult> Edit(ManagerViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var manager = Mapper.ConvertViewModel<Manager, EditManagerViewModel>(model);
-                try
-                {
-                    await _managerService.Update(manager);
-                    await _managerService.Save();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _managerService.ExistsAsync(manager.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return Redirect(Request.Headers["Referer"].ToString());
+                await _managerService.Update(_mapper.Map<Manager>(model));
+                return RedirectToAction("Index");
             }
             return View(model);
         }
@@ -166,13 +108,7 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int Id)
         {
-            var manager = await _managerService.GetAsync(Id);
-            if (manager == null)
-            {
-                return NotFound();
-            }
             await _managerService.DeleteAsync(Id);
-            await _managerService.Save();
             return RedirectToAction("Index");
         }
         #endregion

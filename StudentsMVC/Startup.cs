@@ -12,6 +12,8 @@ using System.Globalization;
 using Students.BLL.DataAccess;
 using Students.BLL.Services;
 using Students.BLL.Options;
+using AutoMapper;
+using Students.MVC.Mapper;
 
 namespace Students.MVC
 {
@@ -40,10 +42,10 @@ namespace Students.MVC
 
             services.AddDbContext<Context>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsAssembly("Students.DAL")));
- 
+            
             services.AddIdentity<ApplicationUser, IdentityRole>()      
                 .AddEntityFrameworkStores<Context>();
-
+         
             services.AddScoped<ICourseApplicationService, CourseApplicationService>();
             services.AddScoped<IRepository<ApplicationUser>, ApplicationUserRepository>();
             services.AddScoped<IRepository<Student>, StudentRepository>();
@@ -61,11 +63,18 @@ namespace Students.MVC
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<UnitOfWork>();
 
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
             services.Configure<EmailAdminOptions>(Configuration.GetSection("EmailAdmin"));
 
             services.AddControllersWithViews();
         }
  
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

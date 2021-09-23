@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
@@ -27,16 +28,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.LessonTimesRepository.CreateAsync(item);
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Время урока добавлена");
-                if (n > 0)
-                {
-                    _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -105,26 +97,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task Save()
-        {
-            await _unitOfWork.Save();
-        }
-
         public async Task<LessonTimes> Update(LessonTimes item)
         {
             try
             {
                 var lessonTimes = await _unitOfWork.LessonTimesRepository.Update(item);
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Время проведения занятия изменено");
-                if (n > 0)
-                {
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-
-                }
                 return lessonTimes;
             }
             catch (Exception ex)
@@ -132,6 +110,26 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка редактирования времени проведения занятия");
                 return item;
             }
+        }
+
+        public async Task<IEnumerable<LessonTimes>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+            return await _unitOfWork.LessonTimesRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.LessonTimesRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+        }
+
+        public async Task<IEnumerable<LessonTimes>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        {
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+            }
+            return await GetAllTakeSkipAsync(take, action, skip);
         }
     }
 }

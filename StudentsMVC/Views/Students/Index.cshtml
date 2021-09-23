@@ -1,6 +1,7 @@
 ﻿@using Students.MVC.Helpers
-@model List<Students.MVC.ViewModels.StudentViewModel>
+@model IEnumerable<Students.MVC.ViewModels.StudentViewModel>
 @using System.Linq;
+@using Students.DAL.Enum;
 
 @{
     ViewData["Title"] = "Страница студентов";
@@ -8,12 +9,32 @@
 }
 
 <body>
-
+    @{
+        int skip = 0;
+        if (Model.Count() > 0)
+            skip = Model.Max(s => s.Id);
+        int take = Model.Count();
+    }
     <form method="post" asp-controller="Students">
         <p>
-            <input type="text" name="searchString" size="40" />
+            <select name="serachParameter"
+                    class="form-control"
+                    asp-items="Html.GetEnumSelectList<EnumSearchParametersStudent>()">
+            </select>
+            <input type="text" name="searchString" size="40" value="@ViewData["searchString"]" />
+            <input type="hidden" name="take" value="10" />
             <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
                    type="submit" value="Поиск" />
+        </p>
+    </form>
+    <form method="post" asp-controller="Students">
+        <p>
+            <input type="hidden" name="action" value="@EnumPageActions.add" />
+            <input type="hidden" name="take" value="@take" />
+            <input type="hidden" name="searchString" value="@ViewData["searchString"]" />
+            <input type="hidden" name="serachParameter" value="@ViewData["serachParameter"]" />
+            <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                   type="submit" value="ещё" />
         </p>
     </form>
     <table class="purpleHorizon" id="Table">
@@ -74,15 +95,25 @@
             </tr>
         </tbody>
     </table>
-    <a asp-action="Index"
-       asp-route-elem="@Model.Max(s =>s.Id)-10"
-       class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)">
-        Назад
-    </a>
-    <a asp-action="Index"
-       asp-route-elem="@Model.Max(s =>s.Id)"
-       class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)">
-        Следущие
-    </a>
+    <div class="container">
+        <form method="post" asp-controller="Students">
+            <p>
+                <input type="hidden" name="action" value="@EnumPageActions.back" />
+                <input type="hidden" name="skip" value="@skip" />
+                <input type="hidden" name="take" value="10" />
+                <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                       type="submit" value="Предыдущие" />
+            </p>
+        </form>
+        <form method="post" asp-controller="Students">
+            <p>
+                <input type="hidden" name="action" value="@EnumPageActions.next" />
+                <input type="hidden" name="skip" value="@skip" />
+                <input type="hidden" name="take" value="10" />
+                <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                       type="submit" value="Следущие" />
+            </p>
+        </form>
+    </div>
 </body>
 

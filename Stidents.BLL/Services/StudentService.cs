@@ -23,11 +23,6 @@ namespace Students.BLL.Services
             _logger = logger;
         }
 
-        public async Task Save()
-        {
-            await _unitOfWork.Save();
-        }
-         
         public async Task PutRequest(int StudentId, int СourseId)
         {
             try
@@ -47,7 +42,6 @@ namespace Students.BLL.Services
                     ApplicationStatus = EnumApplicationStatus.Открыта
                 };
                 await _unitOfWork.CourseApplicationRepository.CreateAsync(model);
-                await _unitOfWork.Save();
                 _logger.LogInformation($"Заявка принята Id Cтудента {StudentId}, Id Курса {СourseId}");
             }
             catch (Exception ex)
@@ -135,17 +129,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.StudentRepository.CreateAsync(item);
-
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Студент создан");
-                if (n > 0)
-                {
-                    _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -159,16 +143,6 @@ namespace Students.BLL.Services
             {
                 var student =  await _unitOfWork.StudentRepository.Update(item);
                 _logger.LogInformation("Студент изменен");
-                int n = await _unitOfWork.Save();
-                if (n > 0)
-                {
-                    _logger.LogInformation("Студент добавлен в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-
-                }
                 return student;
             }
             catch (Exception ex)
@@ -186,7 +160,6 @@ namespace Students.BLL.Services
                 await _unitOfWork.StudentRepository.DeleteAsync(id);
                 await _unitOfWork.ApplicationUsers.DeleteAsync((await _unitOfWork.StudentRepository.GetAsync(id)).UserId);
                 await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
-                await _unitOfWork.Save();
                 _logger.LogInformation(id,"Студент удален"); ;
             }
             catch (Exception ex)
@@ -195,42 +168,29 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<List<Student>> DisplayingData(string sortRecords, string searchString, int idRecord)
+        public async Task<IEnumerable<Student>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
         {
-            List<Student> students = new();
-            if (!String.IsNullOrEmpty(searchString) || cache.TryGetValue("keySearchString", out searchString))
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString)) 
             {
-                cache.Set("keySearchString", searchString, new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                });
-                students = (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Skip(idRecord).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy)).ToList().FindAll(c => c.Surname.Contains(searchString));
-                if(students.Count <= 0)
-                {
-                    //Вывод что записей не найдена
-                    cache.Remove("keySearchString");
-                    students = (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Skip(idRecord).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy)).ToList();
-                }
+               return await SearchAllAsync(searchString, searchParametr,action, take, skip);
             }
-            else
-            {
-               students = (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Skip(idRecord).Take(Convert.ToInt32(Properties.Resources.numberRecordsBy)).ToList();
-            }
-            foreach (var student in students)
-            {
-                if (student.GroupId != null)
-                {
-                    var groups = (await _unitOfWork.GroupRepository.GetAsync(student.GroupId));
-                    groups.Course = await _unitOfWork.CourseRepository.GetAsync(groups.CourseId);
-                    student.Group = groups;
-                }
-            }
-            return students;
+            return await GetAllTakeSkipAsync(take,action,skip);
         }
-        private string GetFullName(string Surname, string Name, string MiddleName) => $"{Surname} {Name} {MiddleName}";
+ 
         public async Task<bool> ExistsAsync(int id)
         {
             return await _unitOfWork.StudentRepository.ExistsAsync(id);
+        }
+
+        public async Task<IEnumerable<Student>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+            return await _unitOfWork.StudentRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.StudentRepository.SearchAllAsync(searchString,searchParametr,action, take, skip);
         }
     }
 }

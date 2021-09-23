@@ -29,7 +29,7 @@ namespace Students.MVC.ViewModels
         public int CourseId { get; set; }
         public CourseViewModel Course { get; set; }
         public IEnumerable<CourseViewModel> Courses { get; set; }
-        public List<AssessmentViewModel> Assessments { get; set; }
+        public IEnumerable<AssessmentViewModel> Assessments { get; set; }
         public string ReturnUrl { get; set; }
     }
 }

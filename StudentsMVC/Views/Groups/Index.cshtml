@@ -1,40 +1,62 @@
 ﻿@using Students.MVC.Helpers;
-@model List<Students.MVC.ViewModels.GroupViewModel>
+@using Students.DAL.Enum;
+@model IEnumerable<Students.MVC.ViewModels.GroupViewModel>
 @{
     ViewData["Title"] = "Страница групп";
     Layout = "_Layout";
 }
 <body>
-    <form asp-controller="Groups" asp-action="Index">
+    @{
+        int skip = 0;
+        if (Model.Count() > 0)
+            skip = Model.Max(s => s.Id);
+        int take = Model.Count();
+    }
+    <form method="post" asp-controller="Groups">
         <p>
-            <input type="text" name="searchString" size="40" />
+            <select name="serachParameter"
+                    class="form-control"
+                    asp-items="Html.GetEnumSelectList<EnumSearchParametersGroup>()">
+            </select>
+            <input type="text" name="searchString" size="40" value="@ViewData["searchString"]" />
+            <input type="hidden" name="take" value="10" />
             <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
                    type="submit" value="Поиск" />
+        </p>
+    </form>
+    <form method="post" asp-controller="Groups">
+        <p>
+            <input type="hidden" name="action" value="@EnumPageActions.add" />
+            <input type="hidden" name="take" value="@take" />
+            <input type="hidden" name="searchString" value="@ViewData["searchString"]" />
+            <input type="hidden" name="serachParameter" value="@ViewData["serachParameter"]" />
+            <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                   type="submit" value="ещё" />
         </p>
     </form>
     <table class="purpleHorizon">
         <thead>
             <tr>
                 <th>
-                  Номер группы
+                    Номер группы
                 </th>
                 <th>
-                   Дата старта группы
+                    Дата старта группы
                 </th>
                 <th>
-                 Статус группы
+                    Статус группы
                 </th>
                 <th>
                     Максимальное количество студентов
                 </th>
                 <th>
-                 Менеджер
+                    Менеджер
                 </th>
                 <th>
-                  Преподователь
+                    Преподователь
                 </th>
                 <th>
-                курс
+                    Курс
                 </th>
             </tr>
         </thead>
@@ -55,13 +77,13 @@
                         @Html.DisplayFor(modelItem => item.CountMax)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Manageres.ElementAt(0).Surname)
+                        @Html.DisplayFor(modelItem => item.Manager.GetFullName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Teachers.ElementAt(0).Surname)
+                        @Html.DisplayFor(modelItem => item.Teacher.GetFullName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Courses.ElementAt(0).Name)
+                        @Html.DisplayFor(modelItem => item.Course.Name)
                     </td>
                     <td>
                         <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
@@ -87,5 +109,24 @@
             </tr>
         </tbody>
     </table>
- 
+    <div class="container">
+        <form method="post" asp-controller="Groups">
+            <p>
+                <input type="hidden" name="action" value="@EnumPageActions.back" />
+                <input type="hidden" name="skip" value="@skip" />
+                <input type="hidden" name="take" value="10" />
+                <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                       type="submit" value="Предыдущие" />
+            </p>
+        </form>
+        <form method="post" asp-controller="Groups">
+            <p>
+                <input type="hidden" name="action" value="@EnumPageActions.next" />
+                <input type="hidden" name="skip" value="@skip" />
+                <input type="hidden" name="take" value="10" />
+                <input class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                       type="submit" value="Следущие" />
+            </p>
+        </form>
+    </div>
 </body>

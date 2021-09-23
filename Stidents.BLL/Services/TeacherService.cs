@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
 using Students.DAL.Models;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Services
 {
@@ -28,16 +29,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.TeacherRepository.CreateAsync(item);
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Преподователь создан");
-                if (n > 0)
-                {
-                    _logger.LogInformation("Добавлен в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -106,27 +98,14 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task Save()
-        {
-            await _unitOfWork.Save();
-        }
+   
          
         public async Task<Teacher> Update(Teacher item)
         {
             try
             {
                 var teacher = await _unitOfWork.TeacherRepository.Update(item);
-                int n = await _unitOfWork.Save();
                 _logger.LogInformation("Преподователь изменен");
-                if (n > 0)
-                {
-                    _logger.LogInformation("Преподователь добавлен в кэш");
-                    cache.Set(item.Id, item, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-
-                }
                 return teacher;
             }
             catch (Exception ex)
@@ -134,6 +113,26 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка редактирования приподователя");
                 return item;
             }
+        }
+
+        public async Task<IEnumerable<Teacher>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        {
+            return await _unitOfWork.TeacherRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        {
+            return await _unitOfWork.TeacherRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+        }
+
+        public async Task<IEnumerable<Teacher>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        {
+            take = (take == 0) ? 10 : take;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+            }
+            return await GetAllTakeSkipAsync(take, action, skip);
         }
     }
 }

@@ -122,10 +122,7 @@ namespace Students.BLL.DataAccess
                 return _lessonTimesRepository;
             }
         }
-        public async Task<int> Save()
-        {
-            return await _db.SaveChangesAsync();
-        }
+ 
 
         public virtual void Dispose(bool disposing)
         {

@@ -20,11 +20,11 @@ namespace Students.MVC.ViewModels
 
         public int LessonId { get; set; }
         public LessonViewModel Lesson { get; set; }
-        public List<LessonViewModel> Lessons { get; set; }
+        public IEnumerable<LessonViewModel> Lessons { get; set; }
 
         public int GroupId { get; set; }
         public GroupViewModel Group { get; set; }
-        public List<GroupViewModel> Groups { get; set; }
+        public IEnumerable<GroupViewModel> Groups { get; set; }
 
     }
 }

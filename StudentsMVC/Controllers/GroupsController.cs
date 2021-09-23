@@ -12,6 +12,7 @@ using Students.DAL.Enum;
 using Microsoft.AspNetCore.Identity;
 using Students.MVC.Helpers;
 using System;
+using AutoMapper;
 
 namespace Students.MVC.Controllers
 {
@@ -24,8 +25,8 @@ namespace Students.MVC.Controllers
         private readonly IStudentService _studentService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public GroupsController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService, IGroupService groupService, IManagerService managerService, ITeacherService teacherService, ICourseService courseService)
+        private readonly IMapper _mapper;
+        public GroupsController(IMapper mapper,UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService, IGroupService groupService, IManagerService managerService, ITeacherService teacherService, ICourseService courseService)
         {
             _studentService = studentService;
             _groupService = groupService;
@@ -34,51 +35,17 @@ namespace Students.MVC.Controllers
             _courseService = courseService;
             _signInManager = signInManager;
             _userManager = userManager;
+            _mapper = mapper;
         }
         #region отображения групп
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersGroup serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var groups = await _groupService.GetAllAsync();
-            List<GroupViewModel> GroupViewModels = new();
-            foreach (var group in groups)
-            {
-                GroupViewModels.Add(group.GroupToGroupViewModelMapping(await _managerService.GetAsync(group.ManagerId), await _teacherService.GetAsync(group.TeacherId), await _courseService.GetAsync(group.CourseId)));
-            }
-
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                GroupViewModels = GroupViewModels.FindAll(g => g.NumberGroup.Contains(searchString)
-              //  || g.Course.Name.Contains(searchString)
-              // || g.Manager.GetFullName.Contains(searchString)
-              //  || g.Teacher.GetFullName.Contains(searchString)
-                );
-            }
-           switch (sortRecords)
-           {
-               case "name_desc":
-                   GroupViewModels = GroupViewModels.OrderByDescending(g => g.NumberGroup).ToList();
-                   break;
-               default:
-                   GroupViewModels = GroupViewModels.OrderBy(g => g.NumberGroup).ToList();
-                   break;
-           }
-            return View(GroupViewModels);//PaginatedList<GroupViewModel>.Create(GroupViewModels, pageNumber ?? 1, 10));
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = serachParameter;
+            return View(_mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
-
 
         #region отображения групп преподователя
         [Authorize(Roles = "teacher")]
@@ -86,15 +53,10 @@ namespace Students.MVC.Controllers
         {
             if (_signInManager.IsSignedIn(User))
             {
-                var id = _userManager.GetUserId(User);
-                var teacher = await _teacherService.GetAllAsync();
-                var groups = (await _groupService.GetAllAsync()).Where(g => g.TeacherId == teacher.Where(t => t.UserId == id).First().Id);
-                List<GroupViewModel> models = new();
-                foreach (var group in groups)
-                {
-                    models.Add(group.GroupToGroupViewModelMapping(await _managerService.GetAsync(group.ManagerId), await _teacherService.GetAsync(group.TeacherId), await _courseService.GetAsync(group.CourseId)));
-                }
-                return View(models);
+                var idTeacher = (await _teacherService.GetAllAsync()).First(t => t.UserId == _userManager.GetUserId(User)).Id;
+                var groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).AsQueryable()
+                    .Where(g => g.TeacherId == idTeacher));
+                return View(groups);
             }
             return Redirect(Request.Headers["Referer"].ToString());
         }
@@ -104,24 +66,23 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Details(int id)
         {
-            var group = await _groupService.GetAsync(id);
-            if (group == null)
-            {
-                return NotFound();
-            }
-            List<StudentViewModel> studentViewModels = new();
-            foreach (var student in (await _studentService.GetAllAsync()).Where(s => s.GroupId == id))
-            {
-                studentViewModels.Add(Mapper.ConvertViewModel<StudentViewModel, Student>(student));
-            }
-            DetailGroupViewModel model = group.GroupToDetailGroupViewModelMapping(await _managerService.GetAsync(group.ManagerId), await _teacherService.GetAsync(group.TeacherId), await _courseService.GetAsync(group.CourseId));
-            model.StudentsViewModels = studentViewModels;
-            return View(model);
+            var group = _mapper.Map<DetailGroupViewModel>(await _groupService.GetAsync(id));
+            group.Students = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.GetAllAsync()).AsQueryable().Where(s => s.GroupId == group.Id));
+            return View(group);
         }
         #endregion
         #region отображения добавления группы
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Create() => View(ExtensionMethods.GroupToGroupViewModelMapping(new Group(), (await _managerService.GetAllAsync()).ToList(), (await _teacherService.GetAllAsync()).ToList(), (await _courseService.GetAllAsync()).ToList()));
+        public async Task<IActionResult> Create()
+        {
+            GroupViewModel group = new()
+            {
+                Manageres = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.GetAllAsync())),
+                Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync())),
+                Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync())),
+            };
+           return View(group);
+        }
         
         #endregion
         #region добавления группы
@@ -132,13 +93,9 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var group = Mapper.ConvertViewModel<Group, GroupViewModel>(model);
-                group.GroupStatus = EnumGroupStatus.Набор;
-                await _groupService.CreateAsync(group);
+                await _groupService.CreateAsync(_mapper.Map<Group>(model));
                 return RedirectToAction("Index");
             }
-     
-            model = ExtensionMethods.GroupToGroupViewModelMapping(null, (await _managerService.GetAllAsync()).ToList(), (await _teacherService.GetAllAsync()).ToList(), (await _courseService.GetAllAsync()).ToList());
             return View(model);
         }
         #endregion
@@ -146,13 +103,11 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Edit(int id)
         {
-            var group = await _groupService.GetAsync(id);
-            if (group == null)
-            {
-                return NotFound();
-            }
-            var model = group.GroupToGroupViewModelMapping((await _managerService.GetAllAsync()).ToList(), (await _teacherService.GetAllAsync()).ToList(), (await _courseService.GetAllAsync()).ToList());
-            return View(model);
+            var group = _mapper.Map<GroupViewModel>(await _groupService.GetAsync(id));
+            group.Manageres = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.GetAllAsync()));
+            group.Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync()));
+            group.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()));
+            return View(group);
         }
         #endregion
         #region Редактирования группы
@@ -163,22 +118,7 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var group = Mapper.ConvertViewModel<Group, GroupViewModel>(model);
-                try
-                {
-                    await _groupService.Update(group);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _groupService.ExistsAsync(group.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _groupService.Update(_mapper.Map<Group>(model));
                 return RedirectToAction("Index");
             }
             return View(model);
@@ -190,13 +130,7 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int GroupId)
         {
-            var group = await _groupService.GetAsync(GroupId);
-            if (group == null)
-            {
-                return NotFound();
-            }
             await _groupService.DeleteAsync(GroupId);
-            await _groupService.Save();
             return RedirectToAction("Index");
         }
         #endregion
@@ -205,7 +139,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> StartGroup(int id)
         {
             await _groupService.StartGroup(id);
-            return Redirect(Request.Headers["Referer"].ToString());
+            return RedirectToAction("Index");
         }
         #endregion
     }

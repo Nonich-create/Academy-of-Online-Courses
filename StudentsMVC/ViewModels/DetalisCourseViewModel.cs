@@ -35,8 +35,8 @@ namespace Students.MVC.ViewModels
         public bool Visible { get; set; } = false;
 
 
-        public List<CourseApplicationViewModel> ApplicationCourseViewModels { get; set; } 
-        public List<LessonViewModel> Lessons { get; set; }
-        public List<GroupViewModel> Groups { get; set; }
+        public IEnumerable<CourseApplicationViewModel> CourseApplications { get; set; } 
+        public IEnumerable<LessonViewModel> Lessons { get; set; }
+        public IEnumerable<GroupViewModel> Groups { get; set; }
     }
 }

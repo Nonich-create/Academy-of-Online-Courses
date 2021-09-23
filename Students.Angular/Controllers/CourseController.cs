@@ -23,10 +23,10 @@ namespace Students.Angular.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public IEnumerable<CourseDto> Get()
-        {
-            return Mapper.ConvertListViewModel<CourseDto, Course>(_service.GetAllAsync().Result.ToList());
-        }
+     //  [HttpGet]
+     //  public IEnumerable<CourseDto> Get()
+     //  {
+     //    //  return _mapper.Map<CourseDto, Course>(_service.GetAllAsync().Result.ToList());
+     //  }
     }
 }
