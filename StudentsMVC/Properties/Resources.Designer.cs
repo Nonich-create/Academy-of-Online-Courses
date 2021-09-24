@@ -59,14 +59,5 @@ namespace Students.MVC.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на 10.
-        /// </summary>
-        public static string numberRecordsBy {
-            get {
-                return ResourceManager.GetString("numberRecordsBy", resourceCulture);
-            }
-        }
     }
 }

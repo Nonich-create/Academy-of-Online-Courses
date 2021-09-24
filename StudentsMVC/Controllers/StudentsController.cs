@@ -33,6 +33,13 @@ namespace Students.MVC.Controllers
             _signInManager = signInManager;
             _mapper = mapper;
         }
+
+
+
+        public async Task<IActionResult> TestNotFound()
+        {
+            return null;
+        }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersStudent serachParameter)
