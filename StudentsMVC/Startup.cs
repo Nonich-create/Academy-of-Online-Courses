@@ -14,6 +14,7 @@ using Students.BLL.Services;
 using Students.BLL.Options;
 using AutoMapper;
 using Students.MVC.Mapper;
+using Students.MVC.Filters;
 
 namespace Students.MVC
 {
@@ -69,6 +70,10 @@ namespace Students.MVC
             });
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
+
+            services.AddMvc(options =>
+              options.Filters.Add<CustomExceptionHandler>()
+          );
             services.Configure<EmailAdminOptions>(Configuration.GetSection("EmailAdmin"));
 
             services.AddControllersWithViews();
