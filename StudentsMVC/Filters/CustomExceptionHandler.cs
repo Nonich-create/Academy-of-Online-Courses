@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Students.MVC.Models;
 using System;
 using System.Net;
 
@@ -8,32 +13,27 @@ namespace Students.MVC.Filters
 {
     public class CustomExceptionHandler : IExceptionFilter
     {
+        private readonly IModelMetadataProvider _modelMetadataProvider;
+        private readonly IConfiguration _config;
+
+        public CustomExceptionHandler(IModelMetadataProvider modelMetadataProvider, IConfiguration config)
+        {
+            _modelMetadataProvider = modelMetadataProvider;
+            _config = config;
+        }
         public void OnException(ExceptionContext context)
         {
             HttpStatusCode statusCode = (context.Exception as WebException != null &&
                         ((HttpWebResponse)(context.Exception as WebException).Response) != null) ?
                          ((HttpWebResponse)(context.Exception as WebException).Response).StatusCode
                          : getErrorCode(context.Exception.GetType());
-            string errorMessage = context.Exception.Message;
-            string customErrorMessage = "Error";
-            string stackTrace = context.Exception.StackTrace;
-
-            HttpResponse response = context.HttpContext.Response;
-            response.StatusCode = (int)statusCode;
-            response.ContentType = "application/json";
-            var result = JsonConvert.SerializeObject(
-                new
-                {
-                    message = customErrorMessage,
-                    isError = true,
-                    errorMessage = errorMessage,
-                    errorCode = statusCode,
-                    model = string.Empty
-                });
-
- 
-            response.ContentLength = result.Length;
-            response.WriteAsync(result);
+            var result = new ViewResult { ViewName = "Error",StatusCode = (int)statusCode };
+            result.ViewData = new ViewDataDictionary(_modelMetadataProvider, context.ModelState);
+            context.ExceptionHandled = true;
+            result.ViewData.Add("Exception", $"{(int)statusCode}");
+            result.ViewData.Add("ExceptionInfo", $"Message: {context.Exception} <br/><br/> StackTrace: {context.Exception.StackTrace}");
+            result.ViewData.Add("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+            context.Result = result;
         }
         private HttpStatusCode getErrorCode(Type exceptionType)
         {
