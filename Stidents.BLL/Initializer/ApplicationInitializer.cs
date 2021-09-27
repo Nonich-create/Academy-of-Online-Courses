@@ -81,7 +81,7 @@ namespace Students.DAL.Models
                     if (result.Succeeded)
                     {
                         await userManager.AddToRoleAsync(user, "teacher");
-                        Teacher teacher = new()
+                        Teacher teacher = new() 
                         {
                             Name = GenerateTestdata.Name[rnd.Next(0, GenerateTestdata.Name.Length)],
                             Surname = GenerateTestdata.famile[rnd.Next(0, GenerateTestdata.famile.Length)],

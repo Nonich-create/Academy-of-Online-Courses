@@ -40,18 +40,17 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                        <a class="btn btn-primary"
                            asp-action="Edit" asp-route-id="@item.Id">Редактирование</a>
-                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                        <a class="btn btn-primary"
                            asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
-                        <a class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
-                           asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
                     </td>
                 </tr>
             }
             <tr>
                 <td>
-                    <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                    <a class="btn btn-primary"
                        asp-action="CreateWithCourse">Добавить занятия</a>
                 </td>
             </tr>
