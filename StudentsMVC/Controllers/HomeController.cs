@@ -33,7 +33,7 @@ namespace Students.MVC.Controllers
             _mapper = mapper;
         }
         #region Отображения витрины с курсами
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString,int skip)
         {
             var courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             if (!String.IsNullOrEmpty(searchString))

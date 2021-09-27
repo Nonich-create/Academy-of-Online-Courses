@@ -21,7 +21,7 @@ namespace Students.MVC.Controllers
         private readonly IGroupService _groupService;
         private readonly IMapper _mapper;
 
-        public CourseController(IMapper mapper,IGroupService groupService, ICourseService courseService, ICourseApplicationService applicationCourseService)
+        public CourseController(IMapper mapper, IGroupService groupService, ICourseService courseService, ICourseApplicationService applicationCourseService)
         {
             _courseService = courseService;
             _applicationCourseService = applicationCourseService;
@@ -34,6 +34,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersCourse serachParameter)
         {
             ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = (int)serachParameter;
             //ViewData["CurrentSort"] = sortRecords;
             //ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
             //ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
@@ -71,13 +72,13 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Create(CourseCreateViewModel model)
         {
-               if (ModelState.IsValid)
-               {
+            if (ModelState.IsValid)
+            {
                 var course = _mapper.Map<Course>(model);
                 await _courseService.CreateAsync(course);
-            return RedirectToAction("Index");
-               }
-               return View(model);
+                return RedirectToAction("Index");
+            }
+            return View(model);
         }
         #endregion
         #region отображения редактирование курса

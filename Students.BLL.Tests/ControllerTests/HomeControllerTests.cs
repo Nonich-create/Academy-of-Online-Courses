@@ -17,6 +17,7 @@ using Xunit;
 using AutoFixture.Xunit2;
 using AutoFixture;
 using System.Linq;
+using AutoMapper;
 
 namespace Students.DAL.Tests.ControllerTests
 {
@@ -26,18 +27,34 @@ namespace Students.DAL.Tests.ControllerTests
         public Mock<IStudentService> StudentServiceMock { get; } = new Mock<IStudentService>();
         public Mock<ICourseService> CourseServiceMock { get; } = new Mock<ICourseService>();
         public Fixture Fixture { get; set; } = new();
-
+        private readonly IMapper _mapper;
         public HomeControllerTests()
         {
-           // var fakeUser = new FakeUserManager();
-           // var signInManager = new FakeSignInManager();
-           // HomeController = new HomeController(CourseServiceMock.Object, StudentServiceMock.Object,
-           //     fakeUser, signInManager);
+            var fakeUser = new FakeUserManager();
+            var signInManager = new FakeSignInManager();
+            HomeController = new HomeController(_mapper, CourseServiceMock.Object, StudentServiceMock.Object,
+                fakeUser, signInManager);
             Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
             Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
 
-        // [Theory, AutoData]
+
+        [Fact]
+        public void Index_searchString()
+        {
+            // Arrange
+            var courses = Fixture.CreateMany<Course>(4).ToList();
+
+          //  CourseServiceMock.Setup(c => c.)
+         //   StudentServiceMock.Setup(s => s.PutRequest(students[1].Id, courses[1].Id));
+
+            // Act
+            var result = HomeController.PutRequest(courses[1].Id);
+
+            //Assert
+            Assert.IsType<ViewResult>(result);
+        }
+        //[Theory, AutoData]
         //[Fact]
         //public async Task Index_ActionExecutes_ReturnsViewForIndexAsync( )
         //{
@@ -65,10 +82,10 @@ namespace Students.DAL.Tests.ControllerTests
                 students[i].UserId = users[i].Id;
             }
             StudentServiceMock.Setup(s => s.PutRequest(students[1].Id, courses[1].Id));
-
+        
             // Act
             var result = HomeController.PutRequest(courses[1].Id);
-
+        
             //Assert
             Assert.IsType<ViewResult>(result);
         }

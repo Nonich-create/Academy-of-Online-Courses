@@ -18,8 +18,8 @@
     <br /><br />
     <form method="post" asp-controller="Home" asp-action="PutRequest">
         <div>
-            <button class="myButton" asp-action="PutRequest" asp-route-CourseId="@Model.Id">Оставить заявку</button>
-            <button  type="submit" asp-controller="Home" asp-action="Index" class="myButton">Назад</button>
+            <button class="btn btn-primary" asp-action="PutRequest" asp-route-CourseId="@Model.Id">Оставить заявку</button>
+            <button class="btn btn-primary" type="submit" asp-controller="Home" asp-action="Index">Назад</button>
         </div>
     </form>
 </body>

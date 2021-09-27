@@ -38,7 +38,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersCourseApplication serachParameter)
         {
             ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = serachParameter;
+            ViewData["serachParameter"] = (int)serachParameter;
             return View(_mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _courseApplicationService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion

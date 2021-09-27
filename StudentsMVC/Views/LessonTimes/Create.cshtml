@@ -1,47 +1,48 @@
-﻿
+﻿@model Students.MVC.ViewModels.LessonTimesViewModel
 @{
     ViewData["Title"] = "Добавления расписания к занятию";
     Layout = "_LayoutAdditional";
 }
-
 <body>
     <div class="registration-form">
         <form asp-action="Create">
-            <div class="validation" asp-validation-summary="All"></div>
-
-            @*<div class="form-group">
-            <select asp-for="GroupId" class="form-control custom-select">
-                @foreach (var item in Model.Groups)
-                {
-                    <option value="@item.Id">@item.NumberGroup</option>
-                    x = item.CourseId;
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <select asp-for="GroupId" class="form-control custom-select">
-                @foreach (var item in Model.Lessons.Where(l => l.CourseId == x))
-                {
-                    <option value="@item.Id">@item.NumberLesson @item.Name</option>
-                }
-            </select>
-        </div>*@
-
-            <h3>Выберите страну</h3>
-            @Html.DropDownList("State", ViewBag.Groups as SelectList, new { id = "group" })
-            <h3>Выберите город</h3>
-            @Html.DropDownList("City", ViewBag.Lessons as SelectList, new { id = "lesson" })
-            <div class="form-group">
-                <input type="submit" value="Создать" class="btn btn-block create-account" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Назад" asp-action="Index" class="btn btn-block create-account" />
+            <div class="validation" asp-validation-summary="All">
+                <div class="form-group">
+                    <label class="form_label">Группа</label><br />
+                    <select asp-for="GroupId" class="form-control custom-select" id="group">
+                        <option selected="selected">Группа</option>
+                        @foreach (var item in Model.Groups)
+                        {
+                            <option value="@item.CourseId">@item.NumberGroup</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form_label">Урок</label><br />
+                    <select asp-for="LessonId" class="form-control custom-select" id="lesson">
+                        @if (Model.Lesson != null)
+                            @foreach (var item in Model.Lessons)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form_label">Дата проведения занятия</label><br />
+                    <input type="date" class="form-control item" asp-for="DateOfTheLesson" id="dateOfTheLesson" placeholder="Дата проведения занятия" />
+                    <span asp-validation-for="DateOfTheLesson" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Создать" class="btn btn-block create-account" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Назад" asp-action="Index" class="btn btn-block create-account" />
+                </div>
             </div>
         </form>
     </div>
 </body>
-
-@*@section scripts{
+@section scripts{
     <script type="text/javascript">
     $(function () {
 
@@ -53,11 +54,11 @@
                 type: 'GET',
                 url: '@Url.Action("GetLesson")/' + id,
                 success: function (data) {
-
                     // заменяем содержимое присланным частичным представлением
-                    $('#Name').replaceWith(data);
+                    $('#lesson').replaceWith(data);
                 }
             });
         });
     })
-    </script>*@
+    </script>
+}

@@ -46,7 +46,7 @@ namespace Students.MVC.Controllers
         {
  
             ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = serachParameter;
+            ViewData["serachParameter"] = (int)serachParameter;
   
             // switch (sortRecords)
             // {

@@ -50,23 +50,10 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int GroupId)  // order by
+        public async Task<IActionResult> Index(int GroupId) 
         {
-            var teachers = await _teacherService.GetAllAsync();
-            var teacher = teachers.Where(t => t.UserId == _userManager.GetUserId(User)).First();
-            var groups = (await _groupService.GetAllAsync()).Where(g => g.TeacherId == teacher.Id && g.Id == GroupId);
-            var assessments = await _assessmentService.GetAllAsync();
-
-            List<AssessmentViewModel> assessmentViewModels = new();
-
-            List<AssessmentViewModel> assessmentViewModelsSorted = new();
-
-            foreach (var group in groups)
-            {
-                assessmentViewModelsSorted.AddRange(assessmentViewModels.Where(a => a.Student.GroupId == group.Id).ToList());
-            }
-
-            return View(assessmentViewModelsSorted);
+            var assessments = (await _assessmentService.GetAllAsync()).AsQueryable().Where(a => a.Student.GroupId == GroupId).OrderBy(a => a.Lesson.NumberLesson);
+            return View(_mapper.Map<IEnumerable<AssessmentViewModel>>(assessments));
         }
         #endregion
         #region отображения деталей о оценки

@@ -52,12 +52,12 @@
                         @Html.DisplayFor(modelItem => item.Course.Name)
                     </td>
                     <td>  
-                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
+                        <a class="btn btn-primary"
                            asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
                         @if (item.GroupStatus == EnumGroupStatus.Обучение || item.GroupStatus == EnumGroupStatus.Закрыта)
                         {
-                        <a class="btn btn-info" style=" background: -moz-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: -webkit-linear-gradient(top, #5a518e 0%, #392e77 66%, #231768 100%); background: linear-gradient(to bottom, #5a518e 0%, #392e77 66%, #231768 100%)"
-                         asp-controller="Assessments" asp-action="Index" asp-route-Id="@item.Id">Оценки</a>
+                        <a class="btn btn-primary"
+                         asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>
                         }
                     </td>
                 </tr>

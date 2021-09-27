@@ -111,7 +111,7 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Course>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
+        public async Task<IEnumerable<Course>>GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.CourseRepository.GetAllTakeSkipAsync(take, action, skip);
         }
@@ -129,6 +129,23 @@ namespace Students.BLL.Services
                 return await SearchAllAsync(searchString, searchParametr, action, take, skip);
             }
             return await GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<IEnumerable<Course>> GetСarouselAsync(int skip = 0)
+        {
+            const byte СarouselTake = 3;
+            try
+            {
+                if (await _unitOfWork.CourseRepository.ExistsAsync(skip))
+                    skip = 0;
+                _logger.LogInformation("Выполнения получения списка курсов");
+                return (await _unitOfWork.CourseRepository.GetAllAsync()).AsQueryable().Skip(skip).Take(СarouselTake);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка получение списка курсов");
+                return null;
+            }
         }
     }
 }

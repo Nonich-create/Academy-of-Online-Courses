@@ -38,11 +38,11 @@ namespace Students.MVC.Controllers
             _mapper = mapper;
         }
         #region отображения групп
-        [Authorize(Roles = "admin,manager,teacher")]
+        [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersGroup serachParameter)
         {
             ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = serachParameter;
+            ViewData["serachParameter"] = (int)serachParameter;
             return View(_mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
@@ -51,14 +51,10 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "teacher")]
         public async Task<IActionResult> IndexTeacher()
         {
-            if (_signInManager.IsSignedIn(User))
-            {
                 var idTeacher = (await _teacherService.GetAllAsync()).First(t => t.UserId == _userManager.GetUserId(User)).Id;
                 var groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).AsQueryable()
                     .Where(g => g.TeacherId == idTeacher));
                 return View(groups);
-            }
-            return Redirect(Request.Headers["Referer"].ToString());
         }
         #endregion
 

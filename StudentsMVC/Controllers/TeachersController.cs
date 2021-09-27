@@ -33,7 +33,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersTeacher serachParameter)
         {
             ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = serachParameter;
+            ViewData["serachParameter"] = (int)serachParameter;
             return View(_mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
@@ -43,6 +43,16 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Details(int id)
         {
             return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id)));
+        }
+        #endregion
+
+        #region Отображения дополнительной информации о преподователях
+        [Authorize(Roles = "teacher")]
+        [ActionName("DetailsTeacher")]
+        public async Task<IActionResult> Details()
+        {
+            var teachers = (await _teacherService.GetAllAsync()).First(t => t.UserId == _userManager.GetUserId(User)).Id;
+            return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(teachers)));
         }
         #endregion
 
