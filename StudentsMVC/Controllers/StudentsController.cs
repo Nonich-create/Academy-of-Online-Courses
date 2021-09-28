@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
-using Students.MVC.Helpers;
 using AutoMapper;
 using Students.DAL.Enum;
 
