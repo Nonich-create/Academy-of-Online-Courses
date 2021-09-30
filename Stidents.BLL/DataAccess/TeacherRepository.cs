@@ -68,6 +68,12 @@ namespace Students.BLL.DataAccess
 
         }
 
+        public async Task CreateRangeAsync(IEnumerable<Teacher> teachers)
+        {
+            await _db.Teachers.AddRangeAsync(teachers);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Teacher>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             if (action == EnumPageActions.next)

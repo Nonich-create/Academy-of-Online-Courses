@@ -23,7 +23,6 @@ namespace Students.BLL.DataAccess
         public UnitOfWork(Context db)
         {
             _db = db;
-         
         }
 
         public CourseApplicationRepository CourseApplicationRepository

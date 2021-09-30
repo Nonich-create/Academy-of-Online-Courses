@@ -31,6 +31,12 @@ namespace Students.BLL.DataAccess
             await _db.SaveChangesAsync();
         }
 
+        public async Task CreateRangeAsync(IEnumerable<ApplicationUser> applicationUsers)
+        {
+            await _db.ApplicationUsers.AddRangeAsync(applicationUsers);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<ApplicationUser> Update(ApplicationUser applicationUser)
         {
             var applicationUserEntity = await _db.ApplicationUsers.AsNoTracking().FirstOrDefaultAsync(a => a.Id == applicationUser.Id);

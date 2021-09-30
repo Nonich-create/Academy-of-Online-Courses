@@ -27,7 +27,13 @@ namespace Students.BLL.DataAccess
         public async Task<CourseApplication> GetAsync(int id) => await ExistsAsync(id) ? await _db.CourseApplication.FindAsync(id) : null;
         
         public async Task CreateAsync(CourseApplication courseApplication) => await _db.CourseApplication.AddAsync(courseApplication);
-             
+
+        public async Task CreateRangeAsync(IEnumerable<CourseApplication> courseApplications)
+        {
+            await _db.CourseApplication.AddRangeAsync(courseApplications);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<CourseApplication> Update(CourseApplication courseApplication)
         {
             var applicationCoursesEntity = await _db.CourseApplication
