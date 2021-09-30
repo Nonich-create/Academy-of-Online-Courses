@@ -28,7 +28,13 @@ namespace Students.BLL.DataAccess
             await _db.Manager.AddAsync(manager);
             await _db.SaveChangesAsync();
         }
-        
+
+        public async Task CreateRangeAsync(IEnumerable<Manager> managers)
+        {
+            await _db.Manager.AddRangeAsync(managers);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<Manager> Update(Manager manager)
         {
             var methodologistEntity = await _db.Manager.AsNoTracking().FirstOrDefaultAsync(a => a.Id == manager.Id);

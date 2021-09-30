@@ -51,6 +51,13 @@ namespace Students.BLL.DataAccess
                 await _db.SaveChangesAsync();
             }
         }
+
+        public async Task CreateRangeAsync(IEnumerable<Course> courses)
+        {
+            await _db.Courses.AddRangeAsync(courses);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<bool> ExistsAsync(int id) => await _db.Courses.FindAsync(id) != null;
 
         public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)

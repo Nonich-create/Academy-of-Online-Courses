@@ -40,6 +40,12 @@ namespace Students.BLL.DataAccess
             await _db.SaveChangesAsync();
         }
 
+        public async Task CreateRangeAsync(IEnumerable<Student> students)
+        {
+            await _db.Students.AddRangeAsync(students);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<Student> Update(Student student)
         {
             var studentEntity = await _db.Students.AsNoTracking().FirstOrDefaultAsync(s => s.Id == student.Id);

@@ -15,6 +15,9 @@ using Students.BLL.Options;
 using AutoMapper;
 using Students.MVC.Mapper;
 using Students.MVC.Filters;
+using System;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 
 namespace Students.MVC
 {
@@ -77,6 +80,10 @@ namespace Students.MVC
             services.Configure<EmailAdminOptions>(Configuration.GetSection("EmailAdmin"));
 
             services.AddControllersWithViews();
+
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
         }
  
 

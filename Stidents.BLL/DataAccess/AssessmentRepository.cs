@@ -28,7 +28,12 @@ namespace Students.BLL.DataAccess
             await _db.Assessments.AddAsync(assessment);
             await _db.SaveChangesAsync();
         }
-        
+
+        public async Task CreateRangeAsync(IEnumerable<Assessment> assessments)
+        {
+            await _db.Assessments.AddRangeAsync(assessments);
+            await _db.SaveChangesAsync();
+        }
 
         public async Task<Assessment> Update(Assessment assessment)
         {

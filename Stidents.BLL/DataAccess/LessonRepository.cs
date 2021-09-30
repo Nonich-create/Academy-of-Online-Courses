@@ -31,6 +31,12 @@ namespace Students.BLL.DataAccess
             await _db.SaveChangesAsync();
         }
 
+        public async Task CreateRangeAsync(IEnumerable<Lesson> lessons)
+        {
+            await _db.Lessons.AddRangeAsync(lessons);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<Lesson> Update(Lesson lesson)
         {
             var lessonEntity = await _db.Lessons.AsNoTracking().FirstOrDefaultAsync(l => l.Id == lesson.Id);

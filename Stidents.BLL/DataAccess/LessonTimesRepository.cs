@@ -24,9 +24,15 @@ namespace Students.BLL.DataAccess
 
         public async Task<LessonTimes> GetAsync(int id) => await ExistsAsync(id) ? await _db.LessonTimes.FindAsync(id) : null;
 
-        public async Task CreateAsync(LessonTimes lesson)
+        public async Task CreateAsync(LessonTimes lessonTimes)
         {
-            await _db.LessonTimes.AddAsync(lesson);
+            await _db.LessonTimes.AddAsync(lessonTimes);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task CreateRangeAsync(IEnumerable<LessonTimes> lessonesTimes)
+        {
+            await _db.LessonTimes.AddRangeAsync(lessonesTimes);
             await _db.SaveChangesAsync();
         }
 

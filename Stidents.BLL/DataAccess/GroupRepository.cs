@@ -39,7 +39,13 @@ namespace Students.BLL.DataAccess
             await _db.Groups.AddAsync(group);
             await _db.SaveChangesAsync();
         }
-        
+
+        public async Task CreateRangeAsync(IEnumerable<Group> groups)
+        {
+            await _db.Groups.AddRangeAsync(groups);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task<Group> Update(Group group)
         {
             var groupEntity = await _db.Groups.AsNoTracking().FirstOrDefaultAsync(g => g.Id == group.Id);
