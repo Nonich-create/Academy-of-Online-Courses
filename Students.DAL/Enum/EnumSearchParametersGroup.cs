@@ -6,7 +6,7 @@ namespace Students.DAL.Enum
     public enum EnumSearchParametersGroup
     {
         [Display(Name = "Не определён")]
-        none = 0,
+        None = 0,
         [Display(Name = "По номеру группы")]
         NumberGroup = 13,
         [Display(Name = "По курсу")]

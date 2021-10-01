@@ -31,10 +31,6 @@ namespace Students.MVC.Controllers
 
 
        
-        public async Task<IActionResult> TestNotFound()
-        {
-            return null;
-        }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersStudent serachParameter)
@@ -42,7 +38,7 @@ namespace Students.MVC.Controllers
  
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-  
+
             // switch (sortRecords)
             // {
             //     case "name_desc":
@@ -58,8 +54,9 @@ namespace Students.MVC.Controllers
             //         studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
             //         break;
             // }
-  
-            return View(_mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var model = _mapper.Map<IEnumerable<StudentViewModel>>(
+                await _studentService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
+            return View(model);
         }
         #endregion
 

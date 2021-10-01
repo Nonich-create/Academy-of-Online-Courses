@@ -51,7 +51,7 @@ namespace Students.BLL.Tests.RepositoryTests
             string searchString = "";
 
             //Act
-            var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Surname, EnumPageActions.notActions, take, 0);
+            var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Surname, EnumPageActions.NotActions, take, 0);
 
             //Assert
             Assert.Empty(result);
@@ -67,7 +67,7 @@ namespace Students.BLL.Tests.RepositoryTests
             string searchString = students.ToList()[4].Name;
 
             //Act
-            var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Name, EnumPageActions.notActions, take, 0);
+            var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Name, EnumPageActions.NotActions, take, 0);
 
             //Assert
             var resultSearchStudents = (await UnitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Where(s => s.Name == searchString);

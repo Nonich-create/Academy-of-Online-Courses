@@ -3,7 +3,7 @@ namespace Students.DAL.Enum
 {
     public enum EnumSearchParameters
     {
-        none = 0,
+        None = 0,
         Name = 1,
         Surname = 2,
         MiddleName = 3,

@@ -28,12 +28,12 @@ namespace Students.BLL.Services
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
             var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId
             && g.Id == (int)student.GroupId 
-            && g.GroupStatus == EnumGroupStatus.Обучение);
+            && g.GroupStatus == EnumGroupStatus.Training);
             if (group == null)
             {
                 student.GroupId = null;
                 await _unitOfWork.StudentRepository.Update(student);
-                model.ApplicationStatus = EnumApplicationStatus.Отменена;
+                model.ApplicationStatus = EnumApplicationStatus.Cancelled;
                 await _unitOfWork.CourseApplicationRepository.Update(model);
                 _logger.LogInformation($"Заявка студента {student.Id} на курс {model.CourseId} отменена");
             }
@@ -87,14 +87,14 @@ namespace Students.BLL.Services
         {
             var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null );
             var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId && 
-            g.GroupStatus == EnumGroupStatus.Набор &&
+            g.GroupStatus == EnumGroupStatus.Set &&
             g.CountMax > students.Count(s =>s.GroupId == g.Id));
             if (group == null){ throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
             if(student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
             student.GroupId = group.Id;
             await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = EnumApplicationStatus.Закрыта;
+            model.ApplicationStatus = EnumApplicationStatus.Close;
             await _unitOfWork.CourseApplicationRepository.Update(model);
             _logger.LogInformation($"Студент {model.StudentId} зачислен в группу {group.Id}"); ;
         }
@@ -163,6 +163,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<CourseApplication>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.CourseApplicationRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<CourseApplication> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск заяки");
+                return await _unitOfWork.CourseApplicationRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска заяки");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)

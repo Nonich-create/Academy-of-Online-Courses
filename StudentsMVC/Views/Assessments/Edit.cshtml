@@ -1,31 +1,33 @@
-﻿@model Students.DAL.Models.Assessment
+﻿@model Students.MVC.ViewModels.AssessmentViewModel
 @{
-    ViewData["Title"] = "Редактирование";
+    ViewData["Title"] = "Оценка";
     Layout = "_LayoutAdditional";
 }
-<body> 
-<div class="row">
-    <div class="col-md-4">
+<body>
+    <div class="registration-form">
         <form asp-action="Edit">
             <div class="validation" asp-validation-summary="All"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="LessonId" />
+            <input type="hidden" asp-for="StudentId" />
+            <input type="hidden" asp-for="ReturnUrl" />
             <div class="form-group">
-                <label asp-for="StudentId" class="control-label"></label>
-                <select asp-for="StudentId" class="form-control" asp-items="ViewBag.StudentId"></select>
-                <span asp-validation-for="StudentId" class="text-danger"></span>
+                <label class="form_label">@Model.Student.GetFullName</label><br />
             </div>
             <div class="form-group">
-                <label asp-for="Score" class="control-label"></label>
-                <input asp-for="Score" class="form-control" />
+                <label class="form_label">№@Model.Lesson.NumberLesson @Model.Lesson.Name</label><br />
+            </div>
+            <div class="form-group">
+                <label class="form_label">Оценка</label><br />
                 <span asp-validation-for="Score" class="text-danger"></span>
+                <input type="number" class="form-control item" asp-for="Score" value="@Model.Score" id="score" placeholder="Оценка" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Поставить" class="btn btn-block create-account" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Назад" asp-action="ReturnByUrl" class="btn btn-block create-account" />
             </div>
         </form>
     </div>
-</div>
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 </body>

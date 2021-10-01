@@ -117,6 +117,20 @@ namespace Students.BLL.Services
             return await _unitOfWork.LessonRepository.GetAllTakeSkipAsync(take, action, skip);
         }
 
+        public async Task<Lesson> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск урока");
+                return await _unitOfWork.LessonRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска урока");
+                return null;
+            }
+        }
+
         public async Task<IEnumerable<Lesson>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
         {
             return await _unitOfWork.LessonRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);

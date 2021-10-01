@@ -72,11 +72,17 @@ namespace Students.BLL.DataAccess
         
         public async Task<bool> ExistsAsync(int? id) => await _db.Groups.FindAsync(id) != null;
 
+
+        public async Task<Group> SearchAsync(string predicate)
+        {
+            return await _db.Groups.Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager).Where(predicate).FirstAsync();
+        }
+
         public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.none)
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return null;
-            if (action == EnumPageActions.add)
+            if (action == EnumPageActions.Add)
                 return await _db.Groups.AsQueryable().Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
             return await _db.Groups.AsQueryable().Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager)
@@ -85,10 +91,10 @@ namespace Students.BLL.DataAccess
 
         public async Task<IEnumerable<Group>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
-            if (action == EnumPageActions.next)
+            if (action == EnumPageActions.Next)
                 return await _db.Groups.AsQueryable().Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager).Skip(skip).Take(take).ToListAsync();
 
-            if (action == EnumPageActions.back)
+            if (action == EnumPageActions.Back)
             {
                 skip = (skip < skipById) ? 20 : skip;
                 return await _db.Groups.AsQueryable().Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager).Skip(skip - skipById).Take(take).ToListAsync();

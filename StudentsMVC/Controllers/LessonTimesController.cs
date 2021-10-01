@@ -44,7 +44,7 @@ namespace Students.MVC.Controllers
         {
             LessonTimesViewModel model = new()
             {
-                Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Обучение)),
+                Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Training)),
             };
             return View(model);
         }
@@ -75,7 +75,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var model = _mapper.Map<LessonTimesViewModel>(await _lessonTimesService.GetAsync(id));
-            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Обучение));
+            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Training));
             return View(model);
         }
         #endregion

@@ -5,7 +5,7 @@ namespace Students.DAL.Enum
      public enum EnumSearchParametersAssessment
     {
         [Display(Name = "Не определён")]
-        none = 0,
+        None = 0,
         [Display(Name = "По имени")]
         Student_Name = 6,
         [Display(Name = "По фамилии")]

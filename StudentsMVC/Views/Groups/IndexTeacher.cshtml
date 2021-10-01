@@ -54,7 +54,7 @@
                     <td>  
                         <a class="btn btn-primary"
                            asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
-                        @if (item.GroupStatus == EnumGroupStatus.Обучение || item.GroupStatus == EnumGroupStatus.Закрыта)
+                        @if (item.GroupStatus == EnumGroupStatus.Training || item.GroupStatus == EnumGroupStatus.Close)
                         {
                         <a class="btn btn-primary"
                          asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>

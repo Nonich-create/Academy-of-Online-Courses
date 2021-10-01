@@ -47,7 +47,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка удаления приподавателя");
+                _logger.LogInformation(ex, "Ошибка удаления преподавателя");
             }
         }
 
@@ -65,7 +65,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка получение списка приподователей");
+                _logger.LogError(ex, "Ошибка получение списка преподователей");
                 return null;
             }
         }
@@ -93,7 +93,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка при получение приподователя");
+                _logger.LogInformation(ex, "Ошибка при получение преподователя");
                 return null;
             }
         }
@@ -110,7 +110,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка редактирования приподователя");
+                _logger.LogInformation(ex, "Ошибка редактирования преподователя");
                 return item;
             }
         }
@@ -118,6 +118,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<Teacher>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.TeacherRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<Teacher> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск преподователя");
+                return await _unitOfWork.TeacherRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска преподователя");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)

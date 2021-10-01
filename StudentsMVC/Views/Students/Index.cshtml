@@ -35,7 +35,7 @@
     </form>
     <form method="post" asp-controller="Students">
         <p>
-            <input type="hidden" name="action" value="@EnumPageActions.add" />
+            <input type="hidden" name="action" value="@EnumPageActions.Add" />
             <input type="hidden" name="take" value="@take" />
             <input type="hidden" name="searchString" value="@ViewData["searchString"]" />
             <input type="hidden" name="serachParameter" value="@ViewData["serachParameter"]" />
@@ -102,7 +102,7 @@
     <div class="container">
         <form method="post" asp-controller="Students">
             <p>
-                <input type="hidden" name="action" value="@EnumPageActions.back" />
+                <input type="hidden" name="action" value="@EnumPageActions.Back" />
                 <input type="hidden" name="skip" value="@skip" />
                 <input type="hidden" name="take" value="10" />
                 <input class="btn btn-primary"
@@ -111,7 +111,7 @@
         </form>
         <form method="post" asp-controller="Students">
             <p>
-                <input type="hidden" name="action" value="@EnumPageActions.next" />
+                <input type="hidden" name="action" value="@EnumPageActions.Next" />
                 <input type="hidden" name="skip" value="@skip" />
                 <input type="hidden" name="take" value="10" />
                 <input class="btn btn-primary"

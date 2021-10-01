@@ -101,6 +101,20 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task<Assessment> GetAsyncByLessonIdAndByStudentId(int Assessmentid,int LessonId, int StudentId)
+        {
+            try
+            {
+                _logger.LogInformation("Получение оценки");
+               return await _unitOfWork.AssessmentRepository.GetAsync(Assessmentid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка при получение оценки");
+                return null;
+            }
+        }
+
         public async Task<Assessment> Update(Assessment item)
         {
             try
@@ -123,7 +137,30 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
         {
-            return await _unitOfWork.AssessmentRepository.SearchAllAsync(searchString, searchParametr,action, take, skip);
+            try
+            {
+                _logger.LogInformation("Поиск оценок");
+                return await _unitOfWork.AssessmentRepository.SearchAllAsync(searchString, searchParametr,action, take, skip);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска оценок");
+                return null;
+            }
+        }
+
+        public async Task<Assessment> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск оценки");
+                return await _unitOfWork.AssessmentRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска оценки");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Assessment>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)

@@ -117,6 +117,20 @@ namespace Students.BLL.Services
             return await _unitOfWork.LessonTimesRepository.GetAllTakeSkipAsync(take, action, skip);
         }
 
+        public async Task<LessonTimes> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск времени проведения занятия");
+                return await _unitOfWork.LessonTimesRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска времени проведения занятия");
+                return null;
+            }
+        }
+
         public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
         {
             return await _unitOfWork.LessonTimesRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);

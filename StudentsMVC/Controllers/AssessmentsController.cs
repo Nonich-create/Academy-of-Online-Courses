@@ -56,19 +56,6 @@ namespace Students.MVC.Controllers
             return View(_mapper.Map<IEnumerable<AssessmentViewModel>>(assessments));
         }
         #endregion
-        #region отображения деталей о оценки
-        [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Details(int id)
-        {
-            var assessment = await _assessmentService.GetAsync(id);
-            if (assessment == null)
-            {
-                return NotFound();
-            }
-            var model = _mapper.Map<AssessmentViewModel>(assessment);
-            return View(model);
-        }
-        #endregion
         #region отображения добавления оценки
         [Authorize(Roles = "admin,manager,teacher")]
         public IActionResult Create() => View();
@@ -90,17 +77,15 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения редактирование оценки
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int idAssessment, string Url)
         {
-            var assessment = await _assessmentService.GetAsync(id);
-            if (assessment == null)
-            {
-                return NotFound();
-            }
+            var assessment = await _assessmentService.SearchAsync($"Id = {idAssessment}");
             var model = _mapper.Map<AssessmentViewModel>(assessment);
+            model.ReturnUrl = Url;
             return View(model);
         }
-        #endregion
+        #endregion 
+
         #region  редактирование оценки
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -110,26 +95,20 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var assessment = _mapper.Map<Assessment>(model);
-                try
-                {
-                    await _assessmentService.Update(assessment);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _assessmentService.ExistsAsync(assessment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return Redirect(Request.Headers["Referer"].ToString());
+                await _assessmentService.Update(assessment);
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
-            return View(model);
+            var modelValidate = _mapper.Map<AssessmentViewModel>(await _assessmentService.SearchAsync($"Id = {model.Id}"));
+            modelValidate.ReturnUrl = model.ReturnUrl;
+            return View(modelValidate);
         }
         #endregion
+
+        public IActionResult ReturnByUrl(AssessmentViewModel model)
+        {
+            return RedirectPermanent($"~{model.ReturnUrl}");
+        }
+
         #region удаление оценки
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

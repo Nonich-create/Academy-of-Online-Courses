@@ -39,7 +39,7 @@ namespace Students.BLL.Services
                 {
                     StudentId = StudentId,
                     CourseId = СourseId,
-                    ApplicationStatus = EnumApplicationStatus.Открыта
+                    ApplicationStatus = EnumApplicationStatus.Open
                 };
                 await _unitOfWork.CourseApplicationRepository.CreateAsync(model);
                 _logger.LogInformation($"Заявка принята Id Cтудента {StudentId}, Id Курса {СourseId}");
@@ -186,6 +186,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<Student>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.StudentRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<Student> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск студета");
+                return await _unitOfWork.StudentRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска студента");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)

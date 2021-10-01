@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
+using System;
 
 namespace Students.BLL.DataAccess
 {
@@ -31,6 +32,7 @@ namespace Students.BLL.DataAccess
 
         public async Task CreateRangeAsync(IEnumerable<Assessment> assessments)
         {
+            
             await _db.Assessments.AddRangeAsync(assessments);
             await _db.SaveChangesAsync();
         }
@@ -58,9 +60,14 @@ namespace Students.BLL.DataAccess
         }
         public async Task<bool> ExistsAsync(int id) => await _db.Assessments.FindAsync(id) != null;
 
+        public async Task<Assessment> SearchAsync(string predicate)
+        {
+            return await _db.Assessments.Include(a => a.Student).Include(a => a.Lesson).Where(predicate).FirstAsync();
+        }
+
         public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
         {
-            if (action == EnumPageActions.add)
+            if (action == EnumPageActions.Add)
                 return await _db.Assessments.AsQueryable().Include(a => a.Student).Include(a => a.Lesson)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
 
@@ -70,10 +77,10 @@ namespace Students.BLL.DataAccess
 
         public async Task<IEnumerable<Assessment>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
-            if (action == EnumPageActions.next)
+            if (action == EnumPageActions.Next)
                 return await _db.Assessments.AsQueryable().Include(a => a.Student).Include(a => a.Lesson).Skip(skip).Take(take).ToListAsync();
 
-            if (action == EnumPageActions.back)
+            if (action == EnumPageActions.Back)
             {
                 skip = (skip < skipById) ? 20 : skip;
                 return await _db.Assessments.AsQueryable().Include(a => a.Student).Include(a => a.Lesson).Skip(skip - skipById).Take(take).ToListAsync();

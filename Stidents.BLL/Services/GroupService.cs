@@ -134,7 +134,7 @@ namespace Students.BLL.Services
             try
             {
                 var group = await _unitOfWork.GroupRepository.GetAsync(id);
-                group.GroupStatus = EnumGroupStatus.Обучение;
+                group.GroupStatus = EnumGroupStatus.Training;
                 var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId == group.Id);
                 var lesson = (await _unitOfWork.LessonRepository.GetAllAsync()).Where(l => l.CourseId == group.CourseId);
                 await _unitOfWork.GroupRepository.Update(group);
@@ -142,7 +142,7 @@ namespace Students.BLL.Services
                 {
                     foreach (var itemStudent in students)
                     {
-                        await _unitOfWork.AssessmentRepository.CreateAsync(new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id });
+                        await _unitOfWork.AssessmentRepository.CreateAsync(new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id, Score = 0 });
                     }
                     await _unitOfWork.LessonTimesRepository.CreateAsync(new() { GroupId = group.Id, LessonId = itemLesson.Id });
                 }
@@ -172,6 +172,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<Group>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.GroupRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<Group> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск группы");
+                return await _unitOfWork.GroupRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска группы");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
