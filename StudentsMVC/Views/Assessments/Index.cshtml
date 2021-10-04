@@ -14,16 +14,18 @@
                 @foreach (var mark in Model.GroupBy(l => l.Lesson.Id).Select(y => y.First()))
                 {
                     <th>
-                        <ul id="nav" style="width:35px;"> 
-                            <li>
-                                <a href="#">@mark.Lesson.NumberLesson</a>
-                                <ul>
-                                    <li>
-                                        <a class="nav-link text-white" asp-controller="Lessons" asp-action="Details" asp-route-id="@mark.LessonId" asp-route-Url="@Context.Request.Path">@mark.Lesson.Name</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+                        <div align="left" style="width:30px; text-align:left;"> 
+                            <ul align="left" style="width:inherit; text-align:inherit" id="nav">
+                                <li align="left" style="width: inherit; text-align: inherit; right: 15px; left:0px;">
+                                    <a style="width:inherit; font-size: 15px" href="#"> @mark.Lesson.NumberLesson</a>
+                                    <ul>
+                                        <li>
+                                            <a class="nav-link text-white" asp-controller="Lessons" asp-action="Details" asp-route-id="@mark.LessonId" asp-route-Url="@Context.Request.Path">@mark.Lesson.Name</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
                     </th>
                 }
             </tr>
@@ -33,12 +35,15 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Student.Surname)   @Html.DisplayFor(modelItem => item.Student.Name)   @Html.DisplayFor(modelItem => item.Student.MiddleName)
+                        @Html.DisplayFor(modelItem => item.Student.GetFullName)
                     </td>
-                    @foreach (var mark in Model.Where(m => m.StudentId == item.Id))
+                    @foreach (var mark in Model.Where(m => m.StudentId == item.Student.Id))
                     {
-                        <td>
-                            @mark.Score
+                        <td style="text-align: center; padding-top: 15px">
+                                <a style="font-size: 25px;color:white;text-decoration: none" asp-controller="Assessments" asp-action="Edit" 
+                                   asp-route-idAssessment="@mark.Id" 
+                                   asp-route-Url="@Context.Request.Path?GroupId=@mark.Student.GroupId"
+                                   asp-data>@mark.Score</a>
                         </td>
                     }
                 </tr>
@@ -46,3 +51,6 @@
         </tbody>
     </table>
 </body>
+<div id="modDialog" class="modal fade">
+    <div id="dialogContent" class="modal-dialog"></div>
+</div>

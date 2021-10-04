@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
 using Students.DAL.Models;
@@ -13,14 +11,12 @@ namespace Students.BLL.Services
     public class TeacherService : ITeacherService
     {
 
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
         private readonly UnitOfWork _unitOfWork;
 
-        public TeacherService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<Teacher> logger)
+        public TeacherService(UnitOfWork unitOfWork, ILogger<Teacher> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
         
@@ -47,7 +43,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка удаления приподавателя");
+                _logger.LogInformation(ex, "Ошибка удаления преподавателя");
             }
         }
 
@@ -65,7 +61,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка получение списка приподователей");
+                _logger.LogError(ex, "Ошибка получение списка преподователей");
                 return null;
             }
         }
@@ -75,25 +71,11 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение приподователя");
-                if (!cache.TryGetValue(id, out Teacher teacher))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    teacher = await _unitOfWork.TeacherRepository.GetAsync(id);
-                    if (teacher != null)
-                    {
-                        cache.Set(teacher.Id, teacher,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return teacher;
+                return await _unitOfWork.TeacherRepository.GetAsync(id);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка при получение приподователя");
+                _logger.LogInformation(ex, "Ошибка при получение преподователя");
                 return null;
             }
         }
@@ -110,7 +92,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка редактирования приподователя");
+                _logger.LogInformation(ex, "Ошибка редактирования преподователя");
                 return item;
             }
         }
@@ -118,6 +100,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<Teacher>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.TeacherRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<Teacher> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск преподователя");
+                return await _unitOfWork.TeacherRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска преподователя");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)

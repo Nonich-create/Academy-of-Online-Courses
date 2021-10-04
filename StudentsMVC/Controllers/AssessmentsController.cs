@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -50,23 +49,11 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int GroupId) 
+        public async Task<IActionResult> Index(int GroupId,int take = 9999) 
         {
-            var assessments = (await _assessmentService.GetAllAsync()).AsQueryable().Where(a => a.Student.GroupId == GroupId).OrderBy(a => a.Lesson.NumberLesson);
+            var assessments = (await _assessmentService.SearchAllAsync(
+                $"{GroupId}", EnumSearchParameters.Student_GroupId, EnumPageActions.NotActions, take,0)).OrderBy(a => a.Lesson.NumberLesson);
             return View(_mapper.Map<IEnumerable<AssessmentViewModel>>(assessments));
-        }
-        #endregion
-        #region отображения деталей о оценки
-        [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Details(int id)
-        {
-            var assessment = await _assessmentService.GetAsync(id);
-            if (assessment == null)
-            {
-                return NotFound();
-            }
-            var model = _mapper.Map<AssessmentViewModel>(assessment);
-            return View(model);
         }
         #endregion
         #region отображения добавления оценки
@@ -90,17 +77,15 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения редактирование оценки
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int idAssessment, string Url)
         {
-            var assessment = await _assessmentService.GetAsync(id);
-            if (assessment == null)
-            {
-                return NotFound();
-            }
+            var assessment = await _assessmentService.SearchAsync($"Id = {idAssessment}");
             var model = _mapper.Map<AssessmentViewModel>(assessment);
+            model.ReturnUrl = Url;
             return View(model);
         }
-        #endregion
+        #endregion 
+
         #region  редактирование оценки
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -110,26 +95,20 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var assessment = _mapper.Map<Assessment>(model);
-                try
-                {
-                    await _assessmentService.Update(assessment);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _assessmentService.ExistsAsync(assessment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return Redirect(Request.Headers["Referer"].ToString());
+                await _assessmentService.Update(assessment);
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
-            return View(model);
+            var modelValidate = _mapper.Map<AssessmentViewModel>(await _assessmentService.SearchAsync($"Id = {model.Id}"));
+            modelValidate.ReturnUrl = model.ReturnUrl;
+            return View(modelValidate);
         }
         #endregion
+
+        public IActionResult ReturnByUrl(AssessmentViewModel model)
+        {
+            return RedirectPermanent($"~{model.ReturnUrl}");
+        }
+
         #region удаление оценки
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

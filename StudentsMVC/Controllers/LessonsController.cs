@@ -20,69 +20,46 @@ namespace Students.MVC.Controllers
         private readonly ICourseService _courseService;
         private readonly ILessonService _lessonService;
         private readonly IMapper _mapper;
+
         public LessonsController(ICourseService courseService, ILessonService lessonService, IMapper mapper)
         {
             _lessonService = lessonService;
             _courseService = courseService;
             _mapper = mapper;
         }
+
         #region Отображения уроков
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersLesson serachParameter)
+        public async Task<IActionResult> Index(
+            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLesson serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            return View(_mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var model = (await _lessonService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
+            return View(_mapper.Map<IEnumerable<LessonViewModel>>(model));
         }
+
         #endregion
         #region Отображения уроков определенного курса
         [ActionName("IndexСourseId")]
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(int id, string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(int id,
+            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLesson serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var lessonses = await _lessonService.GetAllAsync();
-            List<LessonViewModel> LessonViewModels = new();
-            LessonViewModel model;
-            foreach (var lesson in lessonses.Where(l => l.CourseId == id))
-            {
-                model = _mapper.Map<LessonViewModel>(lesson);
-                model.Course = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(lesson.CourseId));
-                LessonViewModels.Add(model);
-            }
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                LessonViewModels = LessonViewModels.FindAll(l => l.Name.Contains(searchString)
-                || l.Course.Name.Contains(searchString));
-            }
-          
-            return View();//PaginatedList<LessonViewModel>.Create(LessonViewModels, pageNumber ?? 1, 10));
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = (int)serachParameter;
+            var model = (await _lessonService.DisplayingIndexByIdCourse(id,action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
+            return View(model);
         }
         #endregion
+
         #region Отображения деталей урока
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Details(int id, string Url)
         {
             var lesson = await _lessonService.GetAsync(id);
-            if (lesson == null)
-            {
-                return NotFound();
-            }
-            LessonViewModel model;
-            model = _mapper.Map<LessonViewModel>(lesson);
-            model.Course = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(lesson.CourseId));
+            var model = _mapper.Map<LessonViewModel>(lesson);
             model.ReturnUrl = Url;
             return View(model);
         }
@@ -113,11 +90,8 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> CreateWithCourse()
         {
-            LessonViewModel model = new()
-            {
-                Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync())
-            };
-
+            var model = new LessonViewModel();
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             return View(model);
         }
         #endregion
@@ -125,18 +99,20 @@ namespace Students.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> CreateWithCourse(LessonViewModel model)
+        public async Task<IActionResult> CreateWithCourse(LessonViewModel model) 
         {
-            var lessonCourse = await _lessonService.GetAllAsync();
-            if (lessonCourse.Any(l => l.CourseId == model.CourseId && l.NumberLesson == model.NumberLesson))
+            if (await _lessonService.CheckRecord(model.CourseId, model.NumberLesson) == false)
             {
-                ModelState.AddModelError("Занятие", "Занятия с таким номером в данном курсе существуют");
+                ModelState.AddModelError("Занятие", "Занятия с таким номером в данном курсе существует");
             }
-            if (ModelState.IsValid)
+            else
             {
-                var lesson = _mapper.Map<Lesson>(model);
-                await _lessonService.CreateAsync(lesson);
-                return RedirectPermanent("~/Lessons/Index");
+                if (ModelState.IsValid)
+                {
+                    var lesson = _mapper.Map<Lesson>(model);
+                    await _lessonService.CreateAsync(lesson);
+                    return RedirectPermanent("~/Lessons/Index");
+                }
             }
             model = new()
             {
@@ -145,22 +121,19 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
         #region Отображения редактирования урока
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Edit(int id, string Url)
         {
             var lesson = await _lessonService.GetAsync(id);
-            if (lesson == null)
-            {
-                return NotFound();
-            }
-
             var model = _mapper.Map<LessonViewModel>(lesson);
-            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()).ToList());
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             model.ReturnUrl = Url;
             return View(model);
         }
         #endregion
+
         #region Редактирования урока
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -170,24 +143,9 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var lesson = _mapper.Map<Lesson>(model);
-                try
-                {
-                    await _lessonService.Update(lesson);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (await _lessonService.ExistsAsync(lesson.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectPermanent($"~{model.ReturnUrl}");
+                await _lessonService.Update(lesson);
+                return ReturnByUrl(model.ReturnUrl);
             }
-            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()).ToList());
             return View(model);
         }
         #endregion
@@ -197,14 +155,14 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> DeleteConfirmed(int LessonId)
         {
-            var lesson = await _lessonService.GetAsync(LessonId);
-            if (lesson == null)
-            {
-                return NotFound();
-            }
             await _lessonService.DeleteAsync(LessonId);
             return RedirectToAction("Index");
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

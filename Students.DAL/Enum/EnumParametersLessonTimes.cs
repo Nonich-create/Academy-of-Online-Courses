@@ -2,10 +2,10 @@
 
 namespace Students.DAL.Enum
 {
-    public enum EnumSearchParametersLessonTimes
+    public enum EnumParametersLessonTimes
     {
         [Display(Name = "Не определён")]
-        none = 0,
+        None = 0,
         [Display(Name = "По уроку")]
         Lesson_Name = 9,
         [Display(Name = "По номеру группы")]

@@ -22,7 +22,7 @@ namespace Students.MVC.Controllers
         private readonly IManagerService _managerService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        public ManagerController(IMapper mapper, UserManager<ApplicationUser> userManager,IManagerService managerService)
+        public ManagerController(IMapper mapper, UserManager<ApplicationUser> userManager, IManagerService managerService)
         {
             _managerService = managerService;
             _userManager = userManager;
@@ -30,7 +30,7 @@ namespace Students.MVC.Controllers
         }
         #region Отображения менеджеров
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersManager serachParameter)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersManager serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
@@ -46,10 +46,7 @@ namespace Students.MVC.Controllers
         #endregion
         #region Отображения регистрации менеджера
         [Authorize(Roles = "admin")]
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
         #endregion
         #region Регистрация менеджера
         [HttpPost]
@@ -83,21 +80,23 @@ namespace Students.MVC.Controllers
         #endregion
         #region Отображения редактирования менеджера
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string Url)
         {
-            return View(_mapper.Map<ManagerViewModel>(await _managerService.GetAsync(id)));
+            var model = _mapper.Map<PersonEditViewModel>(await _managerService.GetAsync(id));
+            model.ReturnUrl = Url;
+            return View(model);
         }
         #endregion
         #region Редактирования менеджера
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Edit(ManagerViewModel model)
+        public async Task<IActionResult> Edit(PersonEditViewModel model)
         {
             if (ModelState.IsValid)
             {
                 await _managerService.Update(_mapper.Map<Manager>(model));
-                return RedirectToAction("Index");
+                return ReturnByUrl(model.ReturnUrl);
             }
             return View(model);
         }
@@ -112,5 +111,10 @@ namespace Students.MVC.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

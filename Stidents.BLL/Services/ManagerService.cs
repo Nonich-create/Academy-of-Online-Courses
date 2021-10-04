@@ -4,7 +4,6 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
 
@@ -73,21 +72,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение менеджера");
-                if (!cache.TryGetValue(id, out Manager manager))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    manager = await _unitOfWork.ManagerRepository.GetAsync(id);
-                    if (manager != null)
-                    {
-                        cache.Set(manager.Id, manager,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return manager;
+                return await _unitOfWork.ManagerRepository.GetAsync(id);
             }
             catch (Exception ex)
             {
@@ -114,6 +99,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<Manager>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.ManagerRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<Manager> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск менаджера");
+                return await _unitOfWork.ManagerRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска менаджера");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Manager>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)

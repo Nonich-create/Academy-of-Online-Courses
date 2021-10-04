@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Students.DAL.Enum;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Students.BLL.Services
@@ -13,13 +12,11 @@ namespace Students.BLL.Services
     public class StudentService : IStudentService
     {
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public StudentService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<Student> logger)
+        public StudentService(UnitOfWork unitOfWork, ILogger<Student> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
 
@@ -39,7 +36,7 @@ namespace Students.BLL.Services
                 {
                     StudentId = StudentId,
                     CourseId = СourseId,
-                    ApplicationStatus = EnumApplicationStatus.Открыта
+                    ApplicationStatus = EnumApplicationStatus.Open
                 };
                 await _unitOfWork.CourseApplicationRepository.CreateAsync(model);
                 _logger.LogInformation($"Заявка принята Id Cтудента {StudentId}, Id Курса {СourseId}");
@@ -73,21 +70,7 @@ namespace Students.BLL.Services
                 {
                     return null;
                 }
-                if (!cache.TryGetValue(id, out Student student))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    student = await _unitOfWork.StudentRepository.GetAsync(id);
-                    if (student != null)
-                    {
-                        cache.Set(student.Id, student,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return student;
+                return await _unitOfWork.StudentRepository.GetAsync(id); 
             }
             catch(Exception ex)
             {
@@ -101,21 +84,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение студента");
-                if (!cache.TryGetValue(id, out Student student))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    student = await _unitOfWork.StudentRepository.GetAsync(id);
-                    if (student != null)
-                    {
-                        cache.Set(student.Id, student,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return student;
+                return await _unitOfWork.StudentRepository.GetAsync(id);
             }
             catch (Exception ex)
             {
@@ -157,9 +126,8 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.StudentRepository.DeleteAsync(id);
-                await _unitOfWork.ApplicationUsers.DeleteAsync((await _unitOfWork.StudentRepository.GetAsync(id)).UserId);
                 await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
+                await _unitOfWork.StudentRepository.DeleteAsync(id);
                 _logger.LogInformation(id,"Студент удален"); ;
             }
             catch (Exception ex)
@@ -186,6 +154,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<Student>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.StudentRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<Student> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск студета");
+                return await _unitOfWork.StudentRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска студента");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)

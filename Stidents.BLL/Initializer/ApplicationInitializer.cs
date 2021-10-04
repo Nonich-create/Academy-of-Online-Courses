@@ -235,7 +235,7 @@ namespace Students.DAL.Models
                         TeacherId = 1,
                         NumberGroup = "С# 101",
                         DateStart = new DateTime(2022, 01, 07),
-                        GroupStatus = EnumGroupStatus.Набор,
+                        GroupStatus = EnumGroupStatus.Set,
                         CountMax = 25
                     },
                     new Group
@@ -245,7 +245,7 @@ namespace Students.DAL.Models
                         TeacherId = 1,
                         NumberGroup = "С# 201",
                         DateStart = new DateTime(2022, 01, 07),
-                        GroupStatus = EnumGroupStatus.Набор,
+                        GroupStatus = EnumGroupStatus.Set,
                         CountMax = 25
                     },
                     new Group
@@ -255,7 +255,7 @@ namespace Students.DAL.Models
                         TeacherId = 2,
                         NumberGroup = "С++ 101",
                         DateStart = new DateTime(2022, 01, 07),
-                        GroupStatus = EnumGroupStatus.Набор,
+                        GroupStatus = EnumGroupStatus.Set,
                         CountMax = 20,
                     },
                     new Group
@@ -265,7 +265,7 @@ namespace Students.DAL.Models
                         TeacherId = 2,
                         NumberGroup = "1C 101",
                         DateStart = new DateTime(2021, 11, 01),
-                        GroupStatus = EnumGroupStatus.Набор,
+                        GroupStatus = EnumGroupStatus.Set,
                         CountMax = 15
                     },
                     new Group
@@ -275,7 +275,7 @@ namespace Students.DAL.Models
                         TeacherId = 3,
                         NumberGroup = "English 101",
                         DateStart = new DateTime(2021, 11, 01),
-                        GroupStatus = EnumGroupStatus.Набор,
+                        GroupStatus = EnumGroupStatus.Set,
                         CountMax = 40
                     },
                         new Group
@@ -285,7 +285,7 @@ namespace Students.DAL.Models
                         TeacherId = 3,
                         NumberGroup = "Java 101",
                         DateStart = new DateTime(2020, 10, 01),
-                        GroupStatus = EnumGroupStatus.Набор,
+                        GroupStatus = EnumGroupStatus.Set,
                         CountMax = 30
                     }
 
@@ -325,7 +325,7 @@ namespace Students.DAL.Models
                 {
                     CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus = EnumApplicationStatus.Открыта,
+                        ApplicationStatus = EnumApplicationStatus.Open,
                         CourseId = 1,
                         StudentId = i                       
                     };
@@ -335,7 +335,7 @@ namespace Students.DAL.Models
                 {
                     CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus =EnumApplicationStatus.Открыта,
+                        ApplicationStatus =EnumApplicationStatus.Open,
                         CourseId = 2,
                         StudentId = i
                     };
@@ -345,7 +345,7 @@ namespace Students.DAL.Models
                 {
                     CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus =EnumApplicationStatus.Открыта,
+                        ApplicationStatus =EnumApplicationStatus.Open,
                         CourseId = 3,
                         StudentId = i
                     };
@@ -355,7 +355,7 @@ namespace Students.DAL.Models
                 {
                     CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus =EnumApplicationStatus.Открыта,
+                        ApplicationStatus =EnumApplicationStatus.Open,
                         CourseId = 4,
                         StudentId = i
                     };
@@ -365,7 +365,7 @@ namespace Students.DAL.Models
                 {
                     CourseApplication courseApplication = new()
                     {
-                        ApplicationStatus =EnumApplicationStatus.Открыта,
+                        ApplicationStatus =EnumApplicationStatus.Open,
                         CourseId = 5,
                         StudentId = i
                     };

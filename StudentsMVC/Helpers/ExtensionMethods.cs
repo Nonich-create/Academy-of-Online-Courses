@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Students.MVC.ViewModels;
-using Students.DAL.Models;
-using Students.DAL.Enum;
-using AutoMapper;
  
 
 namespace Students.MVC.Helpers
@@ -23,9 +18,5 @@ namespace Students.MVC.Helpers
                         Value = x.ToString()
                     }), "Value", "Text");
         }
-
- 
     }
-
- 
 }

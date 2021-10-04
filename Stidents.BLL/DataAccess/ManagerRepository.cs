@@ -60,11 +60,16 @@ namespace Students.BLL.DataAccess
 
         public async Task<bool> ExistsAsync(int id) => await _db.Manager.FindAsync(id) != null;
 
+        public async Task<Manager> SearchAsync(string predicate)
+        {
+            return await _db.Manager.Where(predicate).FirstAsync();
+        }
+
         public async Task<IEnumerable<Manager>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.none)
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return null;
-            if (action == EnumPageActions.add)
+            if (action == EnumPageActions.Add)
                 return await _db.Manager.AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
 
@@ -74,10 +79,10 @@ namespace Students.BLL.DataAccess
 
         public async Task<IEnumerable<Manager>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
-            if (action == EnumPageActions.next)
+            if (action == EnumPageActions.Next)
                 return await _db.Manager.AsQueryable().Skip(skip).Take(take).ToListAsync();
 
-            if (action == EnumPageActions.back)
+            if (action == EnumPageActions.Back)
             { 
             skip = (skip < skipById) ? 20 : skip;
             return await _db.Manager.AsQueryable().Skip(skip).Take(take).ToListAsync();

@@ -1,9 +1,14 @@
-﻿namespace Students.DAL.Enum
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Students.DAL.Enum
 {
     public enum EnumApplicationStatus
     {
-        Открыта,
-        Закрыта,
-        Отменена
+        [Display(Name = "Открыта")]
+        Open,
+        [Display(Name = "Закрыта")]
+        Close,
+        [Display(Name = "Отменена")]
+        Cancelled
     }
 }

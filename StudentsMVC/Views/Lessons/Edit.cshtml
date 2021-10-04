@@ -7,8 +7,8 @@
     <div class="registration-form">
         <form asp-action="Edit">
             <div class="validation" asp-validation-summary="All"></div>
-            <input type="hidden" asp-for="Id"/>
-            <input type="hidden" asp-for="ReturnUrl"/>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="@Model.ReturnUrl" />
             <div class="form-group">
                 <label class="form_label">Номер урока</label><br />
                 <input type="text" class="form-control item" asp-for="NumberLesson" id="numberLesson" placeholder="Номер урока">
@@ -42,7 +42,7 @@
                 <input type="submit" value="Сохранить" class="btn btn-block create-account" />
             </div>
             <div class="form-group">
-                <a href="##" onClick="history.go(-1); return false;" class="btn btn-block create-account">Назад</a>
+                <input type="submit" value="Назад" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl" class="btn btn-block create-account" />
             </div>
         </form>
     </div>

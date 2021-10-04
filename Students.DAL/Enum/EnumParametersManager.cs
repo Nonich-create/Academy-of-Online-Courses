@@ -2,10 +2,10 @@
 
 namespace Students.DAL.Enum
 {
-    public enum EnumSearchParametersManager
+    public enum EnumParametersManager
     {
         [Display(Name = "Не определён")]
-        none = 0,
+        None = 0,
         [Display(Name = "Имени")]
         Name = 1,
         [Display(Name = "Фамилии")]

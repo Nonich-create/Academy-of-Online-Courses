@@ -14,6 +14,7 @@ namespace Students.BLL.DataAccess
         Task<T> Update(T item);
         Task DeleteAsync(int id);  
         Task<bool> ExistsAsync(int id);
+        Task<T> SearchAsync(string predicate);
         Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0);
         Task<IEnumerable<T>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0);
     }

@@ -8,10 +8,10 @@ namespace Students.DAL.Enum
 {
     public enum EnumPageActions
     {
-        notActions,
-        next,
-        back,
-        add,
+        NotActions,
+        Next,
+        Back,
+        Add,
 
     }
 }

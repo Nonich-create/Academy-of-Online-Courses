@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class EditStudentViewModel: StudentViewModel
+    public class EditStudentViewModel: PersonEditViewModel
     {
-        public IEnumerable<GroupViewModel> Groups { get; set; }
+        [DataType(DataType.Date)]
+        [Display(Name = "Дата рождения")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DateOfBirth { get; set; }
+        [Display(Name = "Номер группы")]
+        public int? GroupId { get; set; }
     }
 }

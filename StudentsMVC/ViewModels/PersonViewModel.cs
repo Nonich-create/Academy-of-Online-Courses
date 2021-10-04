@@ -43,5 +43,6 @@ namespace Students.MVC.ViewModels
 
         [Display(Name = "ФИО")]
         public string GetFullName => $"{Surname} {Name} {MiddleName}";
+        public string ReturnUrl { get; set; }
     }
 }

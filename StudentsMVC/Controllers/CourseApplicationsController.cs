@@ -35,7 +35,7 @@ namespace Students.MVC.Controllers
 
         #region Отображения заявок
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersCourseApplication serachParameter)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersCourseApplication serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;

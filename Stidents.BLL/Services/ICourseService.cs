@@ -7,6 +7,5 @@ namespace Students.BLL.Services
 {
     public interface ICourseService : IBaseService<Course>
     {
-        Task<IEnumerable<Course>> GetСarouselAsync(int skip = 0);
     }
 }

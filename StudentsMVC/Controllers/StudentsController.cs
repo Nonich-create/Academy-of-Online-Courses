@@ -28,38 +28,17 @@ namespace Students.MVC.Controllers
             _signInManager = signInManager;
             _mapper = mapper;
         }
-
-
        
-        public async Task<IActionResult> TestNotFound()
-        {
-            return null;
-        }
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersStudent serachParameter)
+        public async Task<IActionResult> Index(string sortRecords, string sortParm, string searchString, int skip, int take, EnumPageActions action, EnumParametersStudent serachParameter)
         {
- 
+            ViewData["sortRecords"] = sortRecords;
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-  
-            // switch (sortRecords)
-            // {
-            //     case "name_desc":
-            //         studentViewModels = studentViewModels.OrderByDescending(s => s.GetFullName).ToList();
-            //         break;
-            //     case "Date":
-            //         studentViewModels = studentViewModels.OrderBy(s => s.DateOfBirth).ToList();
-            //         break;
-            //     case "date_desc":
-            //         studentViewModels = studentViewModels.OrderByDescending(s => s.DateOfBirth).ToList();
-            //         break;
-            //     default:
-            //         studentViewModels = studentViewModels.OrderBy(s => s.GetFullName).ToList();
-            //         break;
-            // }
-  
-            return View(_mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var model = _mapper.Map<IEnumerable<StudentViewModel>>(
+                await _studentService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
+            return View(model);
         }
         #endregion
 
@@ -80,12 +59,11 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
         #region Отображения регистрации студента
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
         #endregion
+
         #region Регистрация студента
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -117,21 +95,17 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
         #region Отображения редактирования студента
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string Url)
         {
-            var student = await _studentService.GetAsync(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-            var groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()));
-            var model = _mapper.Map<EditStudentViewModel>(student);
-            model.Groups = groups;
+            var model = _mapper.Map<EditStudentViewModel>(await _studentService.GetAsync(id));
+            model.ReturnUrl = Url;
             return View(model);
         }
         #endregion
+
         #region Редактирования студента
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -143,26 +117,23 @@ namespace Students.MVC.Controllers
                 var student = _mapper.Map<Student>(model);
                 student.GroupId = model.GroupId;
                 await _studentService.Update(student);
-                return Redirect(Request.Headers["Referer"].ToString());
+                return ReturnByUrl(model.ReturnUrl);
             }
             return View(model);
         }
         #endregion
+
         #region Удаления студента
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> DeleteConfirmed(int StudentId)
+        public async Task<IActionResult> Delete(int StudentId)
         {
-            var student = await _studentService.GetAsync(StudentId);
-            if (student == null)
-            {
-                return NotFound();
-            }
             await _studentService.DeleteAsync(StudentId);
             return RedirectToAction("Index");
         }
         #endregion
+
         #region Аутефикация студента
         [HttpPost]
         public async Task<IActionResult> Authenticate(string Email, string Password)
@@ -172,6 +143,10 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
 
     }
 }

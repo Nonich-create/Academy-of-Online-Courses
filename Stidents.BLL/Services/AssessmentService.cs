@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Caching.Memory;
 using System;
 using Students.DAL.Enum;
 
@@ -14,13 +13,11 @@ namespace Students.BLL.Services
     public class AssessmentService : IAssessmentService
     {
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public AssessmentService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<Assessment> logger)
+        public AssessmentService(UnitOfWork unitOfWork, ILogger<Assessment> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
 
@@ -78,21 +75,21 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение оценки");
-                if (!cache.TryGetValue(id, out Assessment assessment))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    assessment = await _unitOfWork.AssessmentRepository.GetAsync(id);
-                    if (assessment != null)
-                    {
-                        cache.Set(assessment.Id, assessment,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return assessment;
+                return await _unitOfWork.AssessmentRepository.GetAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка при получение оценки");
+                return null;
+            }
+        }
+
+        public async Task<Assessment> GetAsyncByLessonIdAndByStudentId(int Assessmentid,int LessonId, int StudentId) // проверить 
+        {
+            try
+            {
+                _logger.LogInformation("Получение оценки");
+               return await _unitOfWork.AssessmentRepository.GetAsync(Assessmentid);
             }
             catch (Exception ex)
             {
@@ -123,7 +120,30 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
         {
-            return await _unitOfWork.AssessmentRepository.SearchAllAsync(searchString, searchParametr,action, take, skip);
+            try
+            {
+                _logger.LogInformation("Поиск оценок");
+                return await _unitOfWork.AssessmentRepository.SearchAllAsync(searchString, searchParametr,action, take, skip);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска оценок");
+                return null;
+            }
+        }
+
+        public async Task<Assessment> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск оценки");
+                return await _unitOfWork.AssessmentRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска оценки");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<Assessment>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)

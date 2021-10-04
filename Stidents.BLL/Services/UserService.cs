@@ -4,7 +4,6 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using Students.DAL.Enum;
 
 namespace Students.BLL.Services
@@ -79,6 +78,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<ApplicationUser>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.ApplicationUsers.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<ApplicationUser> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск пользователя");
+                return await _unitOfWork.ApplicationUsers.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска пользователя");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)

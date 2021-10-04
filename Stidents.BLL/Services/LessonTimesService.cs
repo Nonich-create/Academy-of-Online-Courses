@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
 
@@ -13,13 +11,11 @@ namespace Students.BLL.Services
     public class LessonTimesService : ILessonTimesService
     {
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public LessonTimesService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<LessonTimes> logger)
+        public LessonTimesService(UnitOfWork unitOfWork, ILogger<LessonTimes> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
 
@@ -74,21 +70,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение времени проведния занятия");
-                if (!cache.TryGetValue(id, out LessonTimes lesson))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    lesson = await _unitOfWork.LessonTimesRepository.GetAsync(id);
-                    if (lesson != null)
-                    {
-                        cache.Set(lesson.Id, lesson,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return lesson;
+                return await _unitOfWork.LessonTimesRepository.GetAsync(id);
             }
             catch (Exception ex)
             {
@@ -115,6 +97,20 @@ namespace Students.BLL.Services
         public async Task<IEnumerable<LessonTimes>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
         {
             return await _unitOfWork.LessonTimesRepository.GetAllTakeSkipAsync(take, action, skip);
+        }
+
+        public async Task<LessonTimes> SearchAsync(string predicate)
+        {
+            try
+            {
+                _logger.LogInformation("Поиск времени проведения занятия");
+                return await _unitOfWork.LessonTimesRepository.SearchAsync(predicate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка поиска времени проведения занятия");
+                return null;
+            }
         }
 
         public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
