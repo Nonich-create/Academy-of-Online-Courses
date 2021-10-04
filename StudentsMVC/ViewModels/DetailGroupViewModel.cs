@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Students.DAL.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,7 +19,7 @@ namespace Students.MVC.ViewModels
         public DateTime DateStart { get; set; }
 
         [Display(Name = "Статус группы")]
-        public string GroupStatus { get; set; }
+        public EnumGroupStatus GroupStatus { get; set; }
 
         [Required(ErrorMessage = "Не указана максимальная количество студентов")]
         [Display(Name = "Количество студентов")]
@@ -43,7 +44,7 @@ namespace Students.MVC.ViewModels
         public IEnumerable<CourseViewModel> Courses { get; set; }
 
         public IEnumerable<StudentViewModel> Students { get; set; }
-
+        public string ReturnUrl { get; set; }
 
 
     }

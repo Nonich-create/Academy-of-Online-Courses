@@ -14,7 +14,7 @@
                 @foreach (var mark in Model.GroupBy(l => l.Lesson.Id).Select(y => y.First()))
                 {
                     <th>
-                        <div align="left" style="width:30px; text-align:left;">
+                        <div align="left" style="width:30px; text-align:left;"> 
                             <ul align="left" style="width:inherit; text-align:inherit" id="nav">
                                 <li align="left" style="width: inherit; text-align: inherit; right: 15px; left:0px;">
                                     <a style="width:inherit; font-size: 15px" href="#"> @mark.Lesson.NumberLesson</a>

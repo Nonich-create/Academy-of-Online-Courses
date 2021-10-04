@@ -69,10 +69,10 @@ namespace Students.BLL.DataAccess
         {
             if (action == EnumPageActions.Add)
                 return await _db.Assessments.AsQueryable().Include(a => a.Student).Include(a => a.Lesson)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
+                .Where($"{searchParametr.ToString().Replace('_', '.')} == @0", searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
 
             return await _db.Assessments.AsQueryable().Include(a => a.Student).Include(a => a.Lesson)
-             .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take).ToListAsync();
+             .Where($"{searchParametr.ToString().Replace('_', '.')} == @0", searchString).Skip(skip).Take(take).ToListAsync();
         }
 
         public async Task<IEnumerable<Assessment>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)

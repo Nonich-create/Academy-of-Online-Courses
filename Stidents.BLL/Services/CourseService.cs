@@ -3,9 +3,7 @@ using Students.DAL.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Caching.Memory;
 using System;
-using System.Linq;
 using Students.DAL.Enum;
 
 namespace Students.BLL.Services
@@ -13,13 +11,11 @@ namespace Students.BLL.Services
     public class CourseService : ICourseService
     {
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public CourseService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<Course> logger)
+        public CourseService(UnitOfWork unitOfWork, ILogger<Course> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
 
@@ -73,21 +69,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение курса");
-                if (!cache.TryGetValue(id, out Course course))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    course = await _unitOfWork.CourseRepository.GetAsync(id);
-                    if (course != null)
-                    {
-                        cache.Set(course.Id, course,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return course;
+                return await _unitOfWork.CourseRepository.GetAsync(id); 
             }
             catch (Exception ex)
             {
@@ -143,23 +125,6 @@ namespace Students.BLL.Services
                 return await SearchAllAsync(searchString, searchParametr, action, take, skip);
             }
             return await GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<IEnumerable<Course>> GetСarouselAsync(int skip = 0)
-        {
-            const byte СarouselTake = 3;
-            try
-            {
-                if (await _unitOfWork.CourseRepository.ExistsAsync(skip))
-                    skip = 0;
-                _logger.LogInformation("Выполнения получения списка курсов");
-                return (await _unitOfWork.CourseRepository.GetAllAsync()).AsQueryable().Skip(skip).Take(СarouselTake);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Ошибка получение списка курсов");
-                return null;
-            }
         }
     }
 }

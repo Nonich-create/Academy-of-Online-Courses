@@ -2,7 +2,7 @@
 
 namespace Students.DAL.Enum
 {
-    public enum EnumSearchParametersLesson
+    public enum EnumParametersLesson
     {
         [Display(Name = "Не определён")]
         None = 0,

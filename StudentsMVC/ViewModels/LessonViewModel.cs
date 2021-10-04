@@ -6,6 +6,7 @@ namespace Students.MVC.ViewModels
 {
     public class LessonViewModel
     {
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Не указано название занятия")]

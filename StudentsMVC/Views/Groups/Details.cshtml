@@ -22,7 +22,7 @@
                 @Html.DisplayNameFor(model => model.GroupStatus)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.GroupStatus)
+                @Html.DisplayFor(model => model.GroupStatus)  
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Course.Name)
@@ -54,7 +54,7 @@
         <a class="btn btn-primary"
            asp-action="Edit" asp-route-id="@Model.Id">Редактировать</a>
         <a class="btn btn-primary"
-           asp-action="Index">Назад</a>
+           asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
     </div>
     <div class="card m-3">
         <table class="purpleHorizon">

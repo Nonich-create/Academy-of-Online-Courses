@@ -84,9 +84,11 @@ namespace Students.BLL.DataAccess
                 return null;
             if (action == EnumPageActions.Add)
                 return await _db.Groups.AsQueryable().Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
+                .Where($"{searchParametr.ToString().Replace('_', '.')} = @0",
+                searchString).Skip(skip).Take(take + takeByCount).ToListAsync();
             return await _db.Groups.AsQueryable().Include(g => g.Course).Include(g => g.Teacher).Include(g => g.Manager)
-             .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString).Skip(skip).Take(take).ToListAsync();
+             .Where($"{searchParametr.ToString().Replace('_', '.')} = @0",
+             searchString).Skip(skip).Take(take).ToListAsync();
         }
 
         public async Task<IEnumerable<Group>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)

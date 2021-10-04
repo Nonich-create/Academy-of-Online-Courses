@@ -71,7 +71,7 @@ namespace Students.BLL.Tests.RepositoryTests
 
             //Assert
             var resultSearchStudents = (await UnitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Where(s => s.Name == searchString);
-            Assert.Equal(resultSearchStudents.ToList().Count(), result.ToList().Count());
+            Assert.Equal(resultSearchStudents.Count(), result.Count());
         }
     }
 }

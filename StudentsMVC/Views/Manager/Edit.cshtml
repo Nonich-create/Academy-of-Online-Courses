@@ -1,4 +1,4 @@
-﻿@model Students.MVC.ViewModels.TeacherViewModel
+﻿@model Students.MVC.ViewModels.PersonEditViewModel
 @{
     Layout = "_LayoutAdditional";
     ViewData["Title"] = "Редактирование профиля";
@@ -9,6 +9,7 @@
                 <div class="validation" asp-validation-summary="All"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="@Model.ReturnUrl" />
                 <div class="form-group">
                     <label class="form_label">Имя</label><br />
                     <input type="text" class="form-control item" asp-for="Name" id="name" placeholder="Имя">
@@ -25,7 +26,7 @@
                     <span asp-validation-for="MiddleName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label class="form_label">Ссылка на фотографию</label><br />   
+                    <label class="form_label">Ссылка на фотографию</label><br />
                     <input type="text" asp-for="URLImagePhoto" class="form-control item" id="url" placeholder="Ссылка на фотографию">
                     <span asp-validation-for="URLImagePhoto" class="text-danger"></span>
                 </div>
@@ -33,7 +34,7 @@
                     <input type="submit" value="Сохранить" class="btn btn-block create-account" />
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="Назад" asp-action="Index" class="btn btn-block create-account" />
+                    <input type="submit" value="Назад" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl" class="btn btn-block create-account" />
                 </div>
             </form>
         </div>

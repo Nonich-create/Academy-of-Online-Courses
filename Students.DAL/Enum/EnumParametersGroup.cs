@@ -3,7 +3,7 @@
 
 namespace Students.DAL.Enum
 {
-    public enum EnumSearchParametersGroup
+    public enum EnumParametersGroup
     {
         [Display(Name = "Не определён")]
         None = 0,

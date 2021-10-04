@@ -39,31 +39,33 @@ namespace Students.MVC.Controllers
         }
         #region отображения групп
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersGroup serachParameter)
+        public async Task<IActionResult> Index(
+            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersGroup serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            return View(_mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip)));
+            return View(model);
         }
         #endregion
 
         #region отображения групп преподователя
-        [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> IndexTeacher()
+        [Authorize(Roles = "teacher")]  //ДОБАВИТЬ ПАГИНАЦИЮ 
+        public async Task<IActionResult> IndexTeacher(EnumPageActions action ,int skip = 0, int take = 10)
         {
-                var idTeacher = (await _teacherService.GetAllAsync()).First(t => t.UserId == _userManager.GetUserId(User)).Id;
-                var groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).AsQueryable()
-                    .Where(g => g.TeacherId == idTeacher));
-                return View(groups);
+            var idTeacher = (await _teacherService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\"")).Id;
+            var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.DisplayingIndex(action, idTeacher.ToString(), EnumSearchParameters.TeacherId, take, skip)));
+            return View(model);
         }
         #endregion
 
         #region отображения детали группы
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string Url)
         {
             var group = _mapper.Map<DetailGroupViewModel>(await _groupService.GetAsync(id));
             group.Students = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.GetAllAsync()).AsQueryable().Where(s => s.GroupId == group.Id));
+            group.ReturnUrl = Url;
             return View(group);
         }
         #endregion
@@ -92,6 +94,9 @@ namespace Students.MVC.Controllers
                 await _groupService.CreateAsync(_mapper.Map<Group>(model));
                 return RedirectToAction("Index");
             }
+            model.Manageres = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.GetAllAsync()));
+            model.Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync()));
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()));
             return View(model);
         }
         #endregion
@@ -117,6 +122,9 @@ namespace Students.MVC.Controllers
                 await _groupService.Update(_mapper.Map<Group>(model));
                 return RedirectToAction("Index");
             }
+            model.Manageres = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.GetAllAsync()));
+            model.Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync()));
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()));
             return View(model);
         }
         #endregion
@@ -138,5 +146,10 @@ namespace Students.MVC.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

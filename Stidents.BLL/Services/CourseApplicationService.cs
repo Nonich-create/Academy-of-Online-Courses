@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
@@ -13,13 +12,11 @@ namespace Students.BLL.Services
     public class CourseApplicationService : ICourseApplicationService
     {
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public CourseApplicationService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<CourseApplication> logger)
+        public CourseApplicationService(UnitOfWork unitOfWork, ILogger<CourseApplication> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
 
@@ -83,6 +80,7 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления заявок");
             }
         }
+
         public async Task Enroll(CourseApplication model) 
         {
             var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null );
@@ -122,21 +120,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение заяки");
-                if (!cache.TryGetValue(id, out CourseApplication courseApplication))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    courseApplication = await _unitOfWork.CourseApplicationRepository.GetAsync(id);
-                    if (courseApplication != null)
-                    {
-                        cache.Set(courseApplication.Id, courseApplication,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return courseApplication;
+                return await _unitOfWork.CourseApplicationRepository.GetAsync(id);
             }
             catch (Exception ex)
             {

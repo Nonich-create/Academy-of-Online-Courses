@@ -3,7 +3,6 @@ using Students.DAL.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
@@ -14,13 +13,11 @@ namespace Students.BLL.Services
     public class GroupService : IGroupService
     {
         private readonly UnitOfWork _unitOfWork;
-        private readonly IMemoryCache cache;
         private readonly ILogger _logger;
 
-        public GroupService(UnitOfWork unitOfWork, IMemoryCache memoryCache, ILogger<Group> logger)
+        public GroupService(UnitOfWork unitOfWork, ILogger<Group> logger)
         {
             _unitOfWork = unitOfWork;
-            cache = memoryCache;
             _logger = logger;
         }
 
@@ -78,21 +75,7 @@ namespace Students.BLL.Services
                     return null;
                 }
                 _logger.LogInformation("Получение группы");
-                if (!cache.TryGetValue(id, out Group group))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    group = await _unitOfWork.GroupRepository.GetAsync(id);
-                    if (group != null)
-                    {
-                        cache.Set(group.Id, group,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return group;
+                return await _unitOfWork.GroupRepository.GetAsync(id);
             }
             catch (Exception ex)
             {
@@ -106,21 +89,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение группы");
-                if (!cache.TryGetValue(id, out Group group))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    group = await _unitOfWork.GroupRepository.GetAsync(id);
-                    if (group != null)
-                    {
-                        cache.Set(group.Id, group,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return group;
+                return await _unitOfWork.GroupRepository.GetAsync(id);
             }
             catch (Exception ex)
             {

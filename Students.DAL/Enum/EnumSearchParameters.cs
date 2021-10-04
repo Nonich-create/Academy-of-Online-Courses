@@ -18,7 +18,8 @@ namespace Students.DAL.Enum
         DateOfTheLesson = 15,
         Manager_Surname = 16,
         Teacher_Surname = 17,
- 
+        TeacherId = 18,
+        Student_GroupId = 19,
     }
 }
  

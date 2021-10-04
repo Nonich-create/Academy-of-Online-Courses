@@ -31,7 +31,8 @@ namespace Students.MVC.Controllers
         #region Отображения уроков
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersLesson serachParameter)
+        public async Task<IActionResult> Index(
+            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLesson serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
@@ -43,35 +44,13 @@ namespace Students.MVC.Controllers
         #region Отображения уроков определенного курса
         [ActionName("IndexСourseId")]
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(int id, string sortRecords, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(int id,
+            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLesson serachParameter)
         {
-            ViewData["CurrentSort"] = sortRecords;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewData["CurrentFilter"] = searchString;
-            var lessonses = await _lessonService.GetAllAsync();
-            List<LessonViewModel> LessonViewModels = new();
-            LessonViewModel model;
-            foreach (var lesson in lessonses.Where(l => l.CourseId == id))
-            {
-                model = _mapper.Map<LessonViewModel>(lesson);
-                model.Course = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(lesson.CourseId));
-                LessonViewModels.Add(model);
-            }
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                LessonViewModels = LessonViewModels.FindAll(l => l.Name.Contains(searchString)
-                || l.Course.Name.Contains(searchString));
-            }
-            return View();
+            ViewData["searchString"] = searchString;
+            ViewData["serachParameter"] = (int)serachParameter;
+            var model = (await _lessonService.DisplayingIndexByIdCourse(id,action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
+            return View(model);
         }
         #endregion
 
@@ -111,7 +90,8 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> CreateWithCourse()
         {
-            var model = _mapper.Map<IEnumerable<LessonViewModel>>(await _lessonService.GetAllAsync());
+            var model = new LessonViewModel();
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             return View(model);
         }
         #endregion
@@ -119,18 +99,20 @@ namespace Students.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> CreateWithCourse(LessonViewModel model) // проверить
+        public async Task<IActionResult> CreateWithCourse(LessonViewModel model) 
         {
-            var lessonCourse = await _lessonService.GetAllAsync();
-            if (lessonCourse.Any(l => l.CourseId == model.CourseId && l.NumberLesson == model.NumberLesson))
+            if (await _lessonService.CheckRecord(model.CourseId, model.NumberLesson) == false)
             {
-                ModelState.AddModelError("Занятие", "Занятия с таким номером в данном курсе существуют");
+                ModelState.AddModelError("Занятие", "Занятия с таким номером в данном курсе существует");
             }
-            if (ModelState.IsValid)
+            else
             {
-                var lesson = _mapper.Map<Lesson>(model);
-                await _lessonService.CreateAsync(lesson);
-                return RedirectPermanent("~/Lessons/Index");
+                if (ModelState.IsValid)
+                {
+                    var lesson = _mapper.Map<Lesson>(model);
+                    await _lessonService.CreateAsync(lesson);
+                    return RedirectPermanent("~/Lessons/Index");
+                }
             }
             model = new()
             {
@@ -146,6 +128,7 @@ namespace Students.MVC.Controllers
         {
             var lesson = await _lessonService.GetAsync(id);
             var model = _mapper.Map<LessonViewModel>(lesson);
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             model.ReturnUrl = Url;
             return View(model);
         }
@@ -161,7 +144,7 @@ namespace Students.MVC.Controllers
             {
                 var lesson = _mapper.Map<Lesson>(model);
                 await _lessonService.Update(lesson);
-                return RedirectPermanent($"~{model.ReturnUrl}");
+                return ReturnByUrl(model.ReturnUrl);
             }
             return View(model);
         }
@@ -176,5 +159,10 @@ namespace Students.MVC.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

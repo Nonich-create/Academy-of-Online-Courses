@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using AutoMapper;
+using Students.DAL.Enum;
 
 namespace Students.MVC.Controllers
 {
@@ -50,9 +49,10 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int GroupId) 
+        public async Task<IActionResult> Index(int GroupId,int take = 9999) 
         {
-            var assessments = (await _assessmentService.GetAllAsync()).AsQueryable().Where(a => a.Student.GroupId == GroupId).OrderBy(a => a.Lesson.NumberLesson);
+            var assessments = (await _assessmentService.SearchAllAsync(
+                $"{GroupId}", EnumSearchParameters.Student_GroupId, EnumPageActions.NotActions, take,0)).OrderBy(a => a.Lesson.NumberLesson);
             return View(_mapper.Map<IEnumerable<AssessmentViewModel>>(assessments));
         }
         #endregion

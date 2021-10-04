@@ -31,22 +31,10 @@ namespace Students.MVC.Controllers
 
         #region отображения курсов
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersCourse serachParameter)
+        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersCourse serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            //ViewData["CurrentSort"] = sortRecords;
-            //ViewData["NameSortParm"] = String.IsNullOrEmpty(sortRecords) ? "name_desc" : "";
-            //ViewData["DateSortParm"] = sortRecords == "Date" ? "date_desc" : "Date";
-            //switch (sortRecords)
-            //{
-            //    case "name_desc":
-            //        courses = courses.OrderByDescending(c => c.Name).ToList();
-            //        break;
-            //    default:
-            //        courses = courses.OrderBy(c => c.Name).ToList();
-            //        break;
-            //}
             return View(_mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
         }
         #endregion
@@ -128,10 +116,6 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public IActionResult CreateLesson(int id)
         {
-            if (id == 0)
-            {
-                return View();
-            }
             LessonViewModel model = new();
             model.CourseId = id;
             return View(model);

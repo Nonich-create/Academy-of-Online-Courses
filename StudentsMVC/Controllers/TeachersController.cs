@@ -1,16 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using Students.BLL.Services;
 using System.Collections.Generic;
-using Students.BLL.Mapper;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
-using System;
-using Students.MVC.Helpers;
 using AutoMapper;
 using Students.DAL.Enum;
 
@@ -30,19 +25,22 @@ namespace Students.MVC.Controllers
 
         #region Отображения преподователей
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumSearchParametersTeacher serachParameter)
+        public async Task<IActionResult> Index(string searchString, int skip, int take, EnumPageActions action, EnumParametersTeacher serachParameter)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            return View(_mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var model = await _teacherService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip);
+            return View(_mapper.Map<IEnumerable<TeacherViewModel>>(model));
         }
         #endregion
 
         #region Отображения дополнительной информации о преподователях
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string Url)
         {
-            return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id)));
+            var model = _mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id));
+            model.ReturnUrl = Url;
+            return View(model);
         }
         #endregion
 
@@ -51,22 +49,20 @@ namespace Students.MVC.Controllers
         [ActionName("DetailsTeacher")]
         public async Task<IActionResult> Details()
         {
-            var teachers = (await _teacherService.GetAllAsync()).First(t => t.UserId == _userManager.GetUserId(User)).Id;
-            return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(teachers)));
+            var model = _mapper.Map<TeacherViewModel>(await _teacherService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\""));
+            return View(model);
         }
         #endregion
 
         #region Отображения регистрации преподователя
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
         #endregion
+
         #region Регистрация преподователя
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Create(TeacherViewModel model)
+        public async Task<IActionResult> Create(TeacherViewModel model) 
         {
             if (ModelState.IsValid)
             {
@@ -92,23 +88,27 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
         #region Отображения редактирования преподователя
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string Url)
         {
-            return View(_mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id)));
+            var model = _mapper.Map<PersonEditViewModel>(await _teacherService.GetAsync(id));
+            model.ReturnUrl = Url;
+            return View(model);
         }
         #endregion
+
         #region Редактирования пользователя
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(TeacherViewModel model)
+        public async Task<IActionResult> Edit(PersonEditViewModel model)
         {
             if (ModelState.IsValid)
             {
                 await _teacherService.Update(_mapper.Map<Teacher>(model));
-                return RedirectToAction("Index");
+                return ReturnByUrl(model.ReturnUrl);
             }
             return View(model);
         }
@@ -120,15 +120,14 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int TeacherId)
         {
-            var teacher = await _teacherService.GetAsync(TeacherId);
-            var user = await _userManager.FindByIdAsync(teacher.UserId);
-            if (teacher != null)
-            {
-                await _teacherService.DeleteAsync(TeacherId);
-                await _userManager.DeleteAsync(user);
-            }
+            await _teacherService.DeleteAsync(TeacherId);
             return RedirectToAction("Index");
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

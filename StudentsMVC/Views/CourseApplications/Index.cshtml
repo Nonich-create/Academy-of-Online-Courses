@@ -15,7 +15,7 @@
     <form method="post" asp-controller="CourseApplications">
         <p>
             <select name="serachParameter" class="form-control">
-                @foreach (var item in Html.GetEnumSelectList<EnumSearchParametersCourseApplication>())
+                @foreach (var item in Html.GetEnumSelectList<EnumParametersCourseApplication>())
                 {
                     @if (item.Value == @ViewData["serachParameter"].ToString())
                     {

@@ -15,7 +15,7 @@
     <form method="post" asp-controller="Lessons">
         <p>
             <select name="serachParameter" class="form-control">
-                @foreach (var item in Html.GetEnumSelectList<EnumSearchParametersLesson>())
+                @foreach (var item in Html.GetEnumSelectList<EnumParametersLesson>())
                 {
                     @if (item.Value == @ViewData["serachParameter"].ToString())
                     {
@@ -85,7 +85,7 @@
                         <a class="btn btn-primary"
                            asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
                         <a class="btn btn-primary"
-                           asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
+                           asp-action="Details" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Подробнее</a>
                         <form method="post" asp-controller="Lessons" asp-action="Delete">
                             <button class="btn btn-danger" asp-controller="Lessons" asp-action="Delete" asp-route-LessonId="@item.Id">
                                 Удалить
@@ -97,8 +97,7 @@
             }
             <tr>
                 <td>
-                    <a class="btn btn-primary"
-                       asp-action="CreateWithCourse">Добавить занятия</a>
+                    <a class="btn btn-primary" asp-action="CreateWithCourse" asp-route-Url="@Context.Request.Path">Добавить занятия</a>
                 </td>
             </tr>
         </tbody>

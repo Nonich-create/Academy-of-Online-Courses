@@ -4,7 +4,6 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
 
@@ -73,21 +72,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение менеджера");
-                if (!cache.TryGetValue(id, out Manager manager))
-                {
-                    _logger.LogInformation("Кэша нету");
-                    manager = await _unitOfWork.ManagerRepository.GetAsync(id);
-                    if (manager != null)
-                    {
-                        cache.Set(manager.Id, manager,
-                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Кэш есть");
-                }
-                return manager;
+                return await _unitOfWork.ManagerRepository.GetAsync(id);
             }
             catch (Exception ex)
             {

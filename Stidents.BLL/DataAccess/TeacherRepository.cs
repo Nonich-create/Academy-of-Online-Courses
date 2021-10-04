@@ -20,20 +20,21 @@ namespace Students.BLL.DataAccess
         }
 
         public async Task<IEnumerable<Teacher>> GetAllAsync() =>
-            await _db.Teachers.AsQueryable().Include(t =>t.Groups).ThenInclude(g =>g.Course).ToListAsync();
+            await _db.Teachers.AsQueryable().Include(t =>t.Groups).ThenInclude(g =>g.Course).Include(t => t.User).ToListAsync();
         
 
         public async Task<Teacher> GetAsync(int id) => await ExistsAsync(id) ? await _db.Teachers.FindAsync(id) : null;
 
         public async Task CreateAsync(Teacher teacher)
         {
+     
             await _db.Teachers.AddAsync(teacher);
             await _db.SaveChangesAsync();
         }
         
         public async Task<Teacher> Update(Teacher teacher)
         {
-            var teacherEntity = await _db.Teachers.AsQueryable().AsNoTracking().FirstOrDefaultAsync(t => t.Id == teacher .Id);
+            var teacherEntity = await _db.Teachers.AsQueryable().Include(t => t.User).AsNoTracking().FirstOrDefaultAsync(t => t.Id == teacher .Id);
 
             if (teacherEntity != null)
             {
@@ -48,8 +49,10 @@ namespace Students.BLL.DataAccess
         public async Task DeleteAsync(int id)
         {
             Teacher teacher = await GetAsync(id);
+            ApplicationUser user = await _db.ApplicationUsers.AsQueryable().FirstAsync(i => i.Id == $"{teacher.UserId}");  
             if (teacher != null)
             {
+                _db.ApplicationUsers.Remove(user);
                 _db.Teachers.Remove(teacher);
                 await _db.SaveChangesAsync();
             }   
@@ -58,7 +61,7 @@ namespace Students.BLL.DataAccess
 
         public async Task<Teacher> SearchAsync(string predicate)
         {
-            return await _db.Teachers.Where(predicate).FirstAsync();
+            return await _db.Teachers.AsQueryable().Include(t => t.User).Where(predicate).FirstAsync();
         }
 
         public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)

@@ -14,9 +14,15 @@ namespace Students.MVC.Mapper
         {
             CreateMap<Person, PersonViewModel>()
             .ReverseMap();
+            CreateMap<Teacher, PersonEditViewModel>()
+            .ReverseMap();
+            CreateMap<Manager, PersonEditViewModel>()
+            .ReverseMap();
             CreateMap<Teacher, TeacherViewModel>()
             .ReverseMap();
             CreateMap<Student, StudentViewModel>()
+            .ReverseMap();
+            CreateMap<Student, EditStudentViewModel>()
             .ReverseMap();
             CreateMap<Manager, ManagerViewModel>()
             .ReverseMap();

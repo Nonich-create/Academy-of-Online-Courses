@@ -59,12 +59,14 @@ namespace Students.BLL.DataAccess
 
             return studentEntity;
         }
-
+ 
         public async Task DeleteAsync(int id)
         {
             Student student = await GetAsync(id);
+            ApplicationUser user = await _db.ApplicationUsers.AsQueryable().FirstAsync(i => i.Id == $"{student.UserId}");
             if (student != null)
             {
+                _db.ApplicationUsers.Remove(user);
                 _db.Students.Remove(student);
                 await _db.SaveChangesAsync();
             }

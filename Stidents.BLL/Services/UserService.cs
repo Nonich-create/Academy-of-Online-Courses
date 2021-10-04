@@ -4,7 +4,6 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using Students.DAL.Enum;
 
 namespace Students.BLL.Services
