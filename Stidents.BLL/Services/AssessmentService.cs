@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
+using System.Linq.Dynamic.Core;
 
 namespace Students.BLL.Services
 {
@@ -26,6 +27,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.AssessmentRepository.CreateAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Оценка создана");
             }
             catch (Exception ex)
@@ -38,8 +40,13 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.AssessmentRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Оценка удалена"); ;
+                Assessment assessment = await GetAsync(id);
+                if (assessment != null)
+                {
+                    await _unitOfWork.AssessmentRepository.DeleteAsync(id);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation(id, "Оценка удалена");
+                }
             }
             catch (Exception ex)
             {
@@ -59,16 +66,9 @@ namespace Students.BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка получение списка оценок");
-                return null;
+                return Enumerable.Empty<Assessment>();
             }
         }
-
-   
-
-        public async Task<IEnumerable<Assessment>> GetAssessmentsByStudentId(int studentId)
-         => (await _unitOfWork.AssessmentRepository.GetAllAsync()).Where(x => x.StudentId == studentId);
- 
-        
 
         public async Task<Assessment> GetAsync(int id)
         {
@@ -84,26 +84,13 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<Assessment> GetAsyncByLessonIdAndByStudentId(int Assessmentid,int LessonId, int StudentId) // проверить 
-        {
-            try
-            {
-                _logger.LogInformation("Получение оценки");
-               return await _unitOfWork.AssessmentRepository.GetAsync(Assessmentid);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка при получение оценки");
-                return null;
-            }
-        }
-
         public async Task<Assessment> Update(Assessment item)
         {
             try
             {
                 var assessment = await _unitOfWork.AssessmentRepository.Update(item);
                 _logger.LogInformation("Оценка изменена");
+                await _unitOfWork.SaveAsync();
                 return assessment;
             }
             catch (Exception ex)
@@ -113,31 +100,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Assessment>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-           return await _unitOfWork.AssessmentRepository.GetAllTakeSkipAsync(take,action, skip);
-        }
-
-        public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0)
-        {
-            try
-            {
-                _logger.LogInformation("Поиск оценок");
-                return await _unitOfWork.AssessmentRepository.SearchAllAsync(searchString, searchParametr,action, take, skip);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска оценок");
-                return null;
-            }
-        }
-
-        public async Task<Assessment> SearchAsync(string predicate)
+        public async Task<Assessment> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск оценки");
-                return await _unitOfWork.AssessmentRepository.SearchAsync(predicate);
+                return await _unitOfWork.AssessmentRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -146,14 +114,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Assessment>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return (await _unitOfWork.AssessmentRepository.GetAllAsync()).Count();
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
+        }
+
+        public async Task<IEnumerable<Assessment>> GetPaginatedResult(int currentPage, int pageSize = 10)
+        {
+            return (await _unitOfWork.AssessmentRepository.GetAllAsync())
+                .OrderBy(a => a.Lesson.NumberLesson).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Assessment>();
+            return (await _unitOfWork.AssessmentRepository.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Assessment>();
+            return (await _unitOfWork.AssessmentRepository.GetAllAsync()).AsQueryable()
+                .OrderBy(a => a.Lesson.NumberLesson)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Assessment>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            {
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+            }
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 }

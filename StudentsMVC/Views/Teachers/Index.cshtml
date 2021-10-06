@@ -5,12 +5,6 @@
     Layout = "_Layout";
 }
 <body>
-    @{
-        int skip = 0;
-        if (Model.Count() > 0)
-            skip = Model.Max(s => s.Id);
-        int take = Model.Count();
-    }
     <form method="post" asp-controller="Teachers">
         <p>
             <select name="serachParameter" class="form-control">
@@ -27,16 +21,6 @@
             <input type="hidden" name="take" value="10" />
             <input class="btn btn-primary"
                    type="submit" value="Поиск" />
-        </p>
-    </form>
-    <form method="post" asp-controller="Teachers">
-        <p>
-            <input type="hidden" name="action" value="@EnumPageActions.Add" />
-            <input type="hidden" name="take" value="@take" />
-            <input type="hidden" name="searchString" value="@ViewData["searchString"]" />
-            <input type="hidden" name="serachParameter" value="@ViewData["serachParameter"]" />
-            <input class="btn btn-primary"
-                   type="submit" value="ещё" />
         </p>
     </form>
     <table class="purpleHorizon">
@@ -77,24 +61,4 @@
             </tr>
         </tbody>
     </table>
-    <div class="container">
-        <form method="post" asp-controller="Teachers">
-            <p>
-                <input type="hidden" name="action" value="@EnumPageActions.Back" />
-                <input type="hidden" name="skip" value="@skip" />
-                <input type="hidden" name="take" value="10" />
-                <input class="btn btn-primary"
-                       type="submit" value="Предыдущие" />
-            </p>
-        </form>
-        <form method="post" asp-controller="Teachers">
-            <p>
-                <input type="hidden" name="action" value="@EnumPageActions.Next" />
-                <input type="hidden" name="skip" value="@skip" />
-                <input type="hidden" name="take" value="10" />
-                <input class="btn btn-primary"
-                       type="submit" value="Следущие" />
-            </p>
-        </form>
-    </div>
 </body>

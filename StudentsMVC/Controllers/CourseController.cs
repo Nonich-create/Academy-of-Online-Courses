@@ -31,11 +31,13 @@ namespace Students.MVC.Controllers
 
         #region отображения курсов
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersCourse serachParameter)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            return View(_mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var count = await _courseService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
+            return View(model);
         }
         #endregion
         #region отображения деталей курса

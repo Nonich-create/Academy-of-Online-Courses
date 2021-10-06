@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using Students.DAL.Enum;
+using System.Linq.Dynamic.Core;
+using System.Linq;
 
 namespace Students.BLL.Services
 {
@@ -25,6 +27,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.TeacherRepository.CreateAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Преподователь создан");
             }
             catch (Exception ex)
@@ -38,8 +41,14 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.TeacherRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Преподователь удален"); ;
+                Teacher teacher = await GetAsync(id);
+                if (teacher != null)
+                {
+                    await _unitOfWork.ApplicationUsers.DeleteAsync(teacher.UserId);
+                    await _unitOfWork.TeacherRepository.DeleteAsync(id);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation(id, "Преподователь удален");
+                }
             }
             catch (Exception ex)
             {
@@ -47,22 +56,19 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _unitOfWork.TeacherRepository.ExistsAsync(id);
-        }
-
+        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.TeacherRepository.ExistsAsync(id);
+        
         public async Task<IEnumerable<Teacher>> GetAllAsync()
         {
             try
             {
-                _logger.LogInformation("Выполнения получения списка приподователей");
+                _logger.LogInformation("Выполнения получения списка преподователей");
                 return await _unitOfWork.TeacherRepository.GetAllAsync(); ;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка получение списка преподователей");
-                return null;
+                return Enumerable.Empty<Teacher>();
             }
         }
          
@@ -70,7 +76,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                _logger.LogInformation("Получение приподователя");
+                _logger.LogInformation("Получение преподователя");
                 return await _unitOfWork.TeacherRepository.GetAsync(id);
             }
             catch (Exception ex)
@@ -87,6 +93,7 @@ namespace Students.BLL.Services
             try
             {
                 var teacher = await _unitOfWork.TeacherRepository.Update(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Преподователь изменен");
                 return teacher;
             }
@@ -97,17 +104,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Teacher>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-            return await _unitOfWork.TeacherRepository.GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<Teacher> SearchAsync(string predicate)
+        public async Task<Teacher> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск преподователя");
-                return await _unitOfWork.TeacherRepository.SearchAsync(predicate);
+                return await _unitOfWork.TeacherRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -116,19 +118,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            return await _unitOfWork.TeacherRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                return (await _unitOfWork.TeacherRepository.GetAllAsync()).Count();
+            }
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<Teacher>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<IEnumerable<Teacher>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            return (await _unitOfWork.TeacherRepository.GetAllAsync())
+                .OrderBy(t => t.Surname).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Teacher>();
+            return (await _unitOfWork.TeacherRepository.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Teacher>();
+            return (await _unitOfWork.TeacherRepository.GetAllAsync()).AsQueryable()
+                .OrderBy(t => t.Surname)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Teacher>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 }

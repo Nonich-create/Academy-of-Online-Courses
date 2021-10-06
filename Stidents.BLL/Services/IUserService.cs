@@ -1,5 +1,4 @@
-﻿using Students.BLL.DataAccess;
-using Students.DAL.Models;
+﻿using Students.DAL.Models;
 using System.Threading.Tasks;
 
 namespace Students.BLL.Services
@@ -8,5 +7,6 @@ namespace Students.BLL.Services
     {
         Task<bool> ExistsAsync(string id);
         Task<ApplicationUser> GetAsync(string id);
+        Task DeleteAsync(string id);
     }
 }

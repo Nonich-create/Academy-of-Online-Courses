@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace Students.BLL.Services
 {
@@ -24,6 +26,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.CourseRepository.CreateAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Курс создан");
             }
             catch (Exception ex)
@@ -36,8 +39,13 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.CourseRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Курс удален"); ;
+                Course course = await GetAsync(id);
+                if (course != null)
+                {
+                    await _unitOfWork.CourseRepository.DeleteAsync(id);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation(id, "Курс удален"); 
+                }
             }
             catch (Exception ex)
             {
@@ -45,10 +53,8 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _unitOfWork.CourseRepository.ExistsAsync(id);
-        }
+        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.CourseRepository.ExistsAsync(id);
+
 
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
@@ -60,7 +66,7 @@ namespace Students.BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка получение списка курсов");
-                return null;
+                return Enumerable.Empty<Course>();
             }
         }
 
@@ -83,6 +89,7 @@ namespace Students.BLL.Services
             try
             {
                 var course = await _unitOfWork.CourseRepository.Update(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Курс изменен");
                 return course;
             }
@@ -93,17 +100,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Course>>GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-            return await _unitOfWork.CourseRepository.GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<Course> SearchAsync(string predicate)
+        public async Task<Course> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск курса");
-                return await _unitOfWork.CourseRepository.SearchAsync(predicate);
+                return await _unitOfWork.CourseRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -112,19 +114,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            return await _unitOfWork.CourseRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                return (await _unitOfWork.CourseRepository.GetAllAsync()).Count();
+            }
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<Course>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<IEnumerable<Course>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            return (await _unitOfWork.CourseRepository.GetAllAsync())
+                .OrderBy(c => c.Name).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Course>();
+            return (await _unitOfWork.CourseRepository.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Course>();
+            return (await _unitOfWork.CourseRepository.GetAllAsync()).AsQueryable()
+                .OrderBy(c => c.Name)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Course>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 }

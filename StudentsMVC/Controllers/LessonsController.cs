@@ -31,25 +31,24 @@ namespace Students.MVC.Controllers
         #region Отображения уроков
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(
-            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLesson serachParameter)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            var model = (await _lessonService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
-            return View(_mapper.Map<IEnumerable<LessonViewModel>>(model));
+            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
+            return View(model);
         }
 
         #endregion
         #region Отображения уроков определенного курса
-        [ActionName("IndexСourseId")]
-        [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(int id,
-            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLesson serachParameter)
+        [Authorize(Roles = "admin,manager,teacher")] // исправить
+        public async Task<IActionResult> IndexСourseId(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            var model = (await _lessonService.DisplayingIndexByIdCourse(id,action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
+            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
             return View(model);
         }
         #endregion
@@ -90,8 +89,10 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> CreateWithCourse()
         {
-            var model = new LessonViewModel();
-            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
+            var model = new LessonViewModel
+            {
+                Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync())
+            };
             return View(model);
         }
         #endregion

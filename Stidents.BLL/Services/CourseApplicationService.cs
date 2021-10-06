@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
+using System.Linq.Dynamic.Core;
 
 namespace Students.BLL.Services
 {
@@ -23,7 +24,7 @@ namespace Students.BLL.Services
         public async Task Cancel(CourseApplication model)
         { 
             var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
-            var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId
+            var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).FirstOrDefault(g => g.CourseId == model.CourseId
             && g.Id == (int)student.GroupId 
             && g.GroupStatus == EnumGroupStatus.Training);
             if (group == null)
@@ -32,6 +33,7 @@ namespace Students.BLL.Services
                 await _unitOfWork.StudentRepository.Update(student);
                 model.ApplicationStatus = EnumApplicationStatus.Cancelled;
                 await _unitOfWork.CourseApplicationRepository.Update(model);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Заявка студента {student.Id} на курс {model.CourseId} отменена");
             }
             else 
@@ -45,7 +47,8 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.CourseApplicationRepository.CreateAsync(item);   
+                await _unitOfWork.CourseApplicationRepository.CreateAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Заявка создана");
             }
             catch (Exception ex)
@@ -59,8 +62,13 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.CourseApplicationRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Заяка удалена"); ;
+                CourseApplication courseApplication = await GetAsync(id);
+                if (courseApplication != null)
+                {
+                    await _unitOfWork.CourseApplicationRepository.DeleteAsync(id);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation(id, "Заяка удалена");
+                }
             }
             catch (Exception ex)
             {
@@ -73,6 +81,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation(id, "Заяки студента удалены"); ;
             }
             catch (Exception ex)
@@ -83,22 +92,29 @@ namespace Students.BLL.Services
 
         public async Task Enroll(CourseApplication model) 
         {
-            var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null );
-            var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId && 
-            g.GroupStatus == EnumGroupStatus.Set &&
-            g.CountMax > students.Count(s =>s.GroupId == g.Id));
-            if (group == null){ throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
-            var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
-            if(student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
-            student.GroupId = group.Id;
-            await _unitOfWork.StudentRepository.Update(student);
-            model.ApplicationStatus = EnumApplicationStatus.Close;
-            await _unitOfWork.CourseApplicationRepository.Update(model);
-            _logger.LogInformation($"Студент {model.StudentId} зачислен в группу {group.Id}"); ;
+            try
+            {
+                var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null);
+                var group = (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == model.CourseId &&
+               g.GroupStatus == EnumGroupStatus.Set &&
+               g.CountMax > students.Count(s => s.GroupId == g.Id));
+                if (group == null) { throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
+                var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
+                if (student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
+                student.GroupId = group.Id;
+                await _unitOfWork.StudentRepository.Update(student);
+                model.ApplicationStatus = EnumApplicationStatus.Close;
+                await _unitOfWork.CourseApplicationRepository.Update(model);
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation($"Студент {model.StudentId} зачислен в группу {group.Id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка обработке заявки");
+            }
         }
 
         public async Task<bool> ExistsAsync(int id) => await _unitOfWork.CourseApplicationRepository.ExistsAsync(id);
-
 
         public async Task<IEnumerable<CourseApplication>> GetAllAsync()
         {
@@ -110,7 +126,7 @@ namespace Students.BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка получение списка заявок");
-                return null;
+                return Enumerable.Empty<CourseApplication>();
             }
         }
 
@@ -144,17 +160,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<CourseApplication>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-            return await _unitOfWork.CourseApplicationRepository.GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<CourseApplication> SearchAsync(string predicate)
+        public async Task<CourseApplication> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск заяки");
-                return await _unitOfWork.CourseApplicationRepository.SearchAsync(predicate);
+                return await _unitOfWork.CourseApplicationRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -163,19 +174,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            return await _unitOfWork.CourseApplicationRepository.SearchAllAsync(searchString, searchParameter,action, take, skip);
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                return (await _unitOfWork.CourseApplicationRepository.GetAllAsync()).Count();
+            }
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<CourseApplication>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<IEnumerable<CourseApplication>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            return (await _unitOfWork.CourseApplicationRepository.GetAllAsync())
+                .OrderBy(c => c.Course.Name).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<CourseApplication>();
+            return (await _unitOfWork.CourseApplicationRepository.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<CourseApplication>();
+            return (await _unitOfWork.CourseApplicationRepository.GetAllAsync()).AsQueryable()
+                .OrderBy(c => c.Course.Name)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<CourseApplication>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 }

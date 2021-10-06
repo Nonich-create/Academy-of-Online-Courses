@@ -35,11 +35,13 @@ namespace Students.MVC.Controllers
 
         #region Отображения заявок
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersCourseApplication serachParameter)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            return View(_mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _courseApplicationService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var count = await _courseApplicationService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _courseApplicationService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
+            return View(model);
         }
         #endregion
         #region Зачисления студента в группу

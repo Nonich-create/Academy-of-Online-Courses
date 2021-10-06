@@ -32,13 +32,12 @@ namespace Students.MVC.Controllers
         #region Отображения расписания занятий
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(
-            string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersLessonTimes serachParameter)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            var model = _mapper.Map<IEnumerable<LessonTimesViewModel>>((
-                await _lessonTimesService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip)));
+            var count = await _lessonTimesService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<LessonTimesViewModel>>((await _lessonTimesService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
             return View(model);
         }
         #endregion

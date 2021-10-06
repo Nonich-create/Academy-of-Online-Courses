@@ -14,11 +14,6 @@
 
   <ItemGroup>
     <None Remove="Views\Roles\NewFile.txt" />
-    <None Remove="Views\Students\NewFile.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\scss\style.scss" />
   </ItemGroup>
 
   <ItemGroup>
