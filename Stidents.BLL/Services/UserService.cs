@@ -5,6 +5,8 @@ using Students.DAL.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
+using System.Linq.Dynamic.Core;
+using System.Linq;
 
 namespace Students.BLL.Services
 {
@@ -24,6 +26,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.ApplicationUsers.CreateAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Пользователь создан");
             }
             catch (Exception ex)
@@ -36,6 +39,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.ApplicationUsers.DeleteAsync(id);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Пользователь удален");
             }
             catch (Exception ex)
@@ -44,20 +48,34 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления пользователя");
             }
         }
-
-        public async Task<bool> ExistsAsync(string id)
+        public async Task DeleteAsync(string id)
         {
-                return await GetAsync(id) != null;
-        }
+            try
+            {
+                await _unitOfWork.ApplicationUsers.DeleteAsync(id);
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation("Пользователь удален");
+            }
+            catch (Exception ex)
+            {
 
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _unitOfWork.ApplicationUsers.ExistsAsync(id);
+                _logger.LogInformation(ex, "Ошибка удаления пользователя");
+            }
         }
-
+        public async Task<bool> ExistsAsync(string id) => await GetAsync(id) != null;
+        
+        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.ApplicationUsers.ExistsAsync(id);
+        
         public async Task<IEnumerable<ApplicationUser>> GetAllAsync()
         {
-            return await _unitOfWork.ApplicationUsers.GetAllAsync();
+            try
+            {
+                return await _unitOfWork.ApplicationUsers.GetAllAsync();
+            }
+            catch
+            {
+                return Enumerable.Empty<ApplicationUser>();
+            }
         }
 
         public async Task<ApplicationUser> GetAsync(string id)
@@ -72,20 +90,27 @@ namespace Students.BLL.Services
 
         public async Task<ApplicationUser> Update(ApplicationUser item)
         {
-            return await _unitOfWork.ApplicationUsers.Update(item);
+            try
+            {
+                var User = await _unitOfWork.ApplicationUsers.Update(item);
+                _logger.LogInformation("Пользователь изменен");
+                await _unitOfWork.SaveAsync();
+                return User;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка редактирования пользователя");
+                return item;
+            }
+
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-            return await _unitOfWork.ApplicationUsers.GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<ApplicationUser> SearchAsync(string predicate)
+        public async Task<ApplicationUser> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск пользователя");
-                return await _unitOfWork.ApplicationUsers.SearchAsync(predicate);
+                return await _unitOfWork.ApplicationUsers.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -94,19 +119,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            return await _unitOfWork.ApplicationUsers.SearchAllAsync(searchString,searchParameter,action, take, skip);
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                return (await _unitOfWork.ApplicationUsers.GetAllAsync()).Count();
+            }
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<ApplicationUser>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<IEnumerable<ApplicationUser>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            return (await _unitOfWork.ApplicationUsers.GetAllAsync())
+                .OrderBy(u => u.Email).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<ApplicationUser>();
+            return (await _unitOfWork.ApplicationUsers.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<ApplicationUser>();
+            return (await _unitOfWork.ApplicationUsers.GetAllAsync()).AsQueryable()
+                .OrderBy(u => u.Email)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<ApplicationUser>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 

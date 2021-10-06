@@ -1,8 +1,4 @@
-﻿using Students.DAL.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
 
@@ -16,9 +12,11 @@ namespace Students.BLL.Services
         Task<T> Update(T item);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
-        Task<T> SearchAsync(string predicate);
-        Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, EnumPageActions action, int take, int skip = 0);
-        Task<IEnumerable<T>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0);
-        Task<IEnumerable<T>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0);
+        Task<T> SearchAsync(string query);
+        Task<IEnumerable<T>> GetPaginatedResult(int currentPage, int pageSize = 10);
+        Task<int> GetCount(string searchString, EnumSearchParameters searchParametr);
+        Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr);
+        Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize);
+        Task<IEnumerable<T>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize);
     }
 }

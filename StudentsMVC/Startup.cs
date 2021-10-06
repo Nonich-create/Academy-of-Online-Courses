@@ -15,7 +15,6 @@ using Students.BLL.Options;
 using AutoMapper;
 using Students.MVC.Mapper;
 using Students.MVC.Filters;
-using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 
@@ -51,11 +50,6 @@ namespace Students.MVC
                 .AddEntityFrameworkStores<Context>();
          
             services.AddScoped<ICourseApplicationService, CourseApplicationService>();
-            services.AddScoped<IRepository<ApplicationUser>, ApplicationUserRepository>();
-            services.AddScoped<IRepository<Student>, StudentRepository>();
-            services.AddScoped<IRepository<Teacher>, TeacherRepository>();
-            services.AddScoped<IRepository<Group>, GroupRepository>();
-            services.AddScoped<IRepository<Manager>, ManagerRepository>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
             services.AddScoped<ICourseService, CourseService>();

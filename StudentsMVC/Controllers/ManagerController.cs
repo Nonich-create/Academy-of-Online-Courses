@@ -30,11 +30,13 @@ namespace Students.MVC.Controllers
         }
         #region Отображения менеджеров
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Index(string sortRecords, string searchString, int skip, int take, EnumPageActions action, EnumParametersManager serachParameter)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
             ViewData["searchString"] = searchString;
             ViewData["serachParameter"] = (int)serachParameter;
-            return View(_mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip))));
+            var count = await _managerService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
+            return View(model);
         }
         #endregion
         #region Отображения подробностей о менеджере 

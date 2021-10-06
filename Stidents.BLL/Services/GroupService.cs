@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
+using System.Linq.Dynamic.Core;
 
 namespace Students.BLL.Services
 {
@@ -26,6 +27,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.GroupRepository.CreateAsync(item);
+                await _unitOfWork.SaveAsync();  
                 _logger.LogInformation("Группа создана");
             }
             catch (Exception ex)
@@ -38,8 +40,13 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.GroupRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Группа удалена"); ;
+                Group group = await GetAsync(id);
+                if (group != null)
+                {
+                    await _unitOfWork.GroupRepository.DeleteAsync(id);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation(id, "Группа удалена");
+                }
             }
             catch (Exception ex)
             {
@@ -47,10 +54,8 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _unitOfWork.GroupRepository.ExistsAsync(id);
-        }
+        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.GroupRepository.ExistsAsync(id);
+        
 
         public async Task<IEnumerable<Group>> GetAllAsync()
         {
@@ -62,7 +67,7 @@ namespace Students.BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка получение списка групп");
-                return null;
+                return Enumerable.Empty<Group>();
             }
         }
 
@@ -115,6 +120,7 @@ namespace Students.BLL.Services
                     }
                     await _unitOfWork.LessonTimesRepository.CreateAsync(new() { GroupId = group.Id, LessonId = itemLesson.Id });
                 }
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Группа {group.Id} начала обучение");
             }
             catch(Exception ex)
@@ -128,6 +134,7 @@ namespace Students.BLL.Services
             try
             {
                 var group = await _unitOfWork.GroupRepository.Update(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Группа изменена");
                 return group;
             }
@@ -138,17 +145,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Group>> GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-            return await _unitOfWork.GroupRepository.GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<Group> SearchAsync(string predicate)
+        public async Task<Group> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск группы");
-                return await _unitOfWork.GroupRepository.SearchAsync(predicate);
+                return await _unitOfWork.GroupRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -157,19 +159,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            return await _unitOfWork.GroupRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                return (await _unitOfWork.GroupRepository.GetAllAsync()).Count();
+            }
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<Group>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<IEnumerable<Group>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            return (await _unitOfWork.GroupRepository.GetAllAsync())
+                .OrderBy(g => g.NumberGroup).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Group>();
+            return (await _unitOfWork.GroupRepository.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<Group>();
+            return (await _unitOfWork.GroupRepository.GetAllAsync()).AsQueryable()
+                .OrderBy(g => g.NumberGroup)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Group>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 

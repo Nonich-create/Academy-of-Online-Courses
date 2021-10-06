@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace Students.BLL.Services
 {
@@ -24,6 +26,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.LessonTimesRepository.CreateAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Время урока добавлена");
             }
             catch (Exception ex)
@@ -37,7 +40,8 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.LessonTimesRepository.DeleteAsync(id);
-                _logger.LogInformation(id, "Время занятия удалена"); ;
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation(id, "Время занятия удалена");
             }
             catch (Exception ex)
             {
@@ -45,11 +49,8 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<bool> ExistsAsync(int id)
-        {
-
-            return await _unitOfWork.LessonTimesRepository.ExistsAsync(id);
-        }
+        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.LessonTimesRepository.ExistsAsync(id);
+        
 
         public async Task<IEnumerable<LessonTimes>> GetAllAsync()
         {
@@ -61,7 +62,7 @@ namespace Students.BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка получение списка времени проведния занятий");
-                return null;
+                return Enumerable.Empty<LessonTimes>();
             }
         }
 
@@ -84,6 +85,7 @@ namespace Students.BLL.Services
             try
             {
                 var lessonTimes = await _unitOfWork.LessonTimesRepository.Update(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Время проведения занятия изменено");
                 return lessonTimes;
             }
@@ -94,17 +96,12 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<LessonTimes>>  GetAllTakeSkipAsync(int take, EnumPageActions action, int skip = 0)
-        {
-            return await _unitOfWork.LessonTimesRepository.GetAllTakeSkipAsync(take, action, skip);
-        }
-
-        public async Task<LessonTimes> SearchAsync(string predicate)
+        public async Task<LessonTimes> SearchAsync(string query)
         {
             try
             {
                 _logger.LogInformation("Поиск времени проведения занятия");
-                return await _unitOfWork.LessonTimesRepository.SearchAsync(predicate);
+                return await _unitOfWork.LessonTimesRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
@@ -113,19 +110,46 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParameter, EnumPageActions action, int take, int skip = 0)
+        public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            return await _unitOfWork.LessonTimesRepository.SearchAllAsync(searchString,searchParameter,action, take, skip);
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                return (await _unitOfWork.LessonTimesRepository.GetAllAsync()).Count();
+            }
+            return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<LessonTimes>> DisplayingIndex(EnumPageActions action, string searchString, EnumSearchParameters searchParametr, int take, int skip = 0)
+        public async Task<IEnumerable<LessonTimes>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            take = (take == 0) ? 10 : take;
-            if (!String.IsNullOrEmpty(searchString))
+            return (await _unitOfWork.LessonTimesRepository.GetAllAsync())
+                .OrderBy(l => l.Lesson.NumberLesson).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<LessonTimes>();
+            return (await _unitOfWork.LessonTimesRepository.GetAllAsync()).AsQueryable()
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+                return Enumerable.Empty<LessonTimes>();
+            return (await _unitOfWork.LessonTimesRepository.GetAllAsync()).AsQueryable()
+                .OrderBy(l => l.Lesson.NumberLesson)
+                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
+                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<LessonTimes>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
+        {
+            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, action, take, skip);
+                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
-            return await GetAllTakeSkipAsync(take, action, skip);
+            return await GetPaginatedResult(currentPage, pageSize);
         }
     }
 }

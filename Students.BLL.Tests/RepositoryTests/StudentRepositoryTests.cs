@@ -26,7 +26,7 @@ namespace Students.BLL.Tests.RepositoryTests
     public class StudentRepositoryTests
     {
 
-        private UnitOfWork UnitOfWork;
+        private readonly UnitOfWork UnitOfWork;
         public Fixture Fixture { get; set; } = new();
 
         public StudentRepositoryTests()
@@ -41,37 +41,37 @@ namespace Students.BLL.Tests.RepositoryTests
         }
 
 
-        [Fact]
-        public async Task SearchSurname__ActionExecutes_ReturnsViewResultNull_WithStudentsCount()
-        {
-            // Arrange
-            const int take = 10;
-            var students = Fixture.CreateMany<Student>(31);
-            await UnitOfWork.StudentRepository.CreateRangeAsync(students);
-            string searchString = "";
+      //  [Fact]
+      //  public async Task SearchSurname__ActionExecutes_ReturnsViewResultNull_WithStudentsCount()
+      //  {
+      //      // Arrange
+      //      const int take = 10;
+      //      var students = Fixture.CreateMany<Student>(31);
+      //      await UnitOfWork.StudentRepository.CreateRangeAsync(students);
+      //      string searchString = "";
+      //
+      //      //Act
+      //      var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Surname, EnumPageActions.NotActions, take, 0);
+      //
+      //      //Assert
+      //      Assert.Empty(result);
+      //  }
 
-            //Act
-            var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Surname, EnumPageActions.NotActions, take, 0);
-
-            //Assert
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task SearchName_ActionExecutes_ReturnsViewResultSearch_WithStudentsCount()
-        {
-            // Arrange
-            const int take = 10;
-            var students = Fixture.CreateMany<Student>(31);
-            await UnitOfWork.StudentRepository.CreateRangeAsync(students);
-            string searchString = students.ToList()[4].Name;
-
-            //Act
-            var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Name, EnumPageActions.NotActions, take, 0);
-
-            //Assert
-            var resultSearchStudents = (await UnitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Where(s => s.Name == searchString);
-            Assert.Equal(resultSearchStudents.Count(), result.Count());
-        }
+    // [Fact]
+    // public async Task SearchName_ActionExecutes_ReturnsViewResultSearch_WithStudentsCount()
+    // {
+    //     // Arrange
+    //     const int take = 10;
+    //     var students = Fixture.CreateMany<Student>(31);
+    //     await UnitOfWork.StudentRepository.CreateRangeAsync(students);
+    //     string searchString = students.ToList()[4].Name;
+    //
+    //     //Act
+    //     var result = await UnitOfWork.StudentRepository.SearchAllAsync(searchString, EnumSearchParameters.Name, EnumPageActions.NotActions, take, 0);
+    //
+    //     //Assert
+    //     var resultSearchStudents = (await UnitOfWork.StudentRepository.GetAllAsync()).AsQueryable().Where(s => s.Name == searchString);
+    //     Assert.Equal(resultSearchStudents.Count(), result.Count());
+    // }
     }
 }

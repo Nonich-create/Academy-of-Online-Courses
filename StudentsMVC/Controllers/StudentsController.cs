@@ -8,37 +8,44 @@ using Students.DAL.Models;
 using Students.BLL.Services;
 using AutoMapper;
 using Students.DAL.Enum;
+using System.Linq;
+using Students.MVC.Models;
+using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
     public class StudentsController : Controller
     {
-        private readonly IStudentService _studentService;
+        
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IGroupService _groupService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
+        private readonly IStudentService _studentService;
         private readonly IMapper _mapper;
-        public StudentsController(IMapper mapper,IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService, IGroupService groupService)
+
+        public StudentsController(IMapper mapper,IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
         {
             _userService = userService;
             _studentService = studentService;
             _userManager = userManager;
-            _groupService = groupService;
             _signInManager = signInManager;
             _mapper = mapper;
         }
        
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(string sortRecords, string sortParm, string searchString, int skip, int take, EnumPageActions action, EnumParametersStudent serachParameter)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
-            ViewData["sortRecords"] = sortRecords;
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var model = _mapper.Map<IEnumerable<StudentViewModel>>(
-                await _studentService.DisplayingIndex(action, searchString, (EnumSearchParameters)(int)serachParameter, take, skip));
-            return View(model);
+            var count = await _studentService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
+            var model = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page,10)));
+            var paginationModel = new PaginationModel<StudentViewModel>(count, page)
+            {
+                searchString = searchString,
+                serachParameter = (int)serachParameter,
+                Data = model
+            };
+
+            return View(paginationModel);
         }
         #endregion
 

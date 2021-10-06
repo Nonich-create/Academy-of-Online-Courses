@@ -37,22 +37,21 @@ namespace Students.MVC.Controllers
         }
 
         #region отображения оценок студента
-        [Authorize(Roles = "admin,manager,teacher,student")]
+        [Authorize(Roles = "admin,manager,teacher,student")] // проверить 45 строку
         public async Task<IActionResult> StudentAssessments()
         {
             var id = _userManager.GetUserId(User);
             var students = (await _studentService.GetAllAsync()).First(s => s.UserId == _userManager.GetUserId(User));
-            var assessments = await _assessmentService.GetAssessmentsByStudentId(students.Id);
-            var assessmentViewModels = _mapper.Map<IEnumerable<AssessmentViewModel>>((await _assessmentService.GetAssessmentsByStudentId(students.Id)).ToList());
-            return View(assessmentViewModels);
+            var assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>((await _assessmentService.GetAllAsync()).Where(a => a.StudentId == students.Id));
+            return View(assessments);
         }
         #endregion
         #region отображения оценок студентов
         [Authorize(Roles = "teacher")]
-        public async Task<IActionResult> Index(int GroupId,int take = 9999) 
+        public async Task<IActionResult> Index(int GroupId) 
         {
-            var assessments = (await _assessmentService.SearchAllAsync(
-                $"{GroupId}", EnumSearchParameters.Student_GroupId, EnumPageActions.NotActions, take,0)).OrderBy(a => a.Lesson.NumberLesson);
+            var assessments = (await _assessmentService.GetAllAsync()).AsQueryable()
+                .OrderBy(a => a.Lesson.NumberLesson).Where(a => a.Student.GroupId == GroupId);
             return View(_mapper.Map<IEnumerable<AssessmentViewModel>>(assessments));
         }
         #endregion
