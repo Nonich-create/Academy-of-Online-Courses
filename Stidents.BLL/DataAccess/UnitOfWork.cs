@@ -4,20 +4,19 @@ using System.Threading.Tasks;
 
 namespace Students.BLL.DataAccess
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly Context _db;
+        private Repository.CourseRepository _courseRepository;
         private ApplicationUserRepository _applicationUserRepository;
         private StudentRepository _studentRepository;
         private TeacherRepository _teacherRepository;
         private GroupRepository _groupRepository;
         private ManagerRepository _managerRepository;
         private LessonRepository _lessonRepository;
-        private CourseRepository _courseRepository;
         private AssessmentRepository _assessmentRepository;
         private CourseApplicationRepository _courseApplicationRepository;
         private LessonTimesRepository _lessonTimesRepository;
-
         private bool disposed = false;
 
         public UnitOfWork(Context db)
@@ -25,6 +24,15 @@ namespace Students.BLL.DataAccess
             _db = db;
         }
 
+        public Repository.CourseRepository CourseRepository
+        {
+            get
+            {
+                if (_courseRepository == null)
+                    _courseRepository = new Repository.CourseRepository(_db);
+                return _courseRepository;
+            }
+        }
         public CourseApplicationRepository CourseApplicationRepository
         {
             get
@@ -93,15 +101,7 @@ namespace Students.BLL.DataAccess
                 return _lessonRepository;
             }
         }
-        public CourseRepository CourseRepository
-        {
-            get
-            {
-                if (_courseRepository == null)
-                    _courseRepository = new CourseRepository(_db);
-                return _courseRepository;
-            }
-        }
+ 
         public AssessmentRepository AssessmentRepository
         {
             get
@@ -122,6 +122,7 @@ namespace Students.BLL.DataAccess
             }
         }
 
+      
 
         public async Task<int> SaveAsync()
         {

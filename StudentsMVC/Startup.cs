@@ -17,6 +17,7 @@ using Students.MVC.Mapper;
 using Students.MVC.Filters;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Students.DAL.Repositories;
 
 namespace Students.MVC
 {
@@ -48,7 +49,8 @@ namespace Students.MVC
             
             services.AddIdentity<ApplicationUser, IdentityRole>()      
                 .AddEntityFrameworkStores<Context>();
-         
+
+        //    services.AddScoped<IRepository<Course>, CourseRepository>();
             services.AddScoped<ICourseApplicationService, CourseApplicationService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
@@ -60,7 +62,8 @@ namespace Students.MVC
             services.AddScoped<ILessonTimesService, LessonTimesService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<UnitOfWork>();
-
+             
+           
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MappingProfile());
