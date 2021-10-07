@@ -31,7 +31,7 @@ namespace Students.BLL.Services
                 }
                 var student = await _unitOfWork.StudentRepository.GetAsync(StudentId);
                 if (student == null) { throw new InvalidOperationException($"Такого пользователя не существует"); }
-                var course = await _unitOfWork.CourseRepository.GetAsync(СourseId);
+                var course = await _unitOfWork.CourseRepository.GetByIdAsync(СourseId);
                 if (course == null) { throw new InvalidOperationException($"Такого курса не существует"); }
                 CourseApplication model = new()
                 {

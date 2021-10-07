@@ -7,6 +7,7 @@ using System;
 using Students.DAL.Enum;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using Students.DAL.Repositories;
 
 namespace Students.BLL.Services
 {
@@ -15,17 +16,18 @@ namespace Students.BLL.Services
         private readonly UnitOfWork _unitOfWork;
         private readonly ILogger _logger;
 
+
         public CourseService(UnitOfWork unitOfWork, ILogger<Course> logger)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
-
+            
         public async Task CreateAsync(Course item)
         {
             try
             {
-                await _unitOfWork.CourseRepository.CreateAsync(item);
+                await _unitOfWork.CourseRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Курс создан");
             }
@@ -42,7 +44,7 @@ namespace Students.BLL.Services
                 Course course = await GetAsync(id);
                 if (course != null)
                 {
-                    await _unitOfWork.CourseRepository.DeleteAsync(id);
+                    await _unitOfWork.CourseRepository.DeleteAsync(course);
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Курс удален"); 
                 }
@@ -53,7 +55,7 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.CourseRepository.ExistsAsync(id);
+       
 
 
         public async Task<IEnumerable<Course>> GetAllAsync()
@@ -75,7 +77,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение курса");
-                return await _unitOfWork.CourseRepository.GetAsync(id); 
+                return await _unitOfWork.CourseRepository.GetByIdAsync(id); 
             }
             catch (Exception ex)
             {
@@ -88,10 +90,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                var course = await _unitOfWork.CourseRepository.Update(item);
+                await _unitOfWork.CourseRepository.UpdateAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Курс изменен");
-                return course;
+                return item;
             }
             catch (Exception ex)
             {
@@ -105,7 +107,8 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Поиск курса");
-                return await _unitOfWork.CourseRepository.SearchAsync(query);
+                // return await _unitOfWork.CourseRepository.(query);
+                return null;
             }
             catch (Exception ex)
             {
@@ -154,6 +157,11 @@ namespace Students.BLL.Services
                 return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
             }
             return await GetPaginatedResult(currentPage, pageSize);
+        }
+
+        public Task<bool> ExistsAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

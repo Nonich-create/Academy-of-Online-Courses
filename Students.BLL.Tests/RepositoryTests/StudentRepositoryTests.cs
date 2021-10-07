@@ -35,7 +35,7 @@ namespace Students.BLL.Tests.RepositoryTests
             var options = new DbContextOptionsBuilder<Context>()
                 .UseInMemoryDatabase(databaseName: myDatabaseName)
                 .Options;
-            UnitOfWork = new UnitOfWork(new Context(options));
+        //    UnitOfWork = new UnitOfWork(new Context(options));
             Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
             Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
