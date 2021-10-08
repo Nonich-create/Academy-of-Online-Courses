@@ -11,6 +11,10 @@ using Students.DAL.Enum;
 using System.Linq;
 using Students.MVC.Models;
 using Students.MVC.Helpers;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Students.MVC.Controllers
 {
@@ -22,14 +26,15 @@ namespace Students.MVC.Controllers
         private readonly IUserService _userService;
         private readonly IStudentService _studentService;
         private readonly IMapper _mapper;
-
-        public StudentsController(IMapper mapper,IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
+        private IWebHostEnvironment _appEnvironment;
+        public StudentsController(IWebHostEnvironment appEnvironment, IMapper mapper,IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
         {
             _userService = userService;
             _studentService = studentService;
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _appEnvironment = appEnvironment;
         }
        
         #region Отображения студентов
@@ -155,6 +160,23 @@ namespace Students.MVC.Controllers
         public IActionResult ReturnByUrl(string ReturnUrl)
         {
             return RedirectPermanent($"~{ReturnUrl}");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddFile(IFormFile uploadedFile,int id)
+        {
+            if (uploadedFile != null)
+            {
+                string path = "/Files/" + uploadedFile.FileName;
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                {
+                    await uploadedFile.CopyToAsync(fileStream);
+                }
+                var StudentPhoto = await _studentService.GetAsync(id);
+                StudentPhoto.URLImagePhoto = path;
+                await _studentService.Update(StudentPhoto);
+            }
+            return RedirectToAction("Index");
         }
 
     }
