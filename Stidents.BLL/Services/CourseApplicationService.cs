@@ -23,16 +23,16 @@ namespace Students.BLL.Services
 
         public async Task Cancel(CourseApplication model)
         { 
-            var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
+            var student = await _unitOfWork.StudentRepository.GetByIdAsync(model.StudentId);
             var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).FirstOrDefault(g => g.CourseId == model.CourseId
             && g.Id == (int)student.GroupId 
             && g.GroupStatus == EnumGroupStatus.Training);
             if (group == null)
             {
                 student.GroupId = null;
-                await _unitOfWork.StudentRepository.Update(student);
+                await _unitOfWork.StudentRepository.UpdateAsync(student);
                 model.ApplicationStatus = EnumApplicationStatus.Cancelled;
-                await _unitOfWork.CourseApplicationRepository.Update(model);
+                await _unitOfWork.CourseApplicationRepository.UpdateAsync(model);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Заявка студента {student.Id} на курс {model.CourseId} отменена");
             }
@@ -47,7 +47,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.CourseApplicationRepository.CreateAsync(item);
+                await _unitOfWork.CourseApplicationRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Заявка создана");
             }
@@ -62,10 +62,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                CourseApplication courseApplication = await GetAsync(id);
+                CourseApplication courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(id);
                 if (courseApplication != null)
                 {
-                    await _unitOfWork.CourseApplicationRepository.DeleteAsync(id);
+                    await _unitOfWork.CourseApplicationRepository.DeleteAsync(courseApplication);
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Заяка удалена");
                 }
@@ -79,8 +79,8 @@ namespace Students.BLL.Services
         public async Task DeleteAsyncAll(int id)
         {
             try
-            {
-                await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
+            {   
+                await _unitOfWork.CourseApplicationRepository.DeleteAsyncAllByStudentId(id);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation(id, "Заяки студента удалены"); ;
             }
@@ -99,12 +99,12 @@ namespace Students.BLL.Services
                g.GroupStatus == EnumGroupStatus.Set &&
                g.CountMax > students.Count(s => s.GroupId == g.Id));
                 if (group == null) { throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
-                var student = await _unitOfWork.StudentRepository.GetAsync(model.StudentId);
+                var student = await _unitOfWork.StudentRepository.GetByIdAsync(model.StudentId);
                 if (student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
                 student.GroupId = group.Id;
-                await _unitOfWork.StudentRepository.Update(student);
+                await _unitOfWork.StudentRepository.UpdateAsync(student);
                 model.ApplicationStatus = EnumApplicationStatus.Close;
-                await _unitOfWork.CourseApplicationRepository.Update(model);
+                await _unitOfWork.CourseApplicationRepository.UpdateAsync(model);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Студент {model.StudentId} зачислен в группу {group.Id}");
             }
@@ -113,8 +113,6 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка обработке заявки");
             }
         }
-
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.CourseApplicationRepository.ExistsAsync(id);
 
         public async Task<IEnumerable<CourseApplication>> GetAllAsync()
         {
@@ -136,7 +134,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение заяки");
-                return await _unitOfWork.CourseApplicationRepository.GetAsync(id);
+                return await _unitOfWork.CourseApplicationRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -149,9 +147,9 @@ namespace Students.BLL.Services
         {
             try
             {
-                var courseApplication = await _unitOfWork.CourseApplicationRepository.Update(item);
+                await _unitOfWork.CourseApplicationRepository.UpdateAsync(item);
                 _logger.LogInformation("Заявка изменена");
-                return courseApplication;
+                return item;
             }
             catch (Exception ex)
             {
@@ -178,14 +176,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.CourseApplicationRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<CourseApplication>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.CourseApplicationRepository.GetAllAsync())
+            return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync())
                 .OrderBy(c => c.Course.Name).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -193,7 +191,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<CourseApplication>();
-            return (await _unitOfWork.CourseApplicationRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -201,7 +199,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<CourseApplication>();
-            return (await _unitOfWork.CourseApplicationRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync()).AsQueryable()
                 .OrderBy(c => c.Course.Name)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

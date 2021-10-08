@@ -26,5 +26,6 @@ namespace Students.DAL.Repositories.Base
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task<int> CountAsync(ISpecification<T> spec);
+        Task<T> SearchAsync(string query);
     }
 }

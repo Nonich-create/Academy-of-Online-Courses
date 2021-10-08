@@ -33,7 +33,7 @@ namespace Students.BLL.Services
         {
             try 
             {
-                await _unitOfWork.LessonRepository.CreateAsync(item);
+                await _unitOfWork.LessonRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Урок создан");
             }
@@ -47,10 +47,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                Lesson lesson = await GetAsync(id);
+                Lesson lesson = await _unitOfWork.LessonRepository.GetByIdAsync(id);
                 if (lesson != null)
                 {
-                    await _unitOfWork.LessonRepository.DeleteAsync(id);
+                    await _unitOfWork.LessonRepository.DeleteAsync(lesson);
                     _logger.LogInformation(id, "Урок удален");
                 }
             }
@@ -59,8 +59,6 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления урока");
             }
         }
-
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.LessonRepository.ExistsAsync(id);
         
         public async Task<IEnumerable<Lesson>> GetAllAsync()
         {
@@ -81,7 +79,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение урока");
-                return await _unitOfWork.LessonRepository.GetAsync(id); 
+                return await _unitOfWork.LessonRepository.GetByIdAsync(id); 
             }
             catch (Exception ex)
             {
@@ -94,10 +92,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                var lesson = await _unitOfWork.LessonRepository.Update(item);
+                await _unitOfWork.LessonRepository.UpdateAsync(item);
                 _logger.LogInformation("Урок изменен");
                 await _unitOfWork.SaveAsync();
-                return lesson;
+                return item;
             }
             catch (Exception ex)
             {
@@ -124,14 +122,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.LessonRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.LessonRepository.GetLessonListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<Lesson>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.LessonRepository.GetAllAsync())
+            return (await _unitOfWork.LessonRepository.GetLessonListAsync())
                 .OrderBy(l => l.NumberLesson).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -139,7 +137,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Lesson>();
-            return (await _unitOfWork.LessonRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.LessonRepository.GetLessonListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -147,7 +145,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Lesson>();
-            return (await _unitOfWork.LessonRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.LessonRepository.GetLessonListAsync()).AsQueryable()
                 .OrderBy(l => l.NumberLesson)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

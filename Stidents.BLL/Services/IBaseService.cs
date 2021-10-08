@@ -11,7 +11,6 @@ namespace Students.BLL.Services
         Task CreateAsync(T item);
         Task<T> Update(T item);
         Task DeleteAsync(int id);
-        Task<bool> ExistsAsync(int id);
         Task<T> SearchAsync(string query);
         Task<IEnumerable<T>> GetPaginatedResult(int currentPage, int pageSize = 10);
         Task<int> GetCount(string searchString, EnumSearchParameters searchParametr);

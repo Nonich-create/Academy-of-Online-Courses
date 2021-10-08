@@ -26,7 +26,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.TeacherRepository.CreateAsync(item);
+                await _unitOfWork.TeacherRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Преподователь создан");
             }
@@ -42,10 +42,11 @@ namespace Students.BLL.Services
             try
             {
                 Teacher teacher = await GetAsync(id);
+                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(teacher.UserId);
                 if (teacher != null)
                 {
-                    await _unitOfWork.ApplicationUsers.DeleteAsync(teacher.UserId);
-                    await _unitOfWork.TeacherRepository.DeleteAsync(id);
+                    await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);
+                    await _unitOfWork.TeacherRepository.DeleteAsync(teacher);
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Преподователь удален");
                 }
@@ -56,8 +57,6 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.TeacherRepository.ExistsAsync(id);
-        
         public async Task<IEnumerable<Teacher>> GetAllAsync()
         {
             try
@@ -77,7 +76,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение преподователя");
-                return await _unitOfWork.TeacherRepository.GetAsync(id);
+                return await _unitOfWork.TeacherRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -92,10 +91,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                var teacher = await _unitOfWork.TeacherRepository.Update(item);
+                await _unitOfWork.TeacherRepository.UpdateAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Преподователь изменен");
-                return teacher;
+                return item;
             }
             catch (Exception ex)
             {
@@ -122,14 +121,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.TeacherRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.TeacherRepository.GetTeacherListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<Teacher>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.TeacherRepository.GetAllAsync())
+            return (await _unitOfWork.TeacherRepository.GetTeacherListAsync())
                 .OrderBy(t => t.Surname).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -137,7 +136,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Teacher>();
-            return (await _unitOfWork.TeacherRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.TeacherRepository.GetTeacherListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -145,7 +144,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Teacher>();
-            return (await _unitOfWork.TeacherRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.TeacherRepository.GetTeacherListAsync()).AsQueryable()
                 .OrderBy(t => t.Surname)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

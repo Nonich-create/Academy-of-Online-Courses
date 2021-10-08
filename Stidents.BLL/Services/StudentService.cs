@@ -29,7 +29,7 @@ namespace Students.BLL.Services
                 {
                     throw new InvalidOperationException($"Вы уже подали заявку на этот курс");
                 }
-                var student = await _unitOfWork.StudentRepository.GetAsync(StudentId);
+                var student = await _unitOfWork.StudentRepository.GetByIdAsync(StudentId);
                 if (student == null) { throw new InvalidOperationException($"Такого пользователя не существует"); }
                 var course = await _unitOfWork.CourseRepository.GetByIdAsync(СourseId);
                 if (course == null) { throw new InvalidOperationException($"Такого курса не существует"); }
@@ -39,7 +39,7 @@ namespace Students.BLL.Services
                     CourseId = СourseId,
                     ApplicationStatus = EnumApplicationStatus.Open
                 };
-                await _unitOfWork.CourseApplicationRepository.CreateAsync(model);
+                await _unitOfWork.CourseApplicationRepository.AddAsync(model);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Заявка принята Id Cтудента {StudentId}, Id Курса {СourseId}");
                 
@@ -73,7 +73,7 @@ namespace Students.BLL.Services
                 {
                     return null;
                 }
-                return await _unitOfWork.StudentRepository.GetAsync(id); 
+                return await _unitOfWork.StudentRepository.GetByIdAsync((int)id); 
             }
             catch(Exception ex)
             {
@@ -87,7 +87,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение студента");
-                return await _unitOfWork.StudentRepository.GetAsync(id);
+                return await _unitOfWork.StudentRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.StudentRepository.CreateAsync(item);
+                await _unitOfWork.StudentRepository.AddAsync(item);
                 _logger.LogInformation("Студент создан");
             }
             catch (Exception ex)
@@ -113,7 +113,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                var student = await _unitOfWork.StudentRepository.Update(item);
+                await _unitOfWork.StudentRepository.UpdateAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Студент изменен");
                 return item;
@@ -130,12 +130,13 @@ namespace Students.BLL.Services
         {
             try
             {
-                Student student = await GetAsync(id);
+                Student student = await _unitOfWork.StudentRepository.GetByIdAsync(id);
+                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(student.UserId);
                 if (student != null)
                 {
-                    await _unitOfWork.CourseApplicationRepository.DeleteAsyncAll(id);
-                    await _unitOfWork.ApplicationUsers.DeleteAsync(student.UserId);
-                    await _unitOfWork.StudentRepository.DeleteAsync(id);
+                    await _unitOfWork.CourseApplicationRepository.DeleteAsyncAllByStudentId(id);
+                    await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);
+                    await _unitOfWork.StudentRepository.DeleteAsync(student);
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Студент удален"); 
                 }
@@ -144,11 +145,6 @@ namespace Students.BLL.Services
             {
                 _logger.LogInformation(ex, "Ошибка удаления студента");
             }
-        }
- 
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _unitOfWork.StudentRepository.ExistsAsync(id);
         }
 
         public async Task<Student> SearchAsync(string query)
@@ -169,14 +165,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.StudentRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.StudentRepository.GetStudentListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<Student>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.StudentRepository.GetAllAsync())
+            return (await _unitOfWork.StudentRepository.GetStudentListAsync())
                 .OrderBy(s => s.Surname).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -184,7 +180,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Student>();
-            return (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.StudentRepository.GetStudentListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -192,7 +188,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Student>();
-            return (await _unitOfWork.StudentRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.StudentRepository.GetStudentListAsync()).AsQueryable()
                 .OrderBy(s => s.Surname)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Students.MVC.ViewModels
 {
@@ -19,6 +20,7 @@ namespace Students.MVC.ViewModels
 
         [Required(ErrorMessage = "Не указана цена курса")]
         [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(18, 2)")]
         [Display(Name = "Цена")]
         public decimal Price { get; set; }
 

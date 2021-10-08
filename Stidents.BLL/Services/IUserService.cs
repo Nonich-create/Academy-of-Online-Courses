@@ -5,7 +5,6 @@ namespace Students.BLL.Services
 {
     public interface IUserService : IBaseService<ApplicationUser>
     {
-        Task<bool> ExistsAsync(string id);
         Task<ApplicationUser> GetAsync(string id);
         Task DeleteAsync(string id);
     }

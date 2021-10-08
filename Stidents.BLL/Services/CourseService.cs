@@ -107,8 +107,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Поиск курса");
-                // return await _unitOfWork.CourseRepository.(query);
-                return null;
+                return await _unitOfWork.CourseRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {

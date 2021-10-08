@@ -69,14 +69,7 @@ namespace Students.MVC.Controllers
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (await _userService.ExistsAsync(model.Id))
-                        {
                             return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
                     }
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
