@@ -43,5 +43,11 @@
                 <input type="submit" value="Назад" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl" class="btn btn-block create-account" />
             </div>
         </form>
+        <h3>Выберите файл для загрузки</h3>
+        <form asp-action="AddFile" asp-controller="Students" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="file" name="uploadedFile" /><br>
+            <input type="submit" value="Загрузить" />
+        </form>
     </div>
 </body>
