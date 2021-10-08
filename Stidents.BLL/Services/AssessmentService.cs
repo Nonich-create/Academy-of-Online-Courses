@@ -26,7 +26,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.AssessmentRepository.CreateAsync(item);
+                await _unitOfWork.AssessmentRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Оценка создана");
             }
@@ -40,10 +40,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                Assessment assessment = await GetAsync(id);
+                Assessment assessment = await _unitOfWork.AssessmentRepository.GetByIdAsync(id);
                 if (assessment != null)
                 {
-                    await _unitOfWork.AssessmentRepository.DeleteAsync(id);
+                    await _unitOfWork.AssessmentRepository.DeleteAsync(assessment);
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Оценка удалена");
                 }
@@ -53,8 +53,6 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка удаления оценки");
             }
         }
-
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.AssessmentRepository.ExistsAsync(id);
 
         public async Task<IEnumerable<Assessment>> GetAllAsync()
         {
@@ -75,7 +73,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение оценки");
-                return await _unitOfWork.AssessmentRepository.GetAsync(id);
+                return await _unitOfWork.AssessmentRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -88,10 +86,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                var assessment = await _unitOfWork.AssessmentRepository.Update(item);
+                await _unitOfWork.AssessmentRepository.UpdateAsync(item);
                 _logger.LogInformation("Оценка изменена");
                 await _unitOfWork.SaveAsync();
-                return assessment;
+                return item;
             }
             catch (Exception ex)
             {
@@ -118,14 +116,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.AssessmentRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<Assessment>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.AssessmentRepository.GetAllAsync())
+            return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync())
                 .OrderBy(a => a.Lesson.NumberLesson).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -133,7 +131,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Assessment>();
-            return (await _unitOfWork.AssessmentRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -141,7 +139,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Assessment>();
-            return (await _unitOfWork.AssessmentRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync()).AsQueryable()
                 .OrderBy(a => a.Lesson.NumberLesson)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

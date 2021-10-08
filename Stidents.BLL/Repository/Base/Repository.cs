@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Students.BLL.Repository.Base
@@ -77,5 +77,7 @@ namespace Students.BLL.Repository.Base
             _db.Set<T>().Remove(entity);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<T> SearchAsync(string query) => await _db.Set<T>().Where(query).FirstAsync();
     }
 }

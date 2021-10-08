@@ -25,7 +25,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.LessonTimesRepository.CreateAsync(item);
+                await _unitOfWork.LessonTimesRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Время урока добавлена");
             }
@@ -39,18 +39,19 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.LessonTimesRepository.DeleteAsync(id);
-                await _unitOfWork.SaveAsync();
-                _logger.LogInformation(id, "Время занятия удалена");
+                LessonTimes lessonTimes = await _unitOfWork.LessonTimesRepository.GetByIdAsync(id);
+                if (lessonTimes != null)
+                {
+                    await _unitOfWork.LessonTimesRepository.DeleteAsync(lessonTimes);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation(id, "Время занятия удалена");
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex, "Ошибка удаления времени занятия");
             }
         }
-
-        public async Task<bool> ExistsAsync(int id) => await _unitOfWork.LessonTimesRepository.ExistsAsync(id);
-        
 
         public async Task<IEnumerable<LessonTimes>> GetAllAsync()
         {
@@ -71,7 +72,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение времени проведния занятия");
-                return await _unitOfWork.LessonTimesRepository.GetAsync(id);
+                return await _unitOfWork.LessonTimesRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -84,10 +85,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                var lessonTimes = await _unitOfWork.LessonTimesRepository.Update(item);
+                await _unitOfWork.LessonTimesRepository.UpdateAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Время проведения занятия изменено");
-                return lessonTimes;
+                return item;
             }
             catch (Exception ex)
             {
@@ -114,14 +115,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.LessonTimesRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<LessonTimes>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.LessonTimesRepository.GetAllAsync())
+            return (await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync())
                 .OrderBy(l => l.Lesson.NumberLesson).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -129,7 +130,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<LessonTimes>();
-            return (await _unitOfWork.LessonTimesRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -137,7 +138,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<LessonTimes>();
-            return (await _unitOfWork.LessonTimesRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync()).AsQueryable()
                 .OrderBy(l => l.Lesson.NumberLesson)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

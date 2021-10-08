@@ -29,16 +29,16 @@ namespace Students.BLL.Tests.RepositoryTests
         private readonly UnitOfWork UnitOfWork;
         public Fixture Fixture { get; set; } = new();
 
-        public StudentRepositoryTests()
-        {
-            var myDatabaseName = "StudentsMVCBD";
-            var options = new DbContextOptionsBuilder<Context>()
-                .UseInMemoryDatabase(databaseName: myDatabaseName)
-                .Options;
-        //    UnitOfWork = new UnitOfWork(new Context(options));
-            Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-            Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-        }
+    //   public StudentRepositoryTests()
+    //   {
+    //       var myDatabaseName = "StudentsMVCBD";
+    //       var options = new DbContextOptionsBuilder<Context>()
+    //           .UseInMemoryDatabase(databaseName: myDatabaseName)
+    //           .Options;
+    //   //    UnitOfWork = new UnitOfWork(new Context(options));
+    //       Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
+    //       Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+    //   }
 
 
       //  [Fact]

@@ -36,17 +36,19 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
         {
+            var searchStringPerm = searchString;
+            var serachParameterPerm = (int)serachParameter;
             var count = await _studentService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
             var model = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page,10)));
             var paginationModel = new PaginationModel<StudentViewModel>(count, page)
             {
-                searchString = searchString,
-                serachParameter = (int)serachParameter,
+                searchString = searchStringPerm,
+                serachParameter = serachParameterPerm,
                 Data = model
             };
 
             return View(paginationModel);
-        }
+            }
         #endregion
 
         #region Отображения подробной информации о студенте

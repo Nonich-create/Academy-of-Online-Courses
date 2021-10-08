@@ -25,7 +25,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                await _unitOfWork.ManagerRepository.CreateAsync(item);
+                await _unitOfWork.ManagerRepository.AddAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Менеджер создан");
             }
@@ -39,24 +39,20 @@ namespace Students.BLL.Services
         {
             try
             {
-                Manager manager = await GetAsync(id);
+                Manager manager = await _unitOfWork.ManagerRepository.GetByIdAsync(id);
+                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(manager.UserId);
                 if (manager != null)
                 {
-                    await _unitOfWork.ApplicationUsers.DeleteAsync(manager.UserId);
-                    await _unitOfWork.ManagerRepository.DeleteAsync(id);
+                    await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);
+                    await _unitOfWork.ManagerRepository.DeleteAsync(manager);
                     await _unitOfWork.SaveAsync();
-                    _logger.LogInformation(id, "Менеджер удален"); ;
+                    _logger.LogInformation(id, "Менеджер удален"); 
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex, "Ошибка удаления менеджера");
             }
-        }
-
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _unitOfWork.ManagerRepository.ExistsAsync(id);
         }
 
         public async Task<IEnumerable<Manager>> GetAllAsync()
@@ -78,7 +74,7 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение менеджера");
-                return await _unitOfWork.ManagerRepository.GetAsync(id);
+                return await _unitOfWork.ManagerRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -91,10 +87,10 @@ namespace Students.BLL.Services
         {
             try
             {
-                var manager = await _unitOfWork.ManagerRepository.Update(item);
+                await _unitOfWork.ManagerRepository.UpdateAsync(item);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Менеджер изменен");
-                return manager;
+                return item;
             }
             catch (Exception ex)
             {
@@ -121,14 +117,14 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.ManagerRepository.GetAllAsync()).Count();
+                return (await _unitOfWork.ManagerRepository.GetManagerListAsync()).Count();
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
         public async Task<IEnumerable<Manager>> GetPaginatedResult(int currentPage, int pageSize = 10)
         {
-            return (await _unitOfWork.ManagerRepository.GetAllAsync())
+            return (await _unitOfWork.ManagerRepository.GetManagerListAsync())
                 .OrderBy(t => t.Surname).Skip((currentPage - 1) * pageSize).Take(pageSize);
         }
 
@@ -136,7 +132,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Manager>();
-            return (await _unitOfWork.ManagerRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.ManagerRepository.GetManagerListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
         }
 
@@ -144,7 +140,7 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Manager>();
-            return (await _unitOfWork.ManagerRepository.GetAllAsync()).AsQueryable()
+            return (await _unitOfWork.ManagerRepository.GetManagerListAsync()).AsQueryable()
                 .OrderBy(t => t.Surname)
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
                 .Skip((currentPage - 1) * pageSize).Take(pageSize);

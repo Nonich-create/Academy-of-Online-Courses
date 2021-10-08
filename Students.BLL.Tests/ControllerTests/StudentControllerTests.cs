@@ -27,12 +27,12 @@ namespace Students.DAL.Tests.ControllerTests
         public StudentControllerTests()
         {
           //var roleManagerMock = FakeRoleManager.GetRoleManagerMock<IdentityRole>().Object; 
-            var fakeUser = new FakeUserManager();
-            var signInManager = new FakeSignInManager();
-            StudentsController = new StudentsController(MapperMock.Object, UserMock.Object,fakeUser, signInManager,
-            StudentServiceMock.Object,GroupServiceMock.Object);
-            Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-            Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+          //  var fakeUser = new FakeUserManager();
+        //    var signInManager = new FakeSignInManager();
+         //   StudentsController = new StudentsController(MapperMock.Object, UserMock.Object,fakeUser, signInManager,
+        //    StudentServiceMock.Object,GroupServiceMock.Object);
+        //    Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
+        //    Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
 
 

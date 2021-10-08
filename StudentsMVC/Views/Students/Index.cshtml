@@ -15,8 +15,11 @@
                 {
                     <option selected="selected" class="test2" value="@item.Value" name="serachParameter">@item.Text</option>
                 }
+                else
+                {
                 <option value="@item.Value" name="serachParameter">@item.Text</option>
-            }
+                }
+             }
         </select>
         <input type="text" name="searchString" class="test" value="@Model.searchString"/>
         <input class="btn btn-primary"
@@ -84,7 +87,7 @@
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {   
-            <a @*href="/Students?page=@i"*@ class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+            <a href="/Students?page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>

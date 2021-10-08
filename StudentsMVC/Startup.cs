@@ -50,7 +50,6 @@ namespace Students.MVC
             services.AddIdentity<ApplicationUser, IdentityRole>()      
                 .AddEntityFrameworkStores<Context>();
 
-        //    services.AddScoped<IRepository<Course>, CourseRepository>();
             services.AddScoped<ICourseApplicationService, CourseApplicationService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IAssessmentService, AssessmentService>();

@@ -1,6 +1,7 @@
 ﻿using Students.DAL.Models;
 using System;
 using System.Threading.Tasks;
+using Students.BLL.Repository;
 
 namespace Students.BLL.DataAccess
 {
@@ -8,15 +9,15 @@ namespace Students.BLL.DataAccess
     {
         private readonly Context _db;
         private Repository.CourseRepository _courseRepository;
-        private ApplicationUserRepository _applicationUserRepository;
-        private StudentRepository _studentRepository;
-        private TeacherRepository _teacherRepository;
-        private GroupRepository _groupRepository;
-        private ManagerRepository _managerRepository;
-        private LessonRepository _lessonRepository;
-        private AssessmentRepository _assessmentRepository;
-        private CourseApplicationRepository _courseApplicationRepository;
-        private LessonTimesRepository _lessonTimesRepository;
+        private Repository.ApplicationUserRepository _applicationUserRepository;
+        private Repository.StudentRepository _studentRepository;
+        private Repository.TeacherRepository _teacherRepository;
+        private Repository.GroupRepository _groupRepository;
+        private Repository.ManagerRepository _managerRepository;
+        private Repository.LessonRepository _lessonRepository;
+        private Repository.AssessmentRepository _assessmentRepository;
+        private Repository.CourseApplicationRepository _courseApplicationRepository;
+        private Repository.LessonTimesRepository _lessonTimesRepository;
         private bool disposed = false;
 
         public UnitOfWork(Context db)
@@ -33,91 +34,91 @@ namespace Students.BLL.DataAccess
                 return _courseRepository;
             }
         }
-        public CourseApplicationRepository CourseApplicationRepository
+        public Repository.CourseApplicationRepository CourseApplicationRepository
         {
             get
             {
                 if (_courseApplicationRepository == null)
-                    _courseApplicationRepository = new CourseApplicationRepository(_db);
+                    _courseApplicationRepository = new Repository.CourseApplicationRepository(_db);
                 return _courseApplicationRepository;
             }
         }
 
-        public ManagerRepository ManagerRepository
+        public Repository.ManagerRepository ManagerRepository
         {
             get
             {
                 if (_managerRepository == null)
-                    _managerRepository = new ManagerRepository(_db);
+                    _managerRepository = new Repository.ManagerRepository(_db);
                 return _managerRepository;
             }
         }
 
-        public GroupRepository GroupRepository
+        public Repository.GroupRepository GroupRepository
         {
             get
             {
                 if (_groupRepository == null)
-                    _groupRepository = new GroupRepository(_db);
+                    _groupRepository = new Repository.GroupRepository(_db);
                 return _groupRepository;
             }
         }
 
-        public ApplicationUserRepository ApplicationUsers
+        public Repository.ApplicationUserRepository ApplicationUsersRepository
         {
             get
             {
                 if (_applicationUserRepository == null)
-                    _applicationUserRepository = new ApplicationUserRepository(_db);
+                    _applicationUserRepository = new Repository.ApplicationUserRepository(_db);
                 return _applicationUserRepository;
             }
         }
 
-        public StudentRepository StudentRepository
+        public Repository.StudentRepository StudentRepository
         {
             get
             {
                 if (_studentRepository == null)
-                    _studentRepository = new StudentRepository(_db);
+                    _studentRepository = new Repository.StudentRepository(_db);
                 return _studentRepository;
             }
         }
 
-        public TeacherRepository TeacherRepository
+        public Repository.TeacherRepository TeacherRepository
         {
             get
             {
                 if (_teacherRepository == null)
-                    _teacherRepository = new TeacherRepository(_db);
+                    _teacherRepository = new Repository.TeacherRepository(_db);
                 return _teacherRepository;
             }
         }
-        public LessonRepository LessonRepository
+        public Repository.LessonRepository LessonRepository
         {
             get
             {
                 if (_lessonRepository == null)
-                    _lessonRepository = new LessonRepository(_db);
+                    _lessonRepository = new Repository.LessonRepository(_db);
                 return _lessonRepository;
             }
         }
  
-        public AssessmentRepository AssessmentRepository
+        public Repository.AssessmentRepository AssessmentRepository
         {
             get
             {
                 if (_assessmentRepository == null)
-                    _assessmentRepository = new AssessmentRepository(_db);
+                    _assessmentRepository = new Repository.AssessmentRepository(_db);
                 return _assessmentRepository;
             }
         }
 
-        public LessonTimesRepository LessonTimesRepository
+        public Repository.LessonTimesRepository LessonTimesRepository
         {
             get
             {
                 if (_lessonTimesRepository == null)
-                    _lessonTimesRepository = new LessonTimesRepository(_db);
+                    _lessonTimesRepository = new Repository.LessonTimesRepository(_db);
                 return _lessonTimesRepository;
             }
         }

@@ -1,8 +1,6 @@
 ﻿using Students.BLL.Repository.Base;
 using Students.DAL.Models;
 using Students.DAL.Repositories;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Students.BLL.Repository
 {
@@ -12,13 +10,8 @@ namespace Students.BLL.Repository
 
         public CourseRepository(Context db) : base(db)
         {
+            _db = db;
         }
-
-        public async Task<IEnumerable<Course>> GetCourseListAsync()
-        {
-             return await GetAllAsync();
-        }
-
 
     }
 }
