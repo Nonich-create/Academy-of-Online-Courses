@@ -30,7 +30,7 @@ namespace Students.MVC.Controllers
             _mapper = mapper;
         }
 
-        #region Отображения студентов
+        #region Отображения студентов с использованием пагинации
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Index(string searchString, EnumParametersStudent searchParameter, int page = 1)
         {
