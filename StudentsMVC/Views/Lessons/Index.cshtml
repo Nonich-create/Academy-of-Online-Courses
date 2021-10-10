@@ -1,43 +1,28 @@
 ﻿@using Students.DAL.Enum;
-@model IEnumerable<Students.MVC.ViewModels.LessonViewModel>
-
+@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.LessonViewModel>
 @{
     ViewData["Title"] = $"Занятия";
     Layout = "_Layout";
 }
 <body>
-    @{
-        int skip = 0;
-        if (Model.Count() > 0)
-            skip = Model.Max(s => s.Id);
-        int take = Model.Count();
-    }
     <form method="post" asp-controller="Lessons">
         <p>
-            <select name="serachParameter" class="form-control">
+            <select name="searchParameter" class="form-control">
                 @foreach (var item in Html.GetEnumSelectList<EnumParametersLesson>())
-                {
-                    @if (item.Value == @ViewData["serachParameter"].ToString())
+                 {
+                    @if (item.Value == Model.searchParameter.ToString())
+                     {
+                        <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
+                     }
+                    else
                     {
-                        <option selected="selected" value="@item.Value" name="serachParameter">@item.Text</option>
+                    <option value="@item.Value" name="searchParameter">@item.Text</option>
                     }
-                    <option value="@item.Value" name="serachParameter">@item.Text</option>
-                }
+                 }
             </select>
-            <input type="text" name="searchString" size="40" value="@ViewData["searchString"]" />
-            <input type="hidden" name="take" value="10" />
+            <input type="text" name="searchString" size="40" value="@Model.searchString" />
             <input class="btn btn-primary"
                    type="submit" value="Поиск" />
-        </p>
-    </form>
-    <form method="post" asp-controller="Lessons">
-        <p>
-            <input type="hidden" name="action" value="@EnumPageActions.Add" />
-            <input type="hidden" name="take" value="@take" />
-            <input type="hidden" name="searchString" value="@ViewData["searchString"]" />
-            <input type="hidden" name="serachParameter" value="@ViewData["serachParameter"]" />
-            <input class="btn btn-primary"
-                   type="submit" value="ещё" />
         </p>
     </form>
     <table class="purpleHorizon">
@@ -62,7 +47,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Data)
             {
                 <tr>
                     <td>
@@ -102,24 +87,12 @@
             </tr>
         </tbody>
     </table>
-    <div class="container">
-        <form method="post" asp-controller="Lessons">
-            <p>
-                <input type="hidden" name="action" value="@EnumPageActions.Back" />
-                <input type="hidden" name="skip" value="@skip" />
-                <input type="hidden" name="take" value="10" />
-                <input class="btn btn-primary"
-                       type="submit" value="Предыдущие" />
-            </p>
-        </form>
-        <form method="post" asp-controller="Lessons">
-            <p>
-                <input type="hidden" name="action" value="@EnumPageActions.Next" />
-                <input type="hidden" name="skip" value="@skip" />
-                <input type="hidden" name="take" value="10" />
-                <input class="btn btn-primary"
-                       type="submit" value="Следущие" />
-            </p>
-        </form>
+    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+        <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="/Lessons?searchString=@Model.searchString&searchParameter=@Model.searchParameter&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+        }
+        <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>
 </body>

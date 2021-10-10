@@ -7,7 +7,7 @@ using System;
 using Students.DAL.Enum;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using Students.DAL.Repositories;
+using Students.BLL.Interface;
 
 namespace Students.BLL.Services
 {

@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Students.BLL.Mapper;
 using Students.MVC.Models;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
-using Students.BLL.Services;
+using Students.BLL.Interface;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -48,13 +47,13 @@ namespace Students.MVC.Controllers
         }
         #endregion
    
-        #region Вызов ошибки
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        #endregion
+
         #region Подробнее о курсе
         public async Task<IActionResult> Detailed(int id)
         {

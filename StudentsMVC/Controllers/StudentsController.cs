@@ -5,25 +5,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
-using Students.BLL.Services;
+using Students.BLL.Interface;
 using AutoMapper;
 using Students.DAL.Enum;
-using System.Linq;
 using Students.MVC.Models;
-using Students.MVC.Helpers;
 
 namespace Students.MVC.Controllers
 {
     public class StudentsController : Controller
     {
-        
+
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
         private readonly IStudentService _studentService;
         private readonly IMapper _mapper;
 
-        public StudentsController(IMapper mapper,IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
+        public StudentsController(IMapper mapper, IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
         {
             _userService = userService;
             _studentService = studentService;
@@ -31,24 +29,22 @@ namespace Students.MVC.Controllers
             _signInManager = signInManager;
             _mapper = mapper;
         }
-       
+
         #region Отображения студентов
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, EnumParametersStudent searchParameter, int page = 1)
         {
-            var searchStringPerm = searchString;
-            var serachParameterPerm = (int)serachParameter;
-            var count = await _studentService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page,10)));
+            var count = await _studentService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
             var paginationModel = new PaginationModel<StudentViewModel>(count, page)
             {
-                searchString = searchStringPerm,
-                serachParameter = serachParameterPerm,
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
                 Data = model
             };
 
             return View(paginationModel);
-            }
+        }
         #endregion
 
         #region Отображения подробной информации о студенте

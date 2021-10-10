@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Students.MVC.ViewModels.CourseApplicationViewModel>
+﻿@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.CourseApplicationViewModel>
 @using Students.DAL.Enum;
 
 @{
@@ -6,85 +6,67 @@
     Layout = "_Layout";
 }
 <body>
-    @{
-        int skip = 0;
-        if (Model.Count() > 0)
-            skip = Model.Max(s => s.Id);
-        int take = Model.Count();
-    }
     <form method="post" asp-controller="CourseApplications">
         <p>
-            <select name="serachParameter" class="form-control">
+            <select name="searchParameter" class="form-control">
                 @foreach (var item in Html.GetEnumSelectList<EnumParametersCourseApplication>())
-                {
-                    @if (item.Value == @ViewData["serachParameter"].ToString())
+                 {
+                    @if (item.Value == Model.searchParameter.ToString())
                     {
-                        <option selected="selected" value="@item.Value" name="serachParameter">@item.Text</option>
+                        <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
                     }
-                    <option value="@item.Value" name="serachParameter">@item.Text</option>
-                }
+                    else
+                    {
+                    <option value="@item.Value" name="searchParameter">@item.Text</option>
+                    }
+                 }
             </select>
-            <input type="text" name="searchString" size="40" value="@ViewData["searchString"]" />
-            <input type="hidden" name="take" value="10" />
+            <input type="text" name="searchString" size="40" value="@Model.searchString" />
             <input class="btn btn-primary"
                    type="submit" value="Поиск" />
-        </p>
-    </form>
-    <form method="post" asp-controller="CourseApplications">
-        <p>
-            <input type="hidden" name="action" value="@EnumPageActions.Add" />
-            <input type="hidden" name="take" value="@take" />
-            <input type="hidden" name="searchString" value="@ViewData["searchString"]" />
-            <input type="hidden" name="serachParameter" value="@ViewData["serachParameter"]" />
-            <input class="btn btn-primary"
-                   type="submit" value="ещё" />
         </p>
     </form>
     <table class="purpleHorizon">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Id)
+                    Номер заяки
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.CourseId)
+                    Курс
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.StudentId)
+                    ФИО
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.ApplicationStatus)
+                    Статус заявки
                 </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Data)
             {
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => item.Id)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Course.Name)
+                        <a  asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">@item.Course.Name</a>
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Student.GetFullName)
+                        <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">@item.Student.GetFullName</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.ApplicationStatus)
                     </td>
                     <td>
                         <div>
-                            <a class="btn btn-primary"
-                               asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">Студент</a>
-                            <a class="btn btn-primary"
-                               asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">Курс</a>
                             @if (item.ApplicationStatus == EnumApplicationStatus.Close)
                             {
                                 <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
                                     <div>
                                         <button class="btn btn-primary"
-                                                asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
+                                            asp-controller="CourseApplications" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
                                             Отменить
                                         </button>
                                     </div>
@@ -95,7 +77,7 @@
                                 <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
                                     <div>
                                         <button class="btn btn-primary"
-                                                asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
+                                            asp-controller="CourseApplications" asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
                                             Принять
                                         </button>
                                     </div>
@@ -107,24 +89,12 @@
             }
         </tbody>
     </table>
-    <div class="container">
-        <form method="post" asp-controller="CourseApplications">
-            <p>
-                <input type="hidden" name="action" value="@EnumPageActions.Back" />
-                <input type="hidden" name="skip" value="@skip" />
-                <input type="hidden" name="take" value="10" />
-                <input class="btn btn-primary"
-                       type="submit" value="Предыдущие" />
-            </p>
-        </form>
-        <form method="post" asp-controller="CourseApplications">
-            <p>
-                <input type="hidden" name="action" value="@EnumPageActions.Next" />
-                <input type="hidden" name="skip" value="@skip" />
-                <input type="hidden" name="take" value="10" />
-                <input class="btn btn-primary"
-                       type="submit" value="Следущие" />
-            </p>
-        </form>
+    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+        <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="/CourseApplications?searchString=@Model.searchString&searchParameter=@Model.searchParameter&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+        }
+        <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>
 </body>

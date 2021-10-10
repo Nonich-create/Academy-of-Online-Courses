@@ -11,6 +11,7 @@ using System.Linq;
 using AutoMapper;
 using Students.DAL.Enum;
 using System.Collections.Generic;
+using Students.BLL.Interface;
 
 namespace Students.DAL.Tests.ControllerTests
 {

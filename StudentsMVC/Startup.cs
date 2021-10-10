@@ -17,7 +17,7 @@ using Students.MVC.Mapper;
 using Students.MVC.Filters;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Students.DAL.Repositories;
+using Students.BLL.Interface;
 
 namespace Students.MVC
 {

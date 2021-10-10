@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
-
+using Students.BLL.Interface;
 
 namespace Students.DAL.Tests.ControllerTests
 {
@@ -21,13 +21,13 @@ namespace Students.DAL.Tests.ControllerTests
     {
         public SecurityController SecurityController { get; set; }
         public Mock<IUserService> UserServicMock { get; } = new Mock<IUserService>();
-        public Mock<ILogger<SecurityController>> LoggerMock { get; } = new Mock<ILogger<SecurityController>>();
+      //  public Mock<ILogger<SecurityController>> LoggerMock { get; } = new Mock<ILogger<SecurityController>>();
 
         public SecurityControllerTests()
         {
-            var fakeUser = new FakeUserManager();
-            var signInManager = new FakeSignInManager();
-            SecurityController = new SecurityController(LoggerMock.Object, fakeUser, signInManager, UserServicMock.Object);
+         //   var fakeUser = new FakeUserManager();
+           // var signInManager = new FakeSignInManager();
+            //SecurityController = new SecurityController(fakeUser, signInManager, UserServicMock.Object);
         }
 
         [Fact]

@@ -2,8 +2,9 @@
 using Students.DAL.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Students.BLL.Interface.Base;
 
-namespace Students.BLL.Services
+namespace Students.BLL.Interface
 {
     public interface ILessonService : IBaseService<Lesson>
     {

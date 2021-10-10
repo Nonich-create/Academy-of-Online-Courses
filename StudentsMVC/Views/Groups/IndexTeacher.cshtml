@@ -34,7 +34,7 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.NumberGroup)
+                        <a asp-action="Details" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">@item.NumberGroup</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.DateStart)
@@ -52,8 +52,6 @@
                         @Html.DisplayFor(modelItem => item.Course.Name)
                     </td>
                     <td>  
-                        <a class="btn btn-primary"
-                           asp-action="Details" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Подробнее</a>
                         @if (item.GroupStatus == EnumGroupStatus.Training || item.GroupStatus == EnumGroupStatus.Close)
                         {
                         <a class="btn btn-primary"

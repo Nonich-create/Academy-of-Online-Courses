@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Students.DAL.Enum;
 
-namespace Students.BLL.Services
+namespace Students.BLL.Interface.Base
 {
     public interface IBaseService<T> where T : class
     {

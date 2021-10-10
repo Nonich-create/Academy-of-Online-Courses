@@ -4,15 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
-using Students.BLL.Services;
-using System;
-using Students.MVC.Helpers;
+using Students.BLL.Interface;
 using AutoMapper;
 using Students.DAL.Enum;
+using Students.MVC.Models;
 
 namespace Students.MVC.Controllers
 {
@@ -30,13 +27,17 @@ namespace Students.MVC.Controllers
         }
         #region Отображения менеджеров
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, EnumParametersManager searchParameter, int page = 1)
         {
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var count = await _managerService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
-            return View(model);
+            var count = await _managerService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var paginationModel = new PaginationModel<ManagerViewModel>(count, page)
+            {
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
+                Data = model
+            };
+            return View(paginationModel);
         }
         #endregion
         #region Отображения подробностей о менеджере 

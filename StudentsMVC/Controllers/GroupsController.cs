@@ -1,18 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
 using System.Linq;
 using System.Collections.Generic;
-using Students.BLL.Services;
-using Students.BLL.Mapper;
+using Students.BLL.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Students.DAL.Enum;
 using Microsoft.AspNetCore.Identity;
-using Students.MVC.Helpers;
-using System;
 using AutoMapper;
+using Students.MVC.Models;
 
 namespace Students.MVC.Controllers
 {
@@ -25,7 +22,8 @@ namespace Students.MVC.Controllers
         private readonly IStudentService _studentService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        public GroupsController(IMapper mapper,UserManager<ApplicationUser> userManager, IStudentService studentService, IGroupService groupService, IManagerService managerService, ITeacherService teacherService, ICourseService courseService)
+
+        public GroupsController(IMapper mapper, UserManager<ApplicationUser> userManager, IStudentService studentService, IGroupService groupService, IManagerService managerService, ITeacherService teacherService, ICourseService courseService)
         {
             _studentService = studentService;
             _groupService = groupService;
@@ -35,15 +33,20 @@ namespace Students.MVC.Controllers
             _userManager = userManager;
             _mapper = mapper;
         }
+
         #region отображения групп
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, EnumParametersGroup searchParameter, int page = 1)
         {
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var count = await _groupService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
-            return View(model);
+            var count = await _groupService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var paginationModel = new PaginationModel<GroupViewModel>(count, page)
+            {
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
+                Data = model
+            };
+            return View(paginationModel);
         }
         #endregion
 
@@ -52,7 +55,6 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> IndexTeacher(int page = 1)
         {
             var idTeacher = (await _teacherService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\"")).Id;
-            var count = await _groupService.GetCount(idTeacher.ToString(),EnumSearchParameters.TeacherId);
             var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.IndexView(idTeacher.ToString(), EnumSearchParameters.TeacherId, page, 10)));
             return View(model);
         }
@@ -78,9 +80,9 @@ namespace Students.MVC.Controllers
                 Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync())),
                 Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync())),
             };
-           return View(group);
+            return View(group);
         }
-        
+
         #endregion
         #region добавления группы
         [HttpPost]
