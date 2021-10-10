@@ -4,7 +4,6 @@ using Students.DAL.Repositories;
 using Students.DAL.Specifications;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace Students.BLL.Repository
 {   

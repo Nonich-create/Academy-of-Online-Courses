@@ -11,6 +11,7 @@ namespace Students.DAL.Specifications
         {
             AddInclude(s => s.User);
             AddInclude(s => s.Group);
+            AddInclude(s => s.Group.Course);
         }
     }
 }

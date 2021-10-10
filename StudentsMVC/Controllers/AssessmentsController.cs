@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
-using Students.BLL.Services;
 using AutoMapper;
-using Students.DAL.Enum;
+using Students.BLL.Interface;
 
 namespace Students.MVC.Controllers
 {

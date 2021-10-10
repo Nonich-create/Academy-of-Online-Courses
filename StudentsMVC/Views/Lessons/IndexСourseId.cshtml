@@ -1,29 +1,49 @@
-﻿@model IEnumerable<Students.MVC.ViewModels.LessonViewModel>
-
+﻿@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.LessonViewModel>
+@using Students.DAL.Enum;
 @{
     ViewData["Title"] = $"Занятия";
     Layout = "_Layout";
 }
 <body>
+    <form method="post" asp-controller="Lessons">
+        <p>
+            <select name="searchParameter" class="form-control">
+                @foreach (var item in Html.GetEnumSelectList<EnumParametersLesson>())
+                {
+                    @if (item.Value == Model.searchParameter.ToString())
+                    {
+                        <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
+                    }
+                    else
+                    {
+                    <option value="@item.Value" name="searchParameter">@item.Text</option>
+                    }
+                 }
+            </select>
+            <input type="text" name="searchString" size="40" value="@Model.searchString" />
+            <input class="btn btn-primary"
+                   type="submit" value="Поиск" />
+        </p>
+    </form>
     <table class="purpleHorizon">
         <thead>
             <tr>
                 <th>
-                 №
+                    №
                 </th>
                 <th>
-                 Названия урока
+                    Названия урока
                 </th>
                 <th>
-                  Домашния задания
+                    Домашния задания
                 </th>
                 <th>
-                   Описания урока
+                    Описания урока
                 </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Data)
             {
                 <tr>
                     <td>
@@ -55,4 +75,12 @@
             </tr>
         </tbody>
     </table>
+    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+        <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="/Lessons?searchString=@Model.searchString&searchParameter=@Model.searchParameter&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+        }
+        <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
+    </div>
 </body>

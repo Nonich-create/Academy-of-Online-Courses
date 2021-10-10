@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
+using Students.BLL.Interface;
 
 namespace Students.BLL.Services
 {

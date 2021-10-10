@@ -18,6 +18,7 @@ using AutoFixture.Xunit2;
 using AutoFixture;
 using System.Linq;
 using AutoMapper;
+using Students.BLL.Interface;
 
 namespace Students.DAL.Tests.ControllerTests
 {
@@ -32,10 +33,10 @@ namespace Students.DAL.Tests.ControllerTests
         {
             var fakeUser = new FakeUserManager();
             var signInManager = new FakeSignInManager();
-            HomeController = new HomeController(_mapper, CourseServiceMock.Object, StudentServiceMock.Object,
-                fakeUser, signInManager);
-            Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
-            Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+          //  HomeController = new HomeController(_mapper, CourseServiceMock.Object, StudentServiceMock.Object,
+          //      fakeUser, signInManager);
+          //  Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
+          //  Fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
 
 

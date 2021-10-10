@@ -1,5 +1,5 @@
 ﻿@using Students.DAL.Enum;
-@model List<Students.MVC.ViewModels.TeacherViewModel>
+@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.TeacherViewModel>
 @{
     ViewData["Title"] = "Страница преподавателей";
     Layout = "_Layout";
@@ -7,18 +7,20 @@
 <body>
     <form method="post" asp-controller="Teachers">
         <p>
-            <select name="serachParameter" class="form-control">
+            <select name="searchParameter" class="form-control">
                 @foreach (var item in Html.GetEnumSelectList<EnumParametersTeacher>())
                 {
-                    @if (item.Value == @ViewData["serachParameter"].ToString())
+                    @if (item.Value == Model.searchParameter.ToString())
                     {
-                        <option selected="selected" value="@item.Value" name="serachParameter">@item.Text</option>
+                        <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
                     }
-                    <option value="@item.Value" name="serachParameter">@item.Text</option>
+                    else
+                    {
+                        <option value="@item.Value" name="searchParameter">@item.Text</option>
+                    }
                 }
             </select>
-            <input type="text" name="searchString" size="40" value="@ViewData["searchString"]" />
-            <input type="hidden" name="take" value="10" />
+            <input type="text" name="searchString" size="40" value="@Model.searchString" />
             <input class="btn btn-primary"
                    type="submit" value="Поиск" />
         </p>
@@ -32,7 +34,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Data)
             {
                 <tr>
                     <td>
@@ -43,8 +45,7 @@
                            asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
                         <a class="btn btn-primary"
                            asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
-                        <a class="btn btn-primary"
-                           asp-action="Security" asp-controller="Security" asp-route-id="@item.UserId">Безопасность</a>
+                        <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@item.UserId" asp-route-Url="@Context.Request.Path">Безопасность</a>
                         <form method="post" asp-controller="Teachers" asp-action="Delete">
                             <button class="btn btn-danger" asp-controller="Teachers" asp-action="Delete" asp-route-TeacherId="@item.Id">
                                 Удалить
@@ -61,4 +62,12 @@
             </tr>
         </tbody>
     </table>
+    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+        <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="/Teachers?searchString=@Model.searchString&searchParameter=@Model.searchParameter&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+        }
+        <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
+    </div>
 </body>

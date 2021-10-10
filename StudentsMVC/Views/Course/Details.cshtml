@@ -5,141 +5,137 @@
     Layout = "_Layout";
 }
 <body>
-    <div class="container"  style="color: #FFFFFF">
-            <img width="150" height="150" src="@Model.URLImagePhoto" alt="нет изображения" />
-            <dl class="row">
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Name)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.Name)
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Description)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.Description)
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Duration)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.Duration)
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Price)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.Price)
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.URLImagePhoto)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.URLImagePhoto)
-                </dd>
-                <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Visible)
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.Visible)
-                </dd>
-            </dl>
-            <div>
-                <a class="btn btn-primary"
-                   asp-action="Edit" asp-route-id="@Model.Id">Редактировать</a>
-                <a class="btn btn-primary"
-                   asp-action="Index">Назад</a>
-            </div>
-            <table class="purpleHorizon">
-                <thead>
-                    <tr>
-                        <th>
-                            Номер группы
-                        </th>
-                        <th>
-                            Дата старта
-                        </th>
-                        <th>
-                            Статус группы
-                        </th>
-                        <th>
-                            Количество студентов
-                        </th>
-                        <th>
-                            Менеджер
-                        </th>
-                        <th>
-                            Преподователь
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Groups)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.NumberGroup)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.DateStart)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.GroupStatus)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CountMax)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Manager.Surname)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Teacher.Surname)
-                            </td>
-                            <td>
-                                <a class="btn btn-primary"
-                                   asp-controller="Groups" asp-action="Edit" asp-route-id="@item.Id">Редактирование</a>
-                                <a class="btn btn-primary"
-                                   asp-controller="Groups" asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
-                                <a class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
-                                   asp-controller="Groups" asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
-                            </td>
-                        </tr>
-                    }
+    <div class="container" style="color: #FFFFFF">
+        <img width="150" height="150" src="@Model.URLImagePhoto" alt="нет изображения" />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Duration)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Duration)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.URLImagePhoto)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.URLImagePhoto)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Visible)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Visible)
+            </dd>
+        </dl>
+        <div>
+            <a class="btn btn-primary"
+               asp-action="Edit" asp-route-id="@Model.Id">Редактировать</a>
+            <a class="btn btn-primary"
+               asp-action="Index">Назад</a>
+        </div>
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        Номер группы
+                    </th>
+                    <th>
+                        Дата старта
+                    </th>
+                    <th>
+                        Статус группы
+                    </th>
+                    <th>
+                        Количество студентов
+                    </th>
+                    <th>
+                        Менеджер
+                    </th>
+                    <th>
+                        Преподователь
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Groups)
+                {
                     <tr>
                         <td>
-                            <a class="btn btn-primary"
-                               asp-controller="Groups" asp-action="Create">Новая группа</a>
+                            <a asp-controller="Groups" asp-action="Details" asp-route-id="@item.Id">@item.NumberGroup</a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DateStart)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.GroupStatus)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CountMax)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Manager.Surname)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Teacher.Surname)
+                        </td>
+                        <td>
+                            <a class="btn btn-danger" style=" background: -moz-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: -webkit-linear-gradient(top, #c94949 0%, #be2525 66%, #B70D0D 100%); background: linear-gradient(to bottom, #c94949 0%, #be2525 66%, #B70D0D 100%)"
+                               asp-controller="Groups" asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-            <table class="purpleHorizon">
-                <thead>
-                    <tr>
-                        <th>
-                            №
-                        </th>
-                        <th>
-                            фИО
-                        </th>
-                        <th>
-                            Статус заявки
-                        </th>
-                        <th>
-                           Группа
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.CourseApplications)
-                    {
+                }
+                <tr>
+                    <td>
+                        <a class="btn btn-primary"
+                           asp-controller="Groups" asp-action="Create">Новая группа</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="purpleHorizon">
+            <thead>
+                <tr>
+                    <th>
+                        №
+                    </th>
+                    <th>
+                        фИО
+                    </th>
+                    <th>
+                        Статус заявки
+                    </th>
+                    <th>
+                        Группа
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CourseApplications)
+                {
                     <tr>
                         <td>
                             @Html.DisplayFor(modelItem => item.Id)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Student.Surname) @Html.DisplayFor(modelItem => item.Student.Name) @Html.DisplayFor(modelItem => item.Student.MiddleName)
+                            <a asp-controller="Students" asp-action="Details" asp-route-id="@item.Id">@item.Student.GetFullName</a>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.ApplicationStatus)
@@ -149,31 +145,29 @@
                         </td>
                         <td>
                             <div>
-                                <a class="btn btn-info,purpleButton"
-                                   asp-controller="Students" asp-action="Details" asp-route-id="@item.Id">Студент</a>
                                 @if (item.ApplicationStatus == EnumApplicationStatus.Close)
                                 {
-                                    <form method="post" asp-controller="CourseApplication" asp-action="Cancel">
-                                            <button class="btn btn-info,purpleButton"
-                                                    asp-controller="CourseApplication" asp-action="Cancel" asp-route-ApplicationCourseId="@item.Id">
-                                                Отменить
-                                            </button>
+                                    <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
+                                        <button class="btn btn-primary"
+                                                asp-controller="CourseApplication" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
+                                            Отменить
+                                        </button>
                                     </form>
                                 }
                                 else
                                 {
-                                    <form method="post" asp-controller="CourseApplication" asp-action="Enroll">
-                                            <button class="btn btn-info,purpleButton"
-                                                    asp-controller="CourseApplication" asp-action="Enroll" asp-route-ApplicationCourseId="@item.Id">
-                                                Принять
-                                            </button>
+                                    <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
+                                        <button class="btn btn-primary"
+                                                asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
+                                            Принять
+                                        </button>
                                     </form>
                                 }
                             </div>
                         </td>
                     </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
     </div>
 </body>

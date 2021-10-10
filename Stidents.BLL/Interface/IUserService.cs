@@ -1,7 +1,8 @@
 ﻿using Students.DAL.Models;
 using System.Threading.Tasks;
+using Students.BLL.Interface.Base;
 
-namespace Students.BLL.Services
+namespace Students.BLL.Interface
 {
     public interface IUserService : IBaseService<ApplicationUser>
     {

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
+using Students.BLL.Interface;
 
 namespace Students.BLL.Services
 {
@@ -177,6 +178,14 @@ namespace Students.BLL.Services
                 return Enumerable.Empty<Group>();
             return (await _unitOfWork.GroupRepository.GetGroupsListAsync()).AsQueryable()
                 .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+        }
+
+        public async Task<IEnumerable<Group>> SearchAllAsync(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                return Enumerable.Empty<Group>();
+            return (await _unitOfWork.GroupRepository.GetGroupsListAsync()).AsQueryable()
+                .Where(query);
         }
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)

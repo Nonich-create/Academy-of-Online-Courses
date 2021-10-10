@@ -2,16 +2,13 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
-using Students.BLL.Services;
 using System.Linq;
-using System;
-using Students.MVC.Helpers;
 using AutoMapper;
 using Students.DAL.Enum;
+using Students.MVC.Models;
+using Students.BLL.Interface;
 
 namespace Students.MVC.Controllers
 {
@@ -31,25 +28,33 @@ namespace Students.MVC.Controllers
         #region Отображения уроков
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, EnumParametersLesson searchParameter, int page = 1)
         {
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
-            return View(model);
+            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var paginationModel = new PaginationModel<LessonViewModel>(count, page)
+            {
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
+                Data = model
+            };
+            return View(paginationModel);
         }
 
         #endregion
         #region Отображения уроков определенного курса
         [Authorize(Roles = "admin,manager,teacher")] // исправить
-        public async Task<IActionResult> IndexСourseId(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> IndexСourseId(string searchString, EnumParametersStudent searchParameter, int page = 1)
         {
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
-            return View(model);
+            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var paginationModel = new PaginationModel<LessonViewModel>(count, page)
+            {
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
+                Data = model
+            };
+            return View(paginationModel);
         }
         #endregion
 

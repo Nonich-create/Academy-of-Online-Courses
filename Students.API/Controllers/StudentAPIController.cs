@@ -5,6 +5,7 @@ using Students.BLL.Mapper;
 using Students.MVC.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Students.BLL.Interface;
 
 namespace StudentsAPI.Controllers
 {
@@ -17,7 +18,7 @@ namespace StudentsAPI.Controllers
        // private readonly IGroupService _groupService;
        // private readonly ICourseService _courseService;
 
-        public StudentAPIController(IUserService userService, IStudentService studentService, IGroupService groupService, ICourseService courseService)
+        public StudentAPIController( IStudentService studentService)
         {
             _studentService = studentService;
          //   _userService = userService;

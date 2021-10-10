@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Students.BLL.Mapper;
-using Students.BLL.Services;
+using Students.BLL.Interface;
 using Students.DAL.Enum;
 using Students.DAL.Models;
+using Students.MVC.Models;
 using Students.MVC.ViewModels;
 
 namespace Students.MVC.Controllers
@@ -32,13 +31,17 @@ namespace Students.MVC.Controllers
         #region Отображения расписания занятий
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("Index")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, EnumParametersLessonTimes searchParameter, int page = 1)
         {
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var count = await _lessonTimesService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<LessonTimesViewModel>>((await _lessonTimesService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
-            return View(model);
+            var count = await _lessonTimesService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<LessonTimesViewModel>>((await _lessonTimesService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var paginationModel = new PaginationModel<LessonTimesViewModel>(count, page)
+            {
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
+                Data = model
+            };
+            return View(paginationModel);
         }
         #endregion
         #region Отображения добавления расписания занятий

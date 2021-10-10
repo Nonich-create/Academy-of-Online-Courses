@@ -12,6 +12,8 @@ namespace Students.MVC.Mapper
     {
         public MappingProfile()
         {
+            CreateMap<ApplicationUser, UserViewModel>()
+           .ReverseMap();
             CreateMap<Person, PersonViewModel>()
             .ReverseMap();
             CreateMap<Teacher, PersonEditViewModel>()

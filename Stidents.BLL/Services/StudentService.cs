@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Students.DAL.Enum;
 using Microsoft.Extensions.Logging;
 using System.Linq.Dynamic.Core;
+using Students.BLL.Interface;
 
 namespace Students.BLL.Services
 {
@@ -174,6 +175,14 @@ namespace Students.BLL.Services
         {
             return (await _unitOfWork.StudentRepository.GetStudentListAsync())
                 .OrderBy(s => s.Surname).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        }
+
+        public async Task<IEnumerable<Student>> SearchAllAsync(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                return Enumerable.Empty<Student>();
+            return (await _unitOfWork.StudentRepository.GetStudentListAsync()).AsQueryable()
+                .Where(query);
         }
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)

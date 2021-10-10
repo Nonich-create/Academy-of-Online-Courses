@@ -5,23 +5,22 @@
     ViewData["Title"] = "Страница студентов";
     Layout = "_Layout";
 }
-
 <body>
     <form method="post" asp-controller="Students">
-        <select name="serachParameter" class="form-control">
+        <select name="searchParameter" class="form-control">
             @foreach (var item in Html.GetEnumSelectList<EnumParametersStudent>())
             {
-                @if (item.Value == Model.serachParameter.ToString())
+                @if (item.Value == Model.searchParameter.ToString())
                 {
-                    <option selected="selected" class="test2" value="@item.Value" name="serachParameter">@item.Text</option>
+                 <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
                 }
                 else
-                {
-                <option value="@item.Value" name="serachParameter">@item.Text</option>
+                {   
+                <option value="@item.Value" name="searchParameter">@item.Text</option>
                 }
-             }
+            }
         </select>
-        <input type="text" name="searchString" class="test" value="@Model.searchString"/>
+        <input type="text" name="searchString" value="@Model.searchString" />
         <input class="btn btn-primary"
                type="submit" value="Поиск" />
     </form>
@@ -32,13 +31,13 @@
                     <a asp-action="Index" asp-route-sortRecords="fip">ФИО</a>
                 </th>
                 <th>
-                    <a asp-action="Index" asp-route-sortRecords="@ViewData["sortRecords"]">Дата рождения</a>
+                    <a asp-action="Index">Дата рождения</a>
                 </th>
                 <th>
-                    <a asp-action="Index" asp-route-sortRecords="@ViewData["sortRecords"]">Номер группы</a>
+                    <a asp-action="Index">Номер группы</a>
                 </th>
                 <th>
-                    <a asp-action="Index" asp-route-sortRecords="@ViewData["sortRecords"]">Курс</a>
+                    <a asp-action="Index">Курс</a>
                 </th>
             </tr>
         </thead>
@@ -61,7 +60,7 @@
                     <td>
                         <a class="btn btn-primary"
                            asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
-                        <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@item.UserId">Безопасность</a>
+                        <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@item.UserId" asp-route-Url="@Context.Request.Path">Безопасность</a>
                         <form method="post" asp-action="Delete">
                             <button class="btn btn-danger" asp-action="Delete" asp-route-StudentId="@item.Id">
                                 Удалить
@@ -80,16 +79,14 @@
         </tbody>
 
     </table>
-    @{
-        int ActionPage = @Model.PageNumber - 1;
-    }
+
     <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
-        {   
-            <a href="/Students?page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+        {
+            <a href="/Students?searchString=@Model.searchString&searchParameter=@Model.searchParameter&page=@i"
+               class="cdp_i" onclick="jQueryAjaxGet('@i')">@i</a>
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>
 </body>
- 

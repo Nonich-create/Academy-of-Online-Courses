@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Students.MVC.ViewModels;
 using Students.DAL.Models;
-using Students.BLL.Services;
+using Students.BLL.Interface;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Students.DAL.Enum;
+using Students.MVC.Models;
 
 namespace Students.MVC.Controllers
 {
@@ -25,13 +26,17 @@ namespace Students.MVC.Controllers
 
         #region Отображения преподователей
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersStudent serachParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, EnumParametersTeacher searchParameter, int page = 1)
         {
-            ViewData["searchString"] = searchString;
-            ViewData["serachParameter"] = (int)serachParameter;
-            var count = await _teacherService.GetCount(searchString, (EnumSearchParameters)(int)serachParameter);
-            var model = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.IndexView(searchString, (EnumSearchParameters)(int)serachParameter, page, 10)));
-            return View(model);
+            var count = await _teacherService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var paginationModel = new PaginationModel<TeacherViewModel>(count, page)
+            {
+                searchString = searchString,
+                searchParameter = (int)searchParameter,
+                Data = model
+            };
+            return View(paginationModel);
         }
         #endregion
 

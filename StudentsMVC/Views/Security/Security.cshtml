@@ -1,17 +1,13 @@
-﻿@model Students.DAL.Models.ApplicationUser
+﻿@model Students.MVC.ViewModels.UserViewModel
 @{
     Layout = "_LayoutAdditional";
     ViewData["Title"] = "Редактирование профиля";
 }
 <body>
     <div class="registration-form">
-        <form asp-action="Security" asp-controller="Security"> 
+        <form asp-action="Security" asp-controller="Security">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <input type="text" class="form-control item" asp-for="UserName" id="username" placeholder="Логин">
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label class="form_label">Email</label><br />
                 <input type="email" class="form-control item" asp-for="Email" id="email" placeholder="Email">
@@ -23,13 +19,13 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <a asp-action="ChangePassword" asp-route-id="@Model.Id"  class="btn btn-block create-account">Смена пароля</a>
+                <a asp-action="ChangePassword" asp-route-id="@Model.Id" asp-route-Url="@Model.ReturnUrl" class="btn btn-block create-account">Смена пароля</a>
             </div>
             <div class="form-group">
                 <input type="submit" value="Сохранить" class="btn btn-block create-account" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Назад"asp-controller="Home" asp-action="Index" class="btn btn-block create-account" />
+                <input type="submit" value="Назад" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl" class="btn btn-block create-account" />
             </div>
         </form>
     </div>
