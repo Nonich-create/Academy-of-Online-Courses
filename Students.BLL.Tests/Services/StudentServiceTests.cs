@@ -13,13 +13,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Students.DAL.Enum;
 
 namespace Students.BLL.Tests.Services
 {
     public class StudentServiceTests
     {
       
-        private StudentService _mockStudentService;
+        private readonly StudentService _mockStudentService;
         public Fixture Fixture { get; set; } = new();
         private readonly UnitOfWork UnitOfWork;
         private readonly Mock<ILogger<Student>> _mockLogger;
@@ -45,7 +46,7 @@ namespace Students.BLL.Tests.Services
             await UnitOfWork.SaveAsync();
  
             //Act 
-            var result = await _mockStudentService.GetPaginatedResult(1, 10);
+            var result = await _mockStudentService.IndexView("",EnumSearchParameters.None,1, 10);
 
             //Assert 
             Assert.Equal(10, result.Count());

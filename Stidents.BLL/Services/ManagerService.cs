@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
-using System.Linq.Dynamic.Core;
 using System.Linq;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
@@ -122,38 +121,34 @@ namespace Students.BLL.Services
                 var spec = new ManagerWithItemsSpecifications();
                 return (await _unitOfWork.ManagerRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new ManagerWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.ManagerRepository.CountAsync(specSearch);
         }
-
-        public async Task<IEnumerable<Manager>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-            await _unitOfWork.ManagerRepository.GetManagerListAsync(currentPage, pageSize);
-        
 
         public async Task<IEnumerable<Manager>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Manager>();
-            return (await _unitOfWork.ManagerRepository.GetManagerListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new ManagerWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.ManagerRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Manager>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Manager>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Manager>();
-            return (await _unitOfWork.ManagerRepository.GetManagerListAsync()).AsQueryable()
-                .OrderBy(t => t.Surname)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new ManagerWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.ManagerRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Manager>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new ManagerWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.ManagerRepository.GetAsync(spec);
         }
     }
 }

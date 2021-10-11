@@ -7,6 +7,5 @@ namespace Students.DAL.Repositories
 {
     public interface IGroupRepository : IRepository<Group>
     {
-        Task<IEnumerable<Group>> GetGroupsListAsync();
     }
 }

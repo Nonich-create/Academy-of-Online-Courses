@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Students.DAL.Specifications.Base;
 using System.Linq;
-
+using System.Linq.Dynamic.Core;
 
 namespace Students.BLL.Repository.Base
 {
@@ -24,6 +24,11 @@ namespace Students.BLL.Repository.Base
             // Include any string-based include statements
             query = specification.IncludeStrings.Aggregate(query,
                                     (current, include) => current.Include(include));
+
+            if (specification.Where != null)
+            {
+                query = query.Where(specification.Where);
+            }
 
             // Apply ordering if expressions are set
             if (specification.OrderBy != null)

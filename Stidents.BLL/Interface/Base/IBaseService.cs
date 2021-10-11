@@ -12,10 +12,9 @@ namespace Students.BLL.Interface.Base
         Task<T> Update(T item);
         Task DeleteAsync(int id);
         Task<T> SearchAsync(string query);
-        Task<IEnumerable<T>> GetPaginatedResult(int currentPage, int pageSize = 10);
         Task<int> GetCount(string searchString, EnumSearchParameters searchParametr);
         Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr);
-        Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize);
+        Task<IEnumerable<T>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr);
         Task<IEnumerable<T>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize);
     }
 }

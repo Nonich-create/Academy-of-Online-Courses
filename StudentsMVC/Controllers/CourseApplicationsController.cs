@@ -38,8 +38,8 @@ namespace Students.MVC.Controllers
             var model = _mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _courseApplicationService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
             var paginationModel = new PaginationModel<CourseApplicationViewModel>(count, page)
             {
-                searchString = searchString,
-                searchParameter = (int)searchParameter,
+                SearchString = searchString,
+                SearchParameter = (int)searchParameter,
                 Data = model
             };
             return View(paginationModel);

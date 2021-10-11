@@ -7,6 +7,5 @@ namespace Students.DAL.Repositories
 {
     public interface IManagerRepository : IRepository<Manager>
     {
-        Task<IEnumerable<Manager>> GetManagerListAsync();
     }
 }
