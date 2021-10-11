@@ -12,5 +12,14 @@ namespace Students.DAL.Specifications
             AddInclude(l => l.Lesson);
             AddInclude(l => l.Group);
         }
+
+        public LessonTimesWithItemsSpecifications(int currentPage, int pageSize)
+: base(null)
+        {
+            AddInclude(l => l.Lesson);
+            AddInclude(l => l.Group);
+            ApplyPaging((currentPage - 1) * pageSize, pageSize);
+            ApplyOrderBy(l => l.Group.NumberGroup);
+        }
     }
 }

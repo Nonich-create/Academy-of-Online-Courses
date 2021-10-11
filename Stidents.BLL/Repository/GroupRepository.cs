@@ -18,6 +18,12 @@ namespace Students.BLL.Repository
             var spec = new GroupWithItemsSpecifications();
             return await GetAsync(spec);
         }
+
+        public async Task<IEnumerable<Group>> GetGroupsListAsync(int currentPage, int pageSize)
+        {
+            var spec = new GroupWithItemsSpecifications(currentPage,pageSize);
+            return await GetAsync(spec);
+        }
  
     }
 }

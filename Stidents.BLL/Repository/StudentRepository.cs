@@ -19,7 +19,11 @@ namespace Students.BLL.Repository
             var spec = new StudentWithItemsSpecifications();
             return await GetAsync(spec);
         }
-
+        public async Task<IEnumerable<Student>> GetStudentListAsync(int currentPage, int pageSize)
+        {
+            var spec = new StudentWithItemsSpecifications(currentPage, pageSize);
+            return await GetAsync(spec);
+        }
 
     }
 }

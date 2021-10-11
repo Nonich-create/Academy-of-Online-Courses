@@ -28,5 +28,11 @@ namespace Students.BLL.Repository
             var spec = new CourseApplicationWithItemsSpecifications();
             return await GetAsync(spec);
         }
+
+        public async Task<IEnumerable<CourseApplication>> GetCourseApplicationListAsync(int currentPage, int pageSize)
+        {
+            var spec = new CourseApplicationWithItemsSpecifications(currentPage,pageSize);
+            return await GetAsync(spec);
+        }
     }
 }

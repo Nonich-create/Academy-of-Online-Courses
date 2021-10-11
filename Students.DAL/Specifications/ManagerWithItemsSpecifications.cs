@@ -11,5 +11,12 @@ namespace Students.DAL.Specifications
         {
             AddInclude(m => m.User);
         }
+        public ManagerWithItemsSpecifications(int currentPage, int pageSize)
+: base(null)
+        {
+            AddInclude(m => m.User);
+            ApplyPaging((currentPage - 1) * pageSize, pageSize);
+            ApplyOrderBy(s => s.Surname);
+        }
     }
 }
