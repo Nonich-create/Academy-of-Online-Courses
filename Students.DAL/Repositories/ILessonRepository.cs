@@ -7,6 +7,5 @@ namespace Students.DAL.Repositories
 {
     public interface ILessonRepository : IRepository<Lesson>
     {
-        Task<IEnumerable<Lesson>> GetLessonListAsync();
     }
 }

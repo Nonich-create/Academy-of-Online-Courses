@@ -8,6 +8,5 @@ namespace Students.DAL.Repositories
     public interface ICourseApplicationRepository : IRepository<CourseApplication>
     {
         Task DeleteAsyncAllByStudentId(int StudentId);
-        Task<IEnumerable<CourseApplication>> GetCourseApplicationListAsync();
     }
 }

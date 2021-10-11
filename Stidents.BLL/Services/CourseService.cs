@@ -8,6 +8,7 @@ using Students.DAL.Enum;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
+using Students.DAL.Specifications;
 
 namespace Students.BLL.Services
 {
@@ -120,47 +121,37 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.CourseRepository.GetAllAsync()).Count();
+                var spec = new CourseWithItemsSpecifications();
+                return (await _unitOfWork.CourseRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
-        }
-
-        public async Task<IEnumerable<Course>> GetPaginatedResult(int currentPage, int pageSize = 10)
-        {
-            return (await _unitOfWork.CourseRepository.GetAllAsync())
-                .OrderBy(c => c.Name).Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var specSearch = new CourseWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.CourseRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Course>();
-            return (await _unitOfWork.CourseRepository.GetAllAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new CourseWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.CourseRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Course>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Course>();
-            return (await _unitOfWork.CourseRepository.GetAllAsync()).AsQueryable()
-                .OrderBy(c => c.Name)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new CourseWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.CourseRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Course>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
-        }
-
-        public Task<bool> ExistsAsync(int id)
-        {
-            throw new NotImplementedException();
+            var spec = new CourseWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.CourseRepository.GetAsync(spec);
         }
     }
 }

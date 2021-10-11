@@ -120,39 +120,34 @@ namespace Students.BLL.Services
                 var spec = new LessonTimesWithItemsSpecifications();
                 return (await _unitOfWork.LessonTimesRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new LessonTimesWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.LessonTimesRepository.CountAsync(specSearch);
         }
-
-        public async Task<IEnumerable<LessonTimes>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-             await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync(currentPage, pageSize);
-
-        
 
         public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<LessonTimes>();
-            return (await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new LessonTimesWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<LessonTimes>();
-            return (await _unitOfWork.LessonTimesRepository.GetLessonTimesListAsync()).AsQueryable()
-                .OrderBy(l => l.Lesson.NumberLesson)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new LessonTimesWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<LessonTimes>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new LessonTimesWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }
     }
 }

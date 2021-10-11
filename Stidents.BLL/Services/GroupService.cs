@@ -165,46 +165,42 @@ namespace Students.BLL.Services
                 var spec = new GroupWithItemsSpecifications();
                 return (await _unitOfWork.GroupRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new GroupWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.GroupRepository.CountAsync(specSearch);
         }
-
-        public async Task<IEnumerable<Group>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-          await _unitOfWork.GroupRepository.GetGroupsListAsync();
-        
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Group>();
-            return (await _unitOfWork.GroupRepository.GetGroupsListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new GroupWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string query)
         {
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<Group>();
-            return (await _unitOfWork.GroupRepository.GetGroupsListAsync()).AsQueryable()
-                .Where(query);
+            var spec = new GroupWithItemsSpecifications(query);
+            return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Group>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Group>();
-            return (await _unitOfWork.GroupRepository.GetGroupsListAsync()).AsQueryable()
-                .OrderBy(g => g.NumberGroup)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new GroupWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Group>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new GroupWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
     }
 

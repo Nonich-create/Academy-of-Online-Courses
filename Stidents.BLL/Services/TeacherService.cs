@@ -126,38 +126,35 @@ namespace Students.BLL.Services
                 var spec = new TeacherWithItemsSpecifications();
                 return (await _unitOfWork.TeacherRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new TeacherWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.TeacherRepository.CountAsync(specSearch);
         }
-
-        public async Task<IEnumerable<Teacher>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-          await _unitOfWork.TeacherRepository.GetTeacherListAsync(currentPage, pageSize);
         
-
         public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Teacher>();
-            return (await _unitOfWork.TeacherRepository.GetTeacherListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new TeacherWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.TeacherRepository.GetAsync(spec);
+
         }
 
-        public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Teacher>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Teacher>();
-            return (await _unitOfWork.TeacherRepository.GetTeacherListAsync()).AsQueryable()
-                .OrderBy(t => t.Surname)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new TeacherWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.TeacherRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Teacher>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new TeacherWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.TeacherRepository.GetAsync(spec);
         }
     }
 }

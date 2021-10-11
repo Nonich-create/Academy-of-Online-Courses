@@ -170,46 +170,43 @@ namespace Students.BLL.Services
                 var spec = new StudentWithItemsSpecifications();
                 return (await _unitOfWork.StudentRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new StudentWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.StudentRepository.CountAsync(specSearch);
         }
-        #region GetPaginatedResult
-        public async Task<IEnumerable<Student>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-             await _unitOfWork.StudentRepository.GetStudentListAsync(currentPage, pageSize);
-        #endregion 
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string query)
         {
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<Student>();
-            return (await _unitOfWork.StudentRepository.GetStudentListAsync()).AsQueryable()
-                .Where(query);
+            var spec = new StudentWithItemsSpecifications(query);
+            return await _unitOfWork.StudentRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Student>();
-            return (await _unitOfWork.StudentRepository.GetStudentListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new StudentWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.StudentRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Student>> SearchAllAsync(int currentPage, int pageSize,string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Student>();
-            return (await _unitOfWork.StudentRepository.GetStudentListAsync()).AsQueryable()
-                .OrderBy(s => s.Surname)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new StudentWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.StudentRepository.GetAsync(spec);
         }
+
 
         public async Task<IEnumerable<Student>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage,pageSize,searchString,searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new StudentWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.StudentRepository.GetAsync(spec);
         }
-    }
+    }   
 }

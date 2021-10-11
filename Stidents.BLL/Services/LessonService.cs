@@ -3,7 +3,6 @@ using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq.Dynamic.Core;
 using System.Linq;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
@@ -127,47 +126,45 @@ namespace Students.BLL.Services
                 var spec = new LessonWithItemsSpecifications();
                 return (await _unitOfWork.LessonRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new LessonWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.LessonRepository.CountAsync(specSearch);
         }
-
-        public async Task<IEnumerable<Lesson>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-             await _unitOfWork.LessonRepository.GetLessonListAsync();
-        
 
         public async Task<IEnumerable<Lesson>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Lesson>();
-            return (await _unitOfWork.LessonRepository.GetLessonListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new LessonWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.LessonRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Lesson>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Lesson>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Lesson>();
-            return (await _unitOfWork.LessonRepository.GetLessonListAsync()).AsQueryable()
-                .OrderBy(l => l.NumberLesson)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new LessonWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.LessonRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Lesson>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new LessonWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.LessonRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Lesson>> IndexView(int courseId, string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return (await SearchAllAsync(searchString, searchParametr, currentPage, pageSize)).Where(l => l.CourseId == courseId);
+                var specSearch = new LessonWithItemsSpecifications(currentPage, pageSize, searchString, courseId, searchParametr);
+                return await _unitOfWork.LessonRepository.GetAsync(specSearch);
             }
-            return (await GetPaginatedResult(currentPage, pageSize)).Where(l => l.CourseId == courseId); ;
+            var spec = new LessonWithItemsSpecifications(currentPage, pageSize, courseId);
+            return await _unitOfWork.LessonRepository.GetAsync(spec);
         }
     }
 }

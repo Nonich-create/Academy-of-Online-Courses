@@ -7,6 +7,5 @@ namespace Students.DAL.Repositories
 {
     public interface IAssessmentRepository : IRepository<Assessment>
     {
-        Task<IEnumerable<Assessment>> GetAssessmentsListAsync();
     }
 }

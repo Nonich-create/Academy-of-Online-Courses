@@ -8,6 +8,7 @@ using System;
 using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
+using Students.DAL.Specifications;
 
 namespace Students.BLL.Services
 {
@@ -117,42 +118,37 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync()).Count();
+                var spec = new AssessmentWithItemsSpecifications();
+                return (await _unitOfWork.AssessmentRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
-        }
-
-        public async Task<IEnumerable<Assessment>> GetPaginatedResult(int currentPage, int pageSize = 10)
-        {
-            return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync())
-                .OrderBy(a => a.Lesson.NumberLesson).Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var specSearch = new AssessmentWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.AssessmentRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Assessment>();
-            return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new AssessmentWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.AssessmentRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<Assessment>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Assessment>();
-            return (await _unitOfWork.AssessmentRepository.GetAssessmentsListAsync()).AsQueryable()
-                .OrderBy(a => a.Lesson.NumberLesson)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new AssessmentWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.AssessmentRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Assessment>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new AssessmentWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.AssessmentRepository.GetAsync(spec);
         }
     }
 }

@@ -181,46 +181,42 @@ namespace Students.BLL.Services
                 var spec = new CourseApplicationWithItemsSpecifications();
                 return (await _unitOfWork.CourseApplicationRepository.CountAsync(spec));
             }
-            return (await SearchAllAsync(searchString, searchParametr)).Count();
+            var specSearch = new CourseApplicationWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.CourseApplicationRepository.CountAsync(specSearch);
         }
-
-        public async Task<IEnumerable<CourseApplication>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
-            await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync();
-        
 
         public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string query)
         {
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<CourseApplication>();
-            return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync()).AsQueryable()
-                .Where(query);
+            var spec = new CourseApplicationWithItemsSpecifications(query);
+            return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<CourseApplication>();
-            return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync()).AsQueryable()
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString);
+            var spec = new CourseApplicationWithItemsSpecifications(searchString, searchParametr);
+            return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize)
+        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<CourseApplication>();
-            return (await _unitOfWork.CourseApplicationRepository.GetCourseApplicationListAsync()).AsQueryable()
-                .OrderBy(c => c.Course.Name)
-                .Where($"{searchParametr.ToString().Replace('_', '.')}.Contains(@0)", searchString)
-                .Skip((currentPage - 1) * pageSize).Take(pageSize);
+            var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
+            return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<CourseApplication>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
             {
-                return await SearchAllAsync(searchString, searchParametr, currentPage, pageSize);
+                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
-            return await GetPaginatedResult(currentPage, pageSize);
+            var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
         }
     }
 }

@@ -14,16 +14,5 @@ namespace Students.BLL.Repository
         {
             _db = db;
         }
-        public async Task<IEnumerable<Student>> GetStudentListAsync()
-        {
-            var spec = new StudentWithItemsSpecifications();
-            return await GetAsync(spec);
-        }
-        public async Task<IEnumerable<Student>> GetStudentListAsync(int currentPage, int pageSize)
-        {
-            var spec = new StudentWithItemsSpecifications(currentPage, pageSize);
-            return await GetAsync(spec);
-        }
-
     }
 }

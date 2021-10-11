@@ -8,7 +8,7 @@
     <div>
         <form method="post" asp-controller="Course">
             <p>
-                <input type="text" name="searchString" size="40" value="@Model.searchString" />
+                <input type="text" name="searchString" size="40" value="@Model.SearchString" />
                 <input class="btn btn-primary"
                        type="submit" value="Поиск" />
             </p>
@@ -73,7 +73,7 @@
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="/Course?searchString=@Model.searchString&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+            <a href="/Course?searchString=@Model.SearchString&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>

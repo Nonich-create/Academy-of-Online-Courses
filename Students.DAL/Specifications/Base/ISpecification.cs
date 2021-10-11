@@ -13,6 +13,7 @@ namespace Students.DAL.Specifications.Base
         Expression<Func<T, object>> OrderBy { get; }
         Expression<Func<T, object>> OrderByDescending { get; }
 
+        string Where { get; }
         int Take { get; }
         int Skip { get; }
         bool isPagingEnabled { get; }
