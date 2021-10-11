@@ -20,6 +20,8 @@ namespace Students.BLL.Repository.Base
             _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
+        public async Task AddRangeAsync(IEnumerable<T> entity) => await _db.Set<T>().AddRangeAsync(entity);
+
         public async Task<IEnumerable<T>> GetAllAsync() => await _db.Set<T>().ToListAsync();
 
         private IQueryable<T> ApplySpecification(ISpecification<T> spec) => SpecificationEvaluator<T>.GetQuery(_db.Set<T>().AsQueryable(), spec);

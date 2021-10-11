@@ -21,7 +21,7 @@ namespace Students.DAL.Tests.ControllerTests
     {
         public SecurityController SecurityController { get; set; }
         public Mock<IUserService> UserServicMock { get; } = new Mock<IUserService>();
-      //  public Mock<ILogger<SecurityController>> LoggerMock { get; } = new Mock<ILogger<SecurityController>>();
+   
 
         public SecurityControllerTests()
         {

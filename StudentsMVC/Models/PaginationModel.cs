@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Students.MVC.Models
 {
+    #region PaginationModel
     public class PaginationModel<T>
     {
         public IEnumerable<T> Data { get; set; }
@@ -17,4 +18,5 @@ namespace Students.MVC.Models
             TotalPages = (int)Math.Ceiling(count / pageSize);
         }
     }
+    #endregion
 }

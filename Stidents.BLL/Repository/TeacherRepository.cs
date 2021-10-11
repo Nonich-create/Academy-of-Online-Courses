@@ -13,9 +13,15 @@ namespace Students.BLL.Repository
         {
         }
 
-        public async Task<IEnumerable<Teacher>> GetTeacherListAsync()
+        public async Task<IEnumerable<Teacher>> GetTeacherListAsync( )
         {
             var spec = new TeacherWithItemsSpecifications();
+            return await GetAsync(spec);
+        }
+
+        public async Task<IEnumerable<Teacher>> GetTeacherListAsync(int currentPage, int pageSize)
+        {
+            var spec = new TeacherWithItemsSpecifications(currentPage,pageSize);
             return await GetAsync(spec);
         }
     }

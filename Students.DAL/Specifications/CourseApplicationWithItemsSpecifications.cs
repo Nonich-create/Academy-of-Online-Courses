@@ -12,5 +12,13 @@ namespace Students.DAL.Specifications
             AddInclude(c => c.Student);
             AddInclude(c => c.Course);
         }
+            public CourseApplicationWithItemsSpecifications(int currentPage, int pageSize)
+: base(null)
+        {
+            AddInclude(c => c.Student);
+            AddInclude(c => c.Course);
+            ApplyPaging((currentPage - 1) * pageSize, pageSize);
+            ApplyOrderBy(c => c.Course.Name);
+        }
     }
 }

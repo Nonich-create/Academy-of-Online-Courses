@@ -8,6 +8,7 @@ using System;
 using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
+using Students.DAL.Specifications;
 
 namespace Students.BLL.Services
 {
@@ -161,16 +162,15 @@ namespace Students.BLL.Services
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
-                return (await _unitOfWork.GroupRepository.GetGroupsListAsync()).Count();
+                var spec = new GroupWithItemsSpecifications();
+                return (await _unitOfWork.GroupRepository.CountAsync(spec));
             }
             return (await SearchAllAsync(searchString, searchParametr)).Count();
         }
 
-        public async Task<IEnumerable<Group>> GetPaginatedResult(int currentPage, int pageSize = 10)
-        {
-            return (await _unitOfWork.GroupRepository.GetGroupsListAsync())
-                .OrderBy(g => g.NumberGroup).Skip((currentPage - 1) * pageSize).Take(pageSize);
-        }
+        public async Task<IEnumerable<Group>> GetPaginatedResult(int currentPage, int pageSize = 10) =>
+          await _unitOfWork.GroupRepository.GetGroupsListAsync();
+        
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {

@@ -13,5 +13,14 @@ namespace Students.DAL.Specifications
             AddInclude(g => g.Teacher);
             AddInclude(g => g.Manager);
         }
+        public GroupWithItemsSpecifications(int currentPage, int pageSize)
+: base(null)
+        {
+            AddInclude(g => g.Course);
+            AddInclude(g => g.Teacher);
+            AddInclude(g => g.Manager);
+            ApplyPaging((currentPage - 1) * pageSize, pageSize);
+            ApplyOrderBy(g => g.NumberGroup);
+        }
     }
 }

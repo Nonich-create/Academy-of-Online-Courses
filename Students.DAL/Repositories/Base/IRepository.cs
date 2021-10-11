@@ -23,6 +23,7 @@ namespace Students.DAL.Repositories.Base
         Task<IEnumerable<T>> GetAsync(ISpecification<T> spec);
         Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task<int> CountAsync(ISpecification<T> spec);

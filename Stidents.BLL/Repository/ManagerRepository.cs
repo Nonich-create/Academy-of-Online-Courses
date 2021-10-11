@@ -18,5 +18,11 @@ namespace Students.BLL.Repository
             return await GetAsync(spec);
         }
 
+        public async Task<IEnumerable<Manager>> GetManagerListAsync(int currentPage, int pageSize)
+        {
+            var spec = new ManagerWithItemsSpecifications(currentPage,pageSize);
+            return await GetAsync(spec);
+        }
+
     }
 }
