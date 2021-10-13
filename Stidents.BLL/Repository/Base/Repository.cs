@@ -79,5 +79,7 @@ namespace Students.BLL.Repository.Base
         }
 
         public async Task<T> SearchAsync(string query) => await _db.Set<T>().Where(query).FirstAsync();
+
+ 
     }
 }

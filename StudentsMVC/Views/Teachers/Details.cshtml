@@ -32,3 +32,41 @@
     <a class="btn btn-primary"
        asp-action="Index">Назад</a>
 </div>
+<table class="purpleHorizon">
+    <thead>
+        <tr>
+            <th>
+                Курс
+            </th>
+            <th>
+                Номер группы
+            </th>
+            <th>
+                Статус группы
+            </th>
+            <th>
+                Менеджер группы
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Groups)
+        {
+        <tr>
+            <td>
+                @item.Course.Name
+            </td>
+            <td>
+                @item.NumberGroup
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GroupStatus)
+            </td>
+            <td>
+                @item.Manager.Name
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+

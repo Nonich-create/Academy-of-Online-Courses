@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Students.MVC.ViewModels.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class AuthorizationViewModel
+    public class AuthorizationViewModel : ModelReturnUrl
     {
         [Required]
         [Display(Name = "Email")]
@@ -13,6 +14,5 @@ namespace Students.MVC.ViewModels
         public string Password { get; set; }
         [Display(Name = "Запомнить?")]
         public bool RememberMe { get; set; }
-        public string ReturnUrl { get; set; }
     }
 }

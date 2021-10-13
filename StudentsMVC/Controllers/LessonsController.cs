@@ -43,11 +43,11 @@ namespace Students.MVC.Controllers
 
         #endregion
         #region Отображения уроков определенного курса
-        [Authorize(Roles = "admin,manager,teacher")] // исправить
-        public async Task<IActionResult> IndexСourseId(string searchString, EnumParametersStudent searchParameter, int page = 1)
+        [Authorize(Roles = "admin,manager,teacher")] 
+        public async Task<IActionResult> IndexСourseId(int CourseId, string searchString, EnumParametersStudent searchParameter, int page = 1)
         {
-            var count = await _lessonService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
-            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var count = await _lessonService.GetCount(CourseId,searchString, (EnumSearchParameters)(int)searchParameter);
+            var model = _mapper.Map<IEnumerable<LessonViewModel>>((await _lessonService.IndexView(CourseId,searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
             var paginationModel = new PaginationModel<LessonViewModel>(count, page)
             {
                 SearchString = searchString,

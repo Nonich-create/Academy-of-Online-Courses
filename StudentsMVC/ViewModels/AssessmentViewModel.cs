@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Students.MVC.ViewModels.Base;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace Students.MVC.ViewModels
 {
-    public class AssessmentViewModel
+    public class AssessmentViewModel : ModelReturnUrl
     {
         public int Id { get; set; }
         [Display(Name = "Студент")]
@@ -17,6 +18,5 @@ namespace Students.MVC.ViewModels
         [Display(Name = "Оценка")]
         [Range(0, 10, ErrorMessage = "Недопустимая оценка")]
         public int? Score { get; set; }
-        public string ReturnUrl { get; set; }
     }
 }

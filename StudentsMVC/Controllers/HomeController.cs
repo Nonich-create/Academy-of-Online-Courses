@@ -15,7 +15,7 @@ using AutoMapper;
 
 namespace Students.MVC.Controllers
 {
-    [ActivatorUtilitiesConstructorAttribute]
+    [ActivatorUtilitiesConstructor]
     public class HomeController : Controller
     {
         private readonly ICourseService _courseService;

@@ -50,9 +50,7 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "manager,admin")]
         public async Task<IActionResult> Enroll(int courseApplicationId)
         {
-                var courseApplication = await _courseApplicationService.GetAsync(courseApplicationId);
-                if(courseApplication == null) { return RedirectToAction(nameof(Index));}
-                await _courseApplicationService.Enroll(courseApplication);
+                await _courseApplicationService.Enroll(courseApplicationId);
                 return Redirect(Request.Headers["Referer"].ToString());
         }
         #endregion
@@ -61,9 +59,7 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "manager,admin")]
         public async Task<IActionResult> Cancel(int courseApplicationId)
         {
-                var courseApplication = await _courseApplicationService.GetAsync(courseApplicationId);
-                if (courseApplication == null) { return RedirectToAction(nameof(Index)); }
-                await _courseApplicationService.Cancel(courseApplication);
+                await _courseApplicationService.Cancel(courseApplicationId);
                 return Redirect(Request.Headers["Referer"].ToString());
         }
         #endregion

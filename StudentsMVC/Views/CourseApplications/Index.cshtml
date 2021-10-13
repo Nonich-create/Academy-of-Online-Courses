@@ -7,24 +7,22 @@
 }
 <body>
     <form method="post" asp-controller="CourseApplications">
-        <p>
-            <select name="searchParameter" class="form-control">
-                @foreach (var item in Html.GetEnumSelectList<EnumParametersCourseApplication>())
-                 {
-                    @if (item.Value == Model.SearchParameter.ToString())
-                    {
-                        <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
-                    }
-                    else
-                    {
+        <input type="text" name="searchString" style="width:15%;" value="@Model.SearchString" />
+        <select name="searchParameter" class="custom-select" style="width:15%;">
+            @foreach (var item in Html.GetEnumSelectList<EnumParametersCourseApplication>())
+            {
+                @if (item.Value == Model.SearchParameter.ToString())
+                {
+                    <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
+                }
+                else
+                {
                     <option value="@item.Value" name="searchParameter">@item.Text</option>
-                    }
-                 }
-            </select>
-            <input type="text" name="searchString" size="40" value="@Model.SearchString" />
-            <input class="btn btn-primary"
-                   type="submit" value="Поиск" />
-        </p>
+                }
+            }
+        </select>
+        <input class="btn btn-primary"
+               type="submit" value="Поиск" />
     </form>
     <table class="purpleHorizon">
         <thead>
@@ -51,7 +49,7 @@
                         @Html.DisplayFor(modelItem => item.Id)
                     </td>
                     <td>
-                        <a  asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">@item.Course.Name</a>
+                        <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">@item.Course.Name</a>
                     </td>
                     <td>
                         <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">@item.Student.GetFullName</a>
@@ -66,7 +64,7 @@
                                 <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
                                     <div>
                                         <button class="btn btn-primary"
-                                            asp-controller="CourseApplications" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
+                                                asp-controller="CourseApplications" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
                                             Отменить
                                         </button>
                                     </div>
@@ -77,7 +75,7 @@
                                 <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
                                     <div>
                                         <button class="btn btn-primary"
-                                            asp-controller="CourseApplications" asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
+                                                asp-controller="CourseApplications" asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
                                             Принять
                                         </button>
                                     </div>
@@ -93,7 +91,8 @@
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="/CourseApplications?searchString=@Model.SearchString&searchParameter=@Model.SearchParameter&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+            <a href="/CourseApplications?searchString=@Model.SearchString&searchParameter=@Model.SearchParameter&page=@i"
+               class="cdp_i" onclick="jQueryAjaxGet('@i')">@i</a>
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>

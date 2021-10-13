@@ -19,15 +19,19 @@ namespace Students.MVC.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
         private readonly IStudentService _studentService;
+        private readonly ICourseApplicationService _courseApplicationService;
+        private readonly IAssessmentService _assessmentService;
         private readonly IMapper _mapper;
 
-        public StudentsController(IMapper mapper, IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
+        public StudentsController(IMapper mapper, IAssessmentService assessmentService, ICourseApplicationService courseApplicationService, IUserService userService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IStudentService studentService)
         {
             _userService = userService;
+            _courseApplicationService = courseApplicationService;
             _studentService = studentService;
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _assessmentService = assessmentService;
         }
 
         #region Отображения студентов с использованием пагинации
@@ -52,15 +56,14 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var student = await _studentService.GetAsync(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-            StudentViewModel model;
             var user = await _userService.GetAsync(student.UserId);
-            model = _mapper.Map<StudentViewModel>(student);
+            var courseApplications = await _courseApplicationService.SearchAllAsync($"StudentId == {id}");
+            var assessments = await _assessmentService.SearchAllAsync($"StudentId == {id}");
+            DetaliStudentViewModel model = _mapper.Map<DetaliStudentViewModel>(student);
             model.Email = user.Email;
             model.PhoneNumber = user.PhoneNumber;
+            model.CourseApplications = _mapper.Map<IEnumerable<CourseApplicationViewModel>>(courseApplications);
+            model.Assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>(assessments);
             return View(model);
         }
         #endregion

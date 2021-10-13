@@ -6,24 +6,22 @@
 }
 <body>
     <form method="post" asp-controller="Lessons">
-        <p>
-            <select name="searchParameter" class="form-control">
-                @foreach (var item in Html.GetEnumSelectList<EnumParametersLesson>())
-                 {
-                    @if (item.Value == Model.SearchParameter.ToString())
-                     {
-                        <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
-                     }
-                    else
-                    {
+        <input type="text" name="searchString" style="width:15%;" value="@Model.SearchString" />
+        <select name="searchParameter" class="custom-select" style="width:15%;">
+            @foreach (var item in Html.GetEnumSelectList<EnumParametersLesson>())
+            {
+                @if (item.Value == Model.SearchParameter.ToString())
+                {
+                    <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
+                }
+                else
+                {
                     <option value="@item.Value" name="searchParameter">@item.Text</option>
-                    }
-                 }
-            </select>
-            <input type="text" name="searchString" size="40" value="@Model.SearchString" />
-            <input class="btn btn-primary"
-                   type="submit" value="Поиск" />
-        </p>
+                }
+            }
+        </select>
+        <input class="btn btn-primary"
+               type="submit" value="Поиск" />
     </form>
     <table class="purpleHorizon">
         <thead>
@@ -43,7 +41,9 @@
                 <th>
                     Описания урока
                 </th>
-
+                <th style="text-align:left">
+                    <a class="btn btn-primary" asp-action="CreateWithCourse" asp-route-Url="@Context.Request.Path">Добавить занятия</a>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -57,7 +57,7 @@
                         @Html.DisplayFor(modelItem => item.NumberLesson)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Name)
+                        <a asp-action="Details" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">@item.Name</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Homework)
@@ -69,9 +69,7 @@
                     <td>
                         <a class="btn btn-primary"
                            asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
-                        <a class="btn btn-primary"
-                           asp-action="Details" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Подробнее</a>
-                        <form method="post" asp-controller="Lessons" asp-action="Delete">
+                        <form method="post" asp-controller="Lessons" asp-action="Delete" style="display:inline-table">
                             <button class="btn btn-danger" asp-controller="Lessons" asp-action="Delete" asp-route-LessonId="@item.Id">
                                 Удалить
                             </button>
@@ -80,18 +78,14 @@
                 </tr>
 
             }
-            <tr>
-                <td>
-                    <a class="btn btn-primary" asp-action="CreateWithCourse" asp-route-Url="@Context.Request.Path">Добавить занятия</a>
-                </td>
-            </tr>
         </tbody>
     </table>
     <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="/Lessons?searchString=@Model.SearchString&searchParameter=@Model.SearchParameter&page=@i" class="cdp_i" onclick="jQueryAjaxGet('@Url.Action("Index", "Students", null, Context.Request.Scheme)', '@i')">@i</a>
+            <a href="/Lessons?searchString=@Model.SearchString&searchParameter=@Model.SearchParameter&page=@i"
+                 class="cdp_i" onclick="jQueryAjaxGet('@i')">@i</a>
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>

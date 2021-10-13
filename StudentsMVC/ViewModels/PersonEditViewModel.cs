@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Students.MVC.ViewModels.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class PersonEditViewModel
+    public class PersonEditViewModel : ModelReturnUrl
     {
         [Key]
         public int Id { get; set; }
@@ -18,7 +19,6 @@ namespace Students.MVC.ViewModels
         [UIHint("Url")]
         [Display(Name = "URL")]
         public string URLImagePhoto { get; set; }
-        public string ReturnUrl { get; set; }
         public string UserId { get; set; }
     }
 }

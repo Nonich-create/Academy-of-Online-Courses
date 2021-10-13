@@ -1,9 +1,10 @@
 ﻿using Students.DAL.Models;
+using Students.MVC.ViewModels.Base;
 using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class PersonViewModel
+    public class PersonViewModel: ModelReturnUrl
     {
         [Key]
         public int Id { get; set; }
@@ -43,6 +44,5 @@ namespace Students.MVC.ViewModels
 
         [Display(Name = "ФИО")]
         public string GetFullName => $"{Surname} {Name} {MiddleName}";
-        public string ReturnUrl { get; set; }
     }
 }

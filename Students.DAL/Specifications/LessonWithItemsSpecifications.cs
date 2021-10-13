@@ -12,6 +12,12 @@ namespace Students.DAL.Specifications
         {
             AddInclude(l => l.Course);
         }
+        public LessonWithItemsSpecifications(int courseId)
+    : base(l => l.Course.Id == courseId)
+        {
+            AddInclude(l => l.Course);
+            ApplyOrderBy(l => l.NumberLesson);
+        }
         public LessonWithItemsSpecifications(int currentPage, int pageSize)
 : base(null)
         {
@@ -33,6 +39,13 @@ namespace Students.DAL.Specifications
         {
             AddInclude(l => l.Course);
             ApplyOrderBy(l => l.Course.Name);
+            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+        }
+        public LessonWithItemsSpecifications(int courseId, string stringSearch, EnumSearchParameters searchParametr)
+: base(l => l.CourseId == courseId)
+        {
+            AddInclude(l => l.Course);
+            ApplyOrderBy(l => l.NumberLesson);
             ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 
@@ -57,7 +70,7 @@ namespace Students.DAL.Specifications
         {
             AddInclude(l => l.Course);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
-            ApplyOrderBy(l => l.Course.Name);
+            ApplyOrderBy(l => l.NumberLesson);
         }
     }
 }

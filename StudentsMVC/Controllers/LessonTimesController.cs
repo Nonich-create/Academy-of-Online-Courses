@@ -97,6 +97,28 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
-
+        #region Отображения редактирования расписания занятий
+        [Authorize(Roles = "admin,manager,teacher")]
+        public async Task<IActionResult> EditByIdLessonTimes(int id, string Url)
+        {
+            var model = _mapper.Map<LessonTimesViewModel>(await _lessonTimesService.GetAsync(id));
+            model.ReturnUrl = Url;
+            return View(model);
+        }
+        #endregion
+        #region Редактирования расписания занятий
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin,manager,teacher")]
+        public async Task<IActionResult> EditByIdLessonTimes(LessonTimesViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _lessonTimesService.Update(_mapper.Map<LessonTimes>(model));
+                return RedirectPermanent($"~{model.ReturnUrl}");
+            }
+            return View(model);
+        }
+        #endregion
     }
 }

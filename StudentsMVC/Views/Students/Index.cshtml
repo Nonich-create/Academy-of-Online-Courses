@@ -7,20 +7,20 @@
 }
 <body>
     <form method="post" asp-controller="Students">
-        <select name="searchParameter" class="form-control">
+        <input type="text" name="searchString" style="width:15%;" value="@Model.SearchString"/>
+        <select name="searchParameter" class="custom-select" style="width:15%;">
             @foreach (var item in Html.GetEnumSelectList<EnumParametersStudent>())
             {
                 @if (item.Value == Model.SearchParameter.ToString())
                 {
-                 <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
+                    <option selected="selected" value="@item.Value" name="searchParameter">@item.Text</option>
                 }
                 else
-                {   
-                <option value="@item.Value" name="searchParameter">@item.Text</option>
+                {
+                    <option value="@item.Value" name="searchParameter">@item.Text</option>
                 }
             }
         </select>
-        <input type="text" name="searchString" value="@Model.SearchString" />
         <input class="btn btn-primary"
                type="submit" value="Поиск" />
     </form>
@@ -38,6 +38,9 @@
                 </th>
                 <th>
                     <a asp-action="Index">Курс</a>
+                </th>
+                <th style="text-align:left">
+                    <a class="btn btn-primary" asp-action="Create">Регистрация студента</a>
                 </th>
             </tr>
         </thead>
@@ -61,7 +64,7 @@
                         <a class="btn btn-primary"
                            asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
                         <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@item.UserId" asp-route-Url="@Context.Request.Path">Безопасность</a>
-                        <form method="post" asp-action="Delete">
+                        <form method="post" asp-action="Delete" style="display:inline-table">
                             <button class="btn btn-danger" asp-action="Delete" asp-route-StudentId="@item.Id">
                                 Удалить
                             </button>
@@ -69,18 +72,11 @@
                     </td>
                 </tr>
             }
-            <tr>
-
-                <td>
-                    <a class="btn btn-primary"
-                       asp-action="Create">Регистрация студента</a>
-                </td>
-            </tr>
         </tbody>
 
     </table>
 
-    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+    <div class="content_detail__pagination cdp" style="height:20px" actpage="@Model.PageNumber">
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {

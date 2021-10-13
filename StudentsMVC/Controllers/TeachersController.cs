@@ -15,12 +15,14 @@ namespace Students.MVC.Controllers
     public class TeachersController : Controller
     {
         private readonly ITeacherService _teacherService;
+        private readonly IGroupService _groupService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        public TeachersController(IMapper mapper,UserManager<ApplicationUser> userManager, ITeacherService teacherService)
+        public TeachersController(IMapper mapper,UserManager<ApplicationUser> userManager, ITeacherService teacherService, IGroupService groupService)
         {
             _userManager = userManager;
             _teacherService = teacherService;
+            _groupService = groupService;
             _mapper = mapper;
         }
 
@@ -45,7 +47,9 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Details(int id, string Url)
         {
             var model = _mapper.Map<TeacherViewModel>(await _teacherService.GetAsync(id));
+            var groups = await _groupService.SearchAllAsync($"TeacherId == {id}");
             model.ReturnUrl = Url;
+            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>(groups);
             return View(model);
         }
         #endregion
@@ -56,6 +60,8 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Details()
         {
             var model = _mapper.Map<TeacherViewModel>(await _teacherService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\""));
+            var groups = _groupService.SearchAllAsync($"TeacherId == {model.Id}");
+            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>(groups);
             return View(model);
         }
         #endregion
