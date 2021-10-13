@@ -149,7 +149,7 @@
                                 {
                                     <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
                                         <button class="btn btn-primary"
-                                                asp-controller="CourseApplication" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
+                                                asp-controller="CourseApplications" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
                                             Отменить
                                         </button>
                                     </form>
@@ -158,7 +158,7 @@
                                 {
                                     <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
                                         <button class="btn btn-primary"
-                                                asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
+                                               asp-controller="CourseApplications"  asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
                                             Принять
                                         </button>
                                     </form>

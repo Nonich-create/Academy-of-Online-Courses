@@ -17,11 +17,13 @@ namespace Students.MVC.Controllers
     {
 
         private readonly IManagerService _managerService;
+        private readonly IGroupService _groupService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        public ManagerController(IMapper mapper, UserManager<ApplicationUser> userManager, IManagerService managerService)
+        public ManagerController(IMapper mapper, UserManager<ApplicationUser> userManager, IManagerService managerService, IGroupService groupService)
         {
             _managerService = managerService;
+            _groupService = groupService;
             _userManager = userManager;
             _mapper = mapper;
         }
@@ -44,7 +46,11 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Details(int id)
         {
-            return View(_mapper.Map<ManagerViewModel>(await _managerService.GetAsync(id)));
+            var model = _mapper.Map<ManagerViewModel>(await _managerService.GetAsync(id));
+            var groups = await _groupService.SearchAllAsync($"ManagerId == {id}");
+            //model.ReturnUrl = Url 
+            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>(groups);
+            return View(model);
         }
         #endregion
         #region Отображения регистрации менеджера
@@ -99,7 +105,7 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 await _managerService.Update(_mapper.Map<Manager>(model));
-                return ReturnByUrl(model.ReturnUrl);
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
             return View(model);
         }
@@ -114,10 +120,5 @@ namespace Students.MVC.Controllers
             return RedirectToAction("Index");
         }
         #endregion
-
-        public IActionResult ReturnByUrl(string ReturnUrl)
-        {
-            return RedirectPermanent($"~{ReturnUrl}");
-        }
     }
 }

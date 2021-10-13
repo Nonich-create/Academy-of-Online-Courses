@@ -14,6 +14,6 @@ namespace Students.MVC.ViewModels
         [Display(Name = "Номер группы")]
         public int? GroupId { get; set; }
         public GroupViewModel Group { get; set; }
-        public List<AssessmentViewModel> Assessments { get; set; }
+        public IEnumerable<AssessmentViewModel> Assessments { get; set; }
     }
 }

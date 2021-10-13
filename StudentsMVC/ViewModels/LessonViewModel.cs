@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Students.MVC.ViewModels.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class LessonViewModel
+    public class LessonViewModel : ModelReturnUrl
     {
         [Key]
         public int Id { get; set; }
@@ -31,6 +32,5 @@ namespace Students.MVC.ViewModels
         public CourseViewModel Course { get; set; }
         public IEnumerable<CourseViewModel> Courses { get; set; }
         public IEnumerable<AssessmentViewModel> Assessments { get; set; }
-        public string ReturnUrl { get; set; }
     }
 }

@@ -7,8 +7,8 @@ namespace Students.BLL.Interface
 {
     public interface ICourseApplicationService : IBaseService<CourseApplication>
     {
-        Task Enroll(CourseApplication model);
-        Task Cancel(CourseApplication model);
+        Task Enroll(int courseApplicationId);
+        Task Cancel(int courseApplicationId);
         Task<IEnumerable<CourseApplication>> SearchAllAsync(string query);
         Task DeleteAsyncAll(int id);
     }

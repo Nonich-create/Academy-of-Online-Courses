@@ -9,6 +9,7 @@ namespace Students.BLL.Interface
     public interface ILessonService : IBaseService<Lesson>
     {
         Task <bool> CheckRecord(int CourseId, int NumberLesson);
+        Task<int> GetCount(int courseId, string searchString, EnumSearchParameters searchParametr);
         Task<IEnumerable<Lesson>> IndexView(int courseId, string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize);
     }
 }

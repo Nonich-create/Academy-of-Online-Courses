@@ -141,6 +141,14 @@ namespace Students.BLL.Services
             return await _unitOfWork.AssessmentRepository.GetAsync(spec);
         }
 
+        public async Task<IEnumerable<Assessment>> SearchAllAsync(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                return Enumerable.Empty<Assessment>();
+            var spec = new AssessmentWithItemsSpecifications(query);
+            return await _unitOfWork.AssessmentRepository.GetAsync(spec);
+        }
+
         public async Task<IEnumerable<Assessment>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
             if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)

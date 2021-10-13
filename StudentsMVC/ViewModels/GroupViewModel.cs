@@ -42,9 +42,5 @@ namespace Students.MVC.ViewModels
         public int CourseId { get; set; }
         public CourseViewModel Course { get; set; }
         public IEnumerable<CourseViewModel> Courses { get; set; }
-
-         
-         
-        
     }
 }

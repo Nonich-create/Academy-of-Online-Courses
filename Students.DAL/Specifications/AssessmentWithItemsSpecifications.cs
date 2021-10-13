@@ -45,8 +45,9 @@ namespace Students.DAL.Specifications
     : base(null)
         {
             AddInclude(a => a.Lesson);
+            AddInclude(a => a.Lesson.Course);
             AddInclude(a => a.Student);
-            ApplyOrderBy(a => a.Lesson.NumberLesson);
+            ApplyOrderBy(a => a.Lesson.Course.Name);
             ApplyWhere(stringSearch);
         }
     }

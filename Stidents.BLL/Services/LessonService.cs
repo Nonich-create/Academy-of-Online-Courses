@@ -130,6 +130,17 @@ namespace Students.BLL.Services
             return await _unitOfWork.LessonRepository.CountAsync(specSearch);
         }
 
+        public async Task<int> GetCount(int courseId, string searchString, EnumSearchParameters searchParametr)
+        {
+            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
+            {
+                var spec = new LessonWithItemsSpecifications(courseId);
+                return (await _unitOfWork.LessonRepository.CountAsync(spec));
+            }
+            var specSearch = new LessonWithItemsSpecifications(courseId, searchString, searchParametr);
+            return await _unitOfWork.LessonRepository.CountAsync(specSearch);
+        }
+
         public async Task<IEnumerable<Lesson>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)

@@ -29,14 +29,14 @@ namespace Students.MVC.Controllers
 
         #region отображения курсов
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Index(string searchString, EnumParametersCourse searchParameter, int page = 1)
+        public async Task<IActionResult> Index(string searchString, int page = 1)
         {
-            var count = await _courseService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
-            var model = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var count = await _courseService.GetCount(searchString, EnumSearchParameters.Name);
+            var model = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.IndexView(searchString, EnumSearchParameters.Name, page, 10)));
             var paginationModel = new PaginationModel<CourseViewModel>(count, page)
             {
                 SearchString = searchString,
-                SearchParameter = (int)searchParameter,
+                SearchParameter = (int)EnumSearchParameters.Name,
                 Data = model
             };
             return View(paginationModel);

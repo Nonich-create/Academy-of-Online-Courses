@@ -1,4 +1,5 @@
 ﻿using Students.DAL.Models;
+using Students.MVC.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Students.MVC.ViewModels
 {
-    public class LessonTimesViewModel
+    public class LessonTimesViewModel : ModelReturnUrl
     {
       
         public int Id { get; set; }
@@ -15,7 +16,7 @@ namespace Students.MVC.ViewModels
         [Required(ErrorMessage = "Не указана дата проведение занятия")]
         [DataType(DataType.Date)]
         [Display(Name = "Дата проведение занятия")]
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime? DateOfTheLesson { get; set; }
 
         public int LessonId { get; set; }

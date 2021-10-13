@@ -74,7 +74,8 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение времени проведния занятия");
-                return await _unitOfWork.LessonTimesRepository.GetByIdAsync(id);
+                var spec = new LessonTimesWithItemsSpecifications(id);
+                return (await _unitOfWork.LessonTimesRepository.GetAsync(spec)).FirstOrDefault();
             }
             catch (Exception ex)
             {
