@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Students.MVC.ViewModels.Base;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Students.MVC.ViewModels
 {
-    public class CourseViewModel
+    public class CourseViewModel: ModelReturnUrl
     {
         [Key]
         public int Id { get; set; }

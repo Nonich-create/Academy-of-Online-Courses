@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Students.DAL.Enum;
+using Students.MVC.ViewModels.Base;
 
 namespace Students.MVC.ViewModels
 {
-    public class GroupViewModel
+    public class GroupViewModel : ModelReturnUrl
     {
         public int Id { get; set; }
 

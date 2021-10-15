@@ -44,11 +44,12 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения деталей курса
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string Url)
         {
             var course = _mapper.Map<DetalisCourseViewModel>(await _courseService.GetAsync(id));
             course.Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.SearchAllAsync($"CourseId = {id}")));
             course.CourseApplications = _mapper.Map<IEnumerable<CourseApplicationViewModel>>((await _applicationCourseService.SearchAllAsync($"CourseId = {id}")));
+            course.ReturnUrl = Url;
             return View(course);
         }
         #endregion
@@ -75,9 +76,11 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения редактирование курса
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string Url)
         {
-            return View(_mapper.Map<CourseViewModel>(await _courseService.GetAsync(id)));
+            var model = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(id));
+            model.ReturnUrl = Url;
+            return View(model);
         }
         #endregion
         #region редактирование курса
@@ -89,7 +92,7 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 await _courseService.Update(_mapper.Map<Course>(model));
-                return RedirectToAction("Index");
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
             return View(model);
         }
@@ -125,5 +128,10 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

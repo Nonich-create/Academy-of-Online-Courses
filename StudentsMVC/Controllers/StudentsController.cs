@@ -53,7 +53,7 @@ namespace Students.MVC.Controllers
 
         #region Отображения подробной информации о студенте
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string Url)
         {
             var student = await _studentService.GetAsync(id);
             var user = await _userService.GetAsync(student.UserId);
@@ -64,6 +64,7 @@ namespace Students.MVC.Controllers
             model.PhoneNumber = user.PhoneNumber;
             model.CourseApplications = _mapper.Map<IEnumerable<CourseApplicationViewModel>>(courseApplications);
             model.Assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>(assessments);
+            model.ReturnUrl = Url;
             return View(model);
         }
         #endregion

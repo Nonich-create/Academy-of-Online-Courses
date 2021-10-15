@@ -46,12 +46,11 @@ namespace Students.MVC.Controllers
         }
         #endregion
         #region отображения оценок студентов
-        [Authorize(Roles = "teacher")]
+        [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Index(int GroupId) 
         {
-            var assessments = (await _assessmentService.GetAllAsync()).AsQueryable()
-                .OrderBy(a => a.Lesson.NumberLesson).Where(a => a.Student.GroupId == GroupId);
-            return View(_mapper.Map<IEnumerable<AssessmentViewModel>>(assessments));
+            var assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>(await _assessmentService.SearchAllAsync($"Student.GroupId == {GroupId}"));
+            return View(assessments);
         }
         #endregion
         #region отображения добавления оценки
@@ -75,9 +74,9 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения редактирование оценки
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(int idAssessment, string Url)
+        public async Task<IActionResult> Edit(int idAssessment, string Url) 
         {
-            var assessment = await _assessmentService.SearchAsync($"Id = {idAssessment}");
+            var assessment = await _assessmentService.GetAsync(idAssessment);
             var model = _mapper.Map<AssessmentViewModel>(assessment);
             model.ReturnUrl = Url;
             return View(model);
@@ -96,16 +95,11 @@ namespace Students.MVC.Controllers
                 await _assessmentService.Update(assessment);
                 return RedirectPermanent($"~{model.ReturnUrl}");
             }
-            var modelValidate = _mapper.Map<AssessmentViewModel>(await _assessmentService.SearchAsync($"Id = {model.Id}"));
+            var modelValidate = _mapper.Map<AssessmentViewModel>(await _assessmentService.GetAsync(model.Id));
             modelValidate.ReturnUrl = model.ReturnUrl;
             return View(modelValidate);
         }
         #endregion
-
-        public IActionResult ReturnByUrl(AssessmentViewModel model)
-        {
-            return RedirectPermanent($"~{model.ReturnUrl}");
-        }
 
         #region удаление оценки
         [HttpPost, ActionName("Delete")]
@@ -113,14 +107,14 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var assessment = await _assessmentService.GetAsync(id);
-            if (assessment == null)
-            {
-                return NotFound();
-            }
             await _assessmentService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
         #endregion
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

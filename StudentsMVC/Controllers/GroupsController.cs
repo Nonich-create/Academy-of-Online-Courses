@@ -103,12 +103,13 @@ namespace Students.MVC.Controllers
         #endregion
         #region Отображения редактирования группы
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string Url)
         {
             var group = _mapper.Map<GroupViewModel>(await _groupService.GetAsync(id));
             group.Manageres = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.GetAllAsync()));
             group.Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync()));
             group.Courses = _mapper.Map<IEnumerable<CourseViewModel>>((await _courseService.GetAllAsync()));
+            group.ReturnUrl = Url;
             return View(group);
         }
         #endregion
@@ -121,7 +122,7 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 await _groupService.Update(_mapper.Map<Group>(model));
-                return RedirectToAction("Index");
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
             model.Manageres = _mapper.Map<IEnumerable<ManagerViewModel>>((await _managerService.GetAllAsync()));
             model.Teachers = _mapper.Map<IEnumerable<TeacherViewModel>>((await _teacherService.GetAllAsync()));

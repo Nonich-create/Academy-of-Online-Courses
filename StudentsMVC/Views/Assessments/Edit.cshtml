@@ -12,7 +12,7 @@
             <input type="hidden" asp-for="StudentId" />
             <input type="hidden" asp-for="ReturnUrl" />
             <div class="form-group">
-                <label class="form_label">@Model.Student.GetFullName</label><br />
+             <label class="form_label">@Model.Student.GetFullName</label><br />
             </div>
             <div class="form-group">
                 <label class="form_label">№@Model.Lesson.NumberLesson @Model.Lesson.Name</label><br />
@@ -26,7 +26,7 @@
                 <input type="submit" value="Поставить" class="btn btn-block create-account" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Назад" asp-action="ReturnByUrl" class="btn btn-block create-account" />
+                <a class="btn btn-block create-account" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
             </div>
         </form>
     </div>

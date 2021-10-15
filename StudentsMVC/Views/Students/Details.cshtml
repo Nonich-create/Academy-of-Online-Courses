@@ -47,9 +47,9 @@
 </div>
 <div>
     <a class="btn btn-primary"
-       asp-action="Edit" asp-route-id="@Model.Id" asp-route-Url="@Context.Request.Path">Редактировать</a>
-    <a class="btn btn-primary"  
-       asp-action="Index">Назад</a>
+       asp-action="Edit" asp-route-id="@Model.Id" asp-route-Url="@Model.ReturnUrl">Редактировать</a>
+    <a class="btn btn-primary"
+       asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
 </div>
 <table class="purpleHorizon">
     <thead>
@@ -73,7 +73,7 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">@item.Course.Name</a>
+                    <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId"  asp-route-Url="@Model.ReturnUrl">@item.Course.Name</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ApplicationStatus)
@@ -104,7 +104,7 @@
                     @item.Lesson.Course.Name
                 </td>
                 <td>
-                    @item.Lesson.NumberLesson @item.Lesson.Name
+                     @item.Lesson.NumberLesson @item.Lesson.Name
                 </td>
                 <td>
                     @item.Score

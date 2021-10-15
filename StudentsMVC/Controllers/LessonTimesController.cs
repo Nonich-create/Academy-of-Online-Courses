@@ -120,5 +120,9 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }
