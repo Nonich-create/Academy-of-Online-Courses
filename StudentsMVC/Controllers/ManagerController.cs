@@ -42,17 +42,31 @@ namespace Students.MVC.Controllers
             return View(paginationModel);
         }
         #endregion
+
         #region Отображения подробностей о менеджере 
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string Url)
         {
             var model = _mapper.Map<ManagerViewModel>(await _managerService.GetAsync(id));
             var groups = await _groupService.SearchAllAsync($"ManagerId == {id}");
-            //model.ReturnUrl = Url 
+            model.ReturnUrl = Url;
             model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>(groups);
             return View(model);
         }
         #endregion
+
+        #region Отображения дополнительной информации о преподователе 
+        [Authorize(Roles = "manager")]
+        [ActionName("DetailsManager")]
+        public async Task<IActionResult> Details()
+        {
+            var model = _mapper.Map<ManagerViewModel>(await _managerService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\""));
+            var groups = await _groupService.SearchAllAsync($"ManagerId == {model.Id}");
+            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>(groups);
+            return View(model);
+        }
+        #endregion
+
         #region Отображения регистрации менеджера
         [Authorize(Roles = "admin")]
         public IActionResult Create() => View();
@@ -120,5 +134,9 @@ namespace Students.MVC.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

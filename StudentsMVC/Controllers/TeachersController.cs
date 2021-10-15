@@ -42,7 +42,7 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
-        #region Отображения дополнительной информации о преподователях
+        #region Отображения дополнительной информации о преподователе
         [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> Details(int id, string Url)
         {
@@ -54,13 +54,13 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
-        #region Отображения дополнительной информации о преподователях
+        #region Отображения дополнительной информации о преподователе 
         [Authorize(Roles = "teacher")]
         [ActionName("DetailsTeacher")]
         public async Task<IActionResult> Details()
         {
             var model = _mapper.Map<TeacherViewModel>(await _teacherService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\""));
-            var groups = _groupService.SearchAllAsync($"TeacherId == {model.Id}");
+            var groups = await _groupService.SearchAllAsync($"TeacherId == {model.Id}");
             model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>(groups);
             return View(model);
         }

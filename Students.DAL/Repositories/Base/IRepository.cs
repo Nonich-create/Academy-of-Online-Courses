@@ -21,6 +21,7 @@ namespace Students.DAL.Repositories.Base
                                         List<Expression<Func<T, object>>> includes = null,
                                         bool disableTracking = true);
         Task<IEnumerable<T>> GetAsync(ISpecification<T> spec);
+        Task<T> GetAsync(ISpecification<T> spec, bool disableTracking = true);
         Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entity);

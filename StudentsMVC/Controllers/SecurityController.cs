@@ -42,10 +42,11 @@ namespace Students.MVC.Controllers
                 {
                     ApplicationUser user = await _userManager.FindByIdAsync(model.Id);
                     user.Email = model.Email;
-                    user.UserName = model.UserName;
+                    user.UserName = model.Email;
+                    user.NormalizedUserName = model.Email.ToUpper();
+                    user.NormalizedEmail = model.Email.ToUpper();
                     user.PhoneNumber = model.PhoneNumber;
                     await _userService.Update(user);
-                    ReturnByUrl(model.ReturnUrl);
                 }
                 return View(model);
         }

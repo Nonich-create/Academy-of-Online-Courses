@@ -52,7 +52,7 @@
     </div>
     <div>
         <a class="btn btn-primary"
-           asp-action="Edit" asp-route-id="@Model.Id">Редактировать</a>
+           asp-action="Edit" asp-route-id="@Model.Id" asp-route-ReturnUrl="@Model.ReturnUrl">Редактировать</a>
         <a class="btn btn-primary"
            asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
     </div>
@@ -74,13 +74,10 @@
 
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.GetFullName)
+                            <a asp-controller="Students" asp-action="Details" asp-route-id="@item.Id"  asp-route-Url="@Model.ReturnUrl">@item.GetFullName</a>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.DateOfBirth)
-                        </td>
-                        <td>
-                            <a asp-controller="Students" asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
                         </td>
                     </tr>
                 }

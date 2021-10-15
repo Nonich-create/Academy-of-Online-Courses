@@ -63,5 +63,11 @@ namespace Students.MVC.Controllers
                 return Redirect(Request.Headers["Referer"].ToString());
         }
         #endregion
+
+
+        public IActionResult ReturnByUrl(string ReturnUrl)
+        {
+            return RedirectPermanent($"~{ReturnUrl}");
+        }
     }
 }

@@ -58,7 +58,7 @@
             {
                 <tr>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Id">@item.NumberGroup</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">@item.NumberGroup</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.DateStart)
@@ -80,11 +80,16 @@
                     </td>
                     <td>
                         <a class="btn btn-primary"
-                           asp-action="Edit" asp-route-id="@item.Id">Редактирование</a>
+                           asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
                         @if (item.GroupStatus == EnumGroupStatus.Set)
                         {
-                        <a class="btn btn-primary"
-                           asp-action="StartGroup" asp-route-id="@item.Id">Запуск группы</a>
+                            <a class="btn btn-primary"
+                               asp-action="StartGroup" asp-route-id="@item.Id">Запуск группы</a>
+                        }
+                        @if (item.GroupStatus == EnumGroupStatus.Training || item.GroupStatus == EnumGroupStatus.Close)
+                        {
+                            <a class="btn btn-primary"
+                               asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>
                         }
                         <form method="post" asp-controller="Groups" asp-action="Delete" style="display:inline-table">
                             <button class="btn btn-danger" asp-controller="Groups" asp-action="Delete" asp-route-GroupId="@item.Id">

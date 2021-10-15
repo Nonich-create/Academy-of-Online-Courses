@@ -58,10 +58,10 @@
                     @item.NumberGroup
                 </td>
                 <td>
-                    @item.GroupStatus
+                    @Html.DisplayFor(modelItem => item.GroupStatus)
                 </td>
                 <td>
-                    @item.Manager.Name
+                    @item.Manager.GetFullName
                 </td>
             </tr>
         }

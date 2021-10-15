@@ -47,8 +47,17 @@ namespace Students.DAL.Specifications
             AddInclude(a => a.Lesson);
             AddInclude(a => a.Lesson.Course);
             AddInclude(a => a.Student);
-            ApplyOrderBy(a => a.Lesson.Course.Name);
+            ApplyOrderBy(a => a.Lesson.NumberLesson);
             ApplyWhere(stringSearch);
+        }
+
+        public AssessmentWithItemsSpecifications(int Id)
+  : base(a => a.Id == Id)
+        {
+            AddInclude(a => a.Lesson);
+            AddInclude(a => a.Lesson.Course);
+            AddInclude(a => a.Student);
+            ApplyOrderBy(a => a.Lesson.NumberLesson);
         }
     }
 }

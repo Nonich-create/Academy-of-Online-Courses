@@ -46,6 +46,13 @@ namespace Students.BLL.Repository.Base
             return await query.ToListAsync();
         }
 
+        public virtual async Task<T> GetAsync(ISpecification<T> spec, bool disableTracking = true)
+        {
+            IQueryable<T> query = ApplySpecification(spec);
+            if (disableTracking) query = query.AsNoTracking();
+            return await query.FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<Expression<Func<T, object>>> includes = null, bool disableTracking = true)
         {
             IQueryable<T> query = _db.Set<T>();
@@ -61,6 +68,8 @@ namespace Students.BLL.Repository.Base
         }
 
         public virtual async Task<T> GetByIdAsync(int id) => await _db.Set<T>().FindAsync(id);
+
+      
 
         public async Task<T> AddAsync(T entity)
         {

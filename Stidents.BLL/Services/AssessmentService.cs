@@ -6,7 +6,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
-using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
 
@@ -75,7 +74,8 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение оценки");
-                return await _unitOfWork.AssessmentRepository.GetByIdAsync(id);
+                var spec = new AssessmentWithItemsSpecifications(id);
+                return await _unitOfWork.AssessmentRepository.GetAsync(spec,true);
             }
             catch (Exception ex)
             {

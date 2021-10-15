@@ -150,7 +150,7 @@ namespace Students.MVC.Controllers
             {
                 var lesson = _mapper.Map<Lesson>(model);
                 await _lessonService.Update(lesson);
-                return ReturnByUrl(model.ReturnUrl);
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
             return View(model);
         }

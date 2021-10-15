@@ -49,10 +49,10 @@
                         @Html.DisplayFor(modelItem => item.Id)
                     </td>
                     <td>
-                        <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId">@item.Course.Name</a>
+                        <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId" asp-route-Url="@Context.Request.Path">@item.Course.Name</a>
                     </td>
                     <td>
-                        <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId">@item.Student.GetFullName</a>
+                        <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId" asp-route-Url="@Context.Request.Path">@item.Student.GetFullName</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.ApplicationStatus)
