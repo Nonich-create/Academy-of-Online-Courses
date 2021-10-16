@@ -152,6 +152,7 @@ namespace Students.MVC.Controllers
                 await _lessonService.Update(lesson);
                 return RedirectPermanent($"~{model.ReturnUrl}");
             }
+            model.Courses = _mapper.Map<IEnumerable<CourseViewModel>>(await _courseService.GetAllAsync());
             return View(model);
         }
         #endregion

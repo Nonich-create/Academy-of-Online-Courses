@@ -44,12 +44,29 @@ namespace Students.MVC.Controllers
             return View(paginationModel);
         }
         #endregion
+
+        #region Отображения расписания занятий
+        [Authorize(Roles = "admin,manager,teacher")]
+        [ActionName("IndexGroupId")]
+        public async Task<IActionResult> IndexGroupId(int groupId, int page = 1)
+        {
+            var count = await _lessonTimesService.GetCount(groupId);
+            var model = _mapper.Map<IEnumerable<LessonTimesViewModel>>((await _lessonTimesService.IndexView(groupId, page, 10)));
+            var paginationModel = new PaginationModel<LessonTimesViewModel>(count, page)
+            {
+                Data = model
+            };
+            return View(paginationModel);
+        }
+        #endregion
+
         #region Отображения добавления расписания занятий
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(string Url)
         {
             LessonTimesViewModel model = new()
             {
                 Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Training)),
+                ReturnUrl = Url
             };
             return View(model);
         }
@@ -63,7 +80,7 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 await _lessonTimesService.CreateAsync(_mapper.Map<LessonTimes>(model));
-                return RedirectToAction("Index");
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
             return View(model);
         }
@@ -120,6 +137,18 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
+        #region Удаления расписания урока
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin,manager")]
+        public async Task<IActionResult> Delete(int Id, string Url)
+        {
+            await _lessonTimesService.DeleteAsync(Id);
+            return RedirectPermanent($"~{Url}");
+        }
+        #endregion
+
         public IActionResult ReturnByUrl(string ReturnUrl)
         {
             return RedirectPermanent($"~{ReturnUrl}");

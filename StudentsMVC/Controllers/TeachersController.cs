@@ -120,7 +120,7 @@ namespace Students.MVC.Controllers
             if (ModelState.IsValid)
             {
                 await _teacherService.Update(_mapper.Map<Teacher>(model));
-                return ReturnByUrl(model.ReturnUrl);
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
             return View(model);
         }

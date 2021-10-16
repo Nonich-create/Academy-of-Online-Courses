@@ -1,0 +1,76 @@
+﻿@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.LessonTimesViewModel>
+@{
+    ViewData["Title"] = $"Расписания";
+    Layout = "_Layout";
+}
+<body>
+    <table class="purpleHorizon">
+        <thead>
+            <tr>
+                <th>
+                    Номер группы
+                </th>
+                <th>
+                    Номер занятия
+                </th>
+                <th>
+                    Занятия
+                </th>
+                <th>
+                    Дата проведение занятия
+                </th>
+                @if (User.IsInRole("admin,manager"))
+                {
+                    <th style="text-align:left">
+
+                        <a class="btn btn-primary" asp-action="Create"
+                           asp-route-Url="@Context.Request.Path?groupId=@Model.Data.FirstOrDefault().GroupId&page=@Model.PageNumber">Добавить расписания</a>
+                    </th>
+                }
+                </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Group.NumberGroup)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lesson.NumberLesson)
+                    </td>
+                    <td>
+                        <a asp-controller="Lessons" asp-action="Details" asp-route-id="@item.LessonId"
+                           asp-route-Url="@Context.Request.Path?groupId=@Model.Data.FirstOrDefault().GroupId&page=@Model.PageNumber">@item.Lesson.Name</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateOfTheLesson)
+                    </td>
+
+                    <td>
+                        <a class="btn btn-primary" asp-action="EditByIdLessonTimes" asp-route-id="@item.Id"
+                           asp-route-Url="@Context.Request.Path?groupId=@Model.Data.FirstOrDefault().GroupId&page=@Model.PageNumber">Редактирование</a>
+                        @if (User.IsInRole("admin,manager"))
+                        {
+                            <form method="post" asp-controller="LessonTimes" asp-action="Delete" style="display:inline-table">
+                                <button class="btn btn-danger" asp-controller="LessonTimes" asp-action="Delete" asp-route-Id="@item.Id"
+                                        asp-route-Url="@Context.Request.Path?groupId=@Model.Data.FirstOrDefault().GroupId&page=@Model.PageNumber">
+                                    Удалить
+                                </button>
+                            </form>
+                        }
+                        </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+        <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="/LessonTimes/IndexGroupId?groupId=@Model.Data.FirstOrDefault().GroupId&page=@i"
+               class="cdp_i" onclick="jQueryAjaxGet('@i')">@i</a>
+        }
+        <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
+    </div>
+</body>

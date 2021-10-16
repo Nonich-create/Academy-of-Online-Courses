@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Students.MVC.ViewModels.GroupViewModel>
+﻿@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.GroupViewModel>
 @using Students.DAL.Enum;
 
 @{
@@ -10,27 +10,24 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.NumberGroup)
+                    Номер группы
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.DateStart)
+                    Дата старта группы
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.GroupStatus)
+                    Статус группы
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.ManagerId)
+                    Менеджер
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TeacherId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CourseId)
+                    Курс
                 </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Data)
             {
                 <tr>
                     <td>
@@ -46,20 +43,31 @@
                         @Html.DisplayFor(modelItem => item.Manager.GetFullName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Teacher.GetFullName)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.Course.Name)
                     </td>
-                    <td>  
+                    <td>
                         @if (item.GroupStatus == EnumGroupStatus.Training || item.GroupStatus == EnumGroupStatus.Close)
                         {
-                        <a class="btn btn-primary"
-                         asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>
+                            <a class="btn btn-primary"
+                               asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>
+                            <a class="btn btn-primary"
+                               asp-controller="LessonTimes" asp-action="IndexGroupId" asp-route-groupId="@item.Id">Расписания</a>
                         }
+                        <a class="btn btn-primary"
+                           asp-controller="Lessons" asp-action="IndexСourseId" asp-route-CourseId="@item.CourseId">Уроки</a>
+
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    <div class="content_detail__pagination cdp" actpage="@Model.PageNumber">
+        <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a href="/Groups/IndexTeacher?page=@i"
+               class="cdp_i" onclick="jQueryAjaxGet('@i')">@i</a>
+        }
+        <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
+    </div>
 </body>

@@ -7,6 +7,7 @@
     <div class="registration-form">
         <form asp-action="Create">
             <div class="validation" asp-validation-summary="All">
+                <input type="hidden" asp-for="@Model.ReturnUrl" />
                 <div class="form-group">
                     <label class="form_label">Группа</label><br />
                     <select asp-for="GroupId" class="form-control custom-select" id="group">
@@ -16,8 +17,6 @@
                             <option value="@item.CourseId">@item.NumberGroup</option>
                         }
                     </select>
-                </div>
-                <div class="form-group">
                     <label class="form_label">Урок</label><br />
                     <select asp-for="LessonId" class="form-control custom-select" id="lesson">
                         @if (Model.Lesson != null)
@@ -26,17 +25,11 @@
                                 <option value="@item.Id">@item.Name</option>
                             }
                     </select>
-                </div>
-                <div class="form-group">
                     <label class="form_label">Дата проведения занятия</label><br />
                     <input type="date" class="form-control item" asp-for="DateOfTheLesson" id="dateOfTheLesson" placeholder="Дата проведения занятия" />
                     <span asp-validation-for="DateOfTheLesson" class="text-danger"></span>
-                </div>
-                <div class="form-group">
                     <input type="submit" value="Создать" class="btn btn-block create-account" />
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Назад" asp-action="Index" class="btn btn-block create-account" />
+                    <input type="submit" value="Назад" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl" class="btn btn-block create-account" />
                 </div>
             </div>
         </form>

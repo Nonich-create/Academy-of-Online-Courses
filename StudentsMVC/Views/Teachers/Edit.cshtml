@@ -9,6 +9,7 @@
             <div class="validation" asp-validation-summary="All"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="ReturnUrl" />
             <div class="form-group">
                 <input type="text" class="form-control item" asp-for="Name" id="name" placeholder="Имя">
                 <span asp-validation-for="Name" class="text-danger"></span>
