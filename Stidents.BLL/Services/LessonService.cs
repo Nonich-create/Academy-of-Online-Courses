@@ -80,7 +80,8 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение урока");
-                return await _unitOfWork.LessonRepository.GetByIdAsync(id); 
+                var spec = new LessonWithItemsSpecifications((uint)id);
+                return await _unitOfWork.LessonRepository.GetAsync(spec,true); 
             }
             catch (Exception ex)
             {

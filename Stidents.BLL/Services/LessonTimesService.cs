@@ -125,6 +125,12 @@ namespace Students.BLL.Services
             return await _unitOfWork.LessonTimesRepository.CountAsync(specSearch);
         }
 
+        public async Task<int> GetCount(int groupId)
+        {
+                var spec = new LessonTimesWithItemsSpecifications((uint)groupId);
+                return (await _unitOfWork.LessonTimesRepository.CountAsync(spec));
+        }
+
         public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
@@ -148,6 +154,12 @@ namespace Students.BLL.Services
                 return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
             var spec = new LessonTimesWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
+        }
+
+        public async Task<IEnumerable<LessonTimes>> IndexView(int groupId, int currentPage, int pageSize = 10)
+        {
+            var spec = new LessonTimesWithItemsSpecifications(groupId, currentPage, pageSize);
             return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }
     }

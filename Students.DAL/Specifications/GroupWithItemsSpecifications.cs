@@ -23,9 +23,24 @@ namespace Students.DAL.Specifications
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(g => g.NumberGroup);
         }
+        public GroupWithItemsSpecifications(int teacherId, int currentPage, int pageSize)
+: base(t => t.TeacherId == teacherId)
+        {
+            AddInclude(g => g.Course);
+            AddInclude(g => g.Teacher);
+            AddInclude(g => g.Manager);
+            ApplyPaging((currentPage - 1) * pageSize, pageSize);
+            ApplyOrderBy(g => g.NumberGroup);
+        }
+
+        public GroupWithItemsSpecifications(int teacherId)
+: base(t => t.TeacherId == teacherId)
+        {
+        }
+
         public GroupWithItemsSpecifications(int currentPage, int pageSize, string stringSearch, EnumSearchParameters searchParametr)
 : base(null)
-        {
+        {   
             AddInclude(g => g.Course);
             AddInclude(g => g.Teacher);
             AddInclude(g => g.Manager);

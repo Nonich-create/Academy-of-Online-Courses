@@ -158,6 +158,12 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task<int> GetCount(int teacherId)
+        {
+                var spec = new GroupWithItemsSpecifications(teacherId);
+                return (await _unitOfWork.GroupRepository.CountAsync(spec));
+        }
+
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
@@ -200,6 +206,12 @@ namespace Students.BLL.Services
                 return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
             }
             var spec = new GroupWithItemsSpecifications(currentPage, pageSize);
+            return await _unitOfWork.GroupRepository.GetAsync(spec);
+        }
+
+        public async Task<IEnumerable<Group>> IndexView(int teacherId,int currentPage, int pageSize = 10)
+        {
+            var spec = new GroupWithItemsSpecifications(teacherId,currentPage, pageSize);
             return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
     }

@@ -39,7 +39,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Index(string searchString, EnumParametersGroup searchParameter, int page = 1)
         {
             var count = await _groupService.GetCount(searchString, (EnumSearchParameters)(int)searchParameter);
-            var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10)));
+            var model = _mapper.Map<IEnumerable<GroupViewModel>>(await _groupService.IndexView(searchString, (EnumSearchParameters)(int)searchParameter, page, 10));
             var paginationModel = new PaginationModel<GroupViewModel>(count, page)
             {
                 SearchString = searchString,
@@ -51,12 +51,17 @@ namespace Students.MVC.Controllers
         #endregion
 
         #region отображения групп преподователя
-        [Authorize(Roles = "teacher")]  // проверить
-        public async Task<IActionResult> IndexTeacher(int page = 1)
+        [Authorize(Roles = "teacher")]   
+        public async Task<IActionResult> IndexTeacher(int page = 1) 
         {
             var idTeacher = (await _teacherService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\"")).Id;
-            var model = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.IndexView(idTeacher.ToString(), EnumSearchParameters.TeacherId, page, 10)));
-            return View(model);
+            var count = await _groupService.GetCount(idTeacher);
+            var model = _mapper.Map<IEnumerable<GroupViewModel>>(await _groupService.IndexView(idTeacher, page, 10));
+            var paginationModel = new PaginationModel<GroupViewModel>(count, page)
+            {
+                Data = model
+            };
+            return View(paginationModel);
         }
         #endregion
 

@@ -38,7 +38,8 @@
                     Дата проведение занятия
                 </th>
                 <th style="text-align:left">
-                    <a class="btn btn-primary" asp-action="Create">Добавить расписания</a>
+                    <a class="btn btn-primary" asp-action="Create"
+                       asp-route-Url="@Context.Request.Path">Добавить расписания</a>
                 </th>
             </tr>
         </thead>
@@ -62,7 +63,8 @@
                     <td>
                         <a class="btn btn-primary" asp-action="EditByIdLessonTimes" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
                         <form method="post" asp-controller="Lessons" asp-action="Delete" style="display:inline-table">
-                            <button class="btn btn-danger" asp-controller="Lessons" asp-action="Delete" asp-route-LessonId="@item.Id">
+                            <button class="btn btn-danger" asp-controller="LessonTimes" asp-action="Delete" asp-route-Id="@item.Id"
+                                    asp-route-Url="@Context.Request.Path">
                                 Удалить
                             </button>
                         </form>

@@ -10,5 +10,7 @@ namespace Students.BLL.Interface
         Task<Group> GetAsync(int? id);
         Task StartGroup(int id);
         Task<IEnumerable<Group>> SearchAllAsync(string query);
+        Task<int> GetCount(int teacherId);
+        Task<IEnumerable<Group>> IndexView(int teacherId, int currentPage, int pageSize = 10);
     }
 }

@@ -18,6 +18,11 @@ namespace Students.DAL.Specifications
             AddInclude(l => l.Course);
             ApplyOrderBy(l => l.NumberLesson);
         }
+        public LessonWithItemsSpecifications(uint lessonId)
+: base(l => l.Id == lessonId)
+        {
+            AddInclude(l => l.Course);
+        }
         public LessonWithItemsSpecifications(int currentPage, int pageSize)
 : base(null)
         {
