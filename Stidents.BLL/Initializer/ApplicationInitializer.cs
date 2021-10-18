@@ -161,7 +161,7 @@ namespace Students.DAL.Models
             if (!context.Lessons.Any())
             {
                 List<Lesson> lessons = new();
-                for (int i = 0; i < 51; i++)
+                for (int i = 1; i < 51; i++)
                 {
                     lessons.Add(
                     new Lesson
@@ -173,7 +173,7 @@ namespace Students.DAL.Models
                         CourseId = 2,               
                     });
                 }
-                for (int i = 0; i < 90; i++)
+                for (int i = 1; i < 91; i++)
                 {
                     lessons.Add(
                     new Lesson
@@ -185,7 +185,7 @@ namespace Students.DAL.Models
                         CourseId = 1,
                     });
                 }
-                for (int i = 0; i < 60; i++)
+                for (int i = 1 ; i < 61; i++)
                 {
                     lessons.Add(
                     new Lesson
@@ -197,7 +197,7 @@ namespace Students.DAL.Models
                         CourseId = 3,
                     });
                 }
-                for (int i = 0; i < 50; i++)
+                for (int i = 1; i < 51; i++)
                 {
                     lessons.Add(
                     new Lesson
@@ -209,7 +209,7 @@ namespace Students.DAL.Models
                         CourseId = 4,
                     });
                 }
-                for (int i = 0; i < 360; i++)
+                for (int i = 1; i < 361; i++)
                 {
                     lessons.Add(
                     new Lesson

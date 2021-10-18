@@ -1,5 +1,5 @@
 ﻿@model Students.MVC.ViewModels.DetaliStudentViewModel
-
+@using Students.DAL.Enum;
 @{
     ViewData["Title"] = "Подробнее";
     Layout = "_Layout";
@@ -47,10 +47,8 @@
 </div>
 <div>
     <a class="btn btn-primary"
-       asp-action="Edit" asp-route-id="@Model.Id" asp-route-Url="@Model.ReturnUrl">Редактировать</a>
-    <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@Model.UserId" asp-route-Url="@Model.ReturnUrl">Безопасность</a>
-    <a class="btn btn-primary"
-       asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
+       asp-action="Edit" asp-route-id="@Model.Id" asp-route-Url="@Context.Request.Path">Редактировать</a>
+    <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@Model.UserId" asp-route-Url="@Context.Request.Path">Безопасность</a>
 </div>
 <table class="purpleHorizon">
     <thead>
@@ -74,10 +72,34 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId"  asp-route-Url="@Model.ReturnUrl">@item.Course.Name</a>
+                   @item.Course.Name
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                </td>
+                <td>
+                    @if (item.ApplicationStatus == EnumApplicationStatus.Open)
+                    {
+                        <form method="post" asp-controller="CourseApplications" asp-action="CancelApplication">
+                            <div>
+                                <button class="btn btn-primary"
+                                        asp-controller="CourseApplications" asp-action="CancelApplication" asp-route-courseApplicationId="@item.Id">
+                                    Отменить
+                                </button>
+                            </div>  
+                        </form>
+                    }
+                    @if (item.ApplicationStatus == EnumApplicationStatus.Cancelled)
+                    {
+                        <form method="post" asp-controller="CourseApplications" asp-action="Open">
+                            <div>
+                                <button class="btn btn-primary"
+                                        asp-controller="CourseApplications" asp-action="Open" asp-route-courseApplicationId="@item.Id">
+                                    Обновить заявку
+                                </button>
+                            </div>
+                        </form>
+                    }
                 </td>
             </tr>
         }
@@ -90,10 +112,10 @@
                 Курс
             </th>
             <th>
-               Занятия
+                Занятия
             </th>
             <th>
-               Оценка
+                Оценка
             </th>
         </tr>
     </thead>
@@ -105,7 +127,7 @@
                     @item.Lesson.Course.Name
                 </td>
                 <td>
-                     @item.Lesson.NumberLesson @item.Lesson.Name
+                    <a asp-controller="Lessons" asp-action="Details" asp-route-id="@item.LessonId" asp-route-Url="@Context.Request.Path">@item.Lesson.NumberLesson @item.Lesson.Name</a>
                 </td>
                 <td>
                     @item.Score

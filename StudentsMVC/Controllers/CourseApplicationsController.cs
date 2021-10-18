@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Students.MVC.ViewModels;
-using Students.DAL.Models;
 using Students.BLL.Interface;
 using AutoMapper;
 using Students.DAL.Enum;
@@ -15,17 +12,11 @@ namespace Students.MVC.Controllers
 {
     public class CourseApplicationsController : Controller
     {
-        private readonly IStudentService _studentService;
-        private readonly ICourseService _courseService;
         private readonly ICourseApplicationService _courseApplicationService;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-        public CourseApplicationsController(IMapper mapper,UserManager<ApplicationUser> userManager, ICourseService courseService, IStudentService studentService, ICourseApplicationService courseApplicationService)
+        public CourseApplicationsController(IMapper mapper, ICourseApplicationService courseApplicationService)
         {
-            _studentService = studentService;
-            _courseService = courseService;
-            _userManager = userManager;
             _courseApplicationService = courseApplicationService;
             _mapper = mapper;
         }
@@ -56,7 +47,7 @@ namespace Students.MVC.Controllers
         #endregion
         #region Отмена зачисления студента в группу
         [HttpPost]
-        [Authorize(Roles = "manager,admin")]
+        [Authorize(Roles = "manager,admin,student")]
         public async Task<IActionResult> Cancel(int courseApplicationId)
         {
                 await _courseApplicationService.Cancel(courseApplicationId);
@@ -64,6 +55,25 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
+        #region Отмена заявки студента
+        [HttpPost]
+        [Authorize(Roles = "manager,admin,student")]
+        public async Task<IActionResult> CancelApplication(int courseApplicationId)
+        {
+            await _courseApplicationService.CancelApplication(courseApplicationId);
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+        #endregion
+
+        #region Открыть заявку студента
+        [HttpPost]
+        [Authorize(Roles = "admin,student")]
+        public async Task<IActionResult> Open(int courseApplicationId)
+        {
+            await _courseApplicationService.Open(courseApplicationId);
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+        #endregion
 
         public IActionResult ReturnByUrl(string ReturnUrl)
         {

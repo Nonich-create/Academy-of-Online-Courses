@@ -6,12 +6,13 @@
 
 @if (!User.Identity.IsAuthenticated)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Зарегистрируйтесь или авторизуйтесь.</strong> Прога пока что , поэтому могут быть ошибки во время эксплуатации.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Зарегистрируйтесь или авторизуйтесь.</strong> Прога пока что , поэтому могут быть ошибки во время эксплуатации.
+    пароль по умолчанию C3F-r8n-z6t-Nui 
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 }
 
 <form asp-controller="Home" asp-action="Index">

@@ -26,7 +26,11 @@ namespace Students.BLL.Services
         public async Task Cancel(int courseApplicationId)
         {
             var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
-            if (courseApplication == null) return;
+            if (courseApplication == null)
+            {
+                _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
+                return;
+            }
             var student = await _unitOfWork.StudentRepository.GetByIdAsync(courseApplication.StudentId);
             var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).FirstOrDefault(g => g.CourseId == courseApplication.CourseId
             && g.Id == (int)student.GroupId 
@@ -47,6 +51,50 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task CancelApplication(int courseApplicationId)
+        {
+            try
+            {
+                var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
+                if (courseApplication == null)
+                {
+                    _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
+                    return;
+                }
+                if (courseApplication.ApplicationStatus == EnumApplicationStatus.Open)
+                {
+                    courseApplication.ApplicationStatus = EnumApplicationStatus.Cancelled;
+                    await _unitOfWork.SaveAsync();
+                }
+                _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} отменена");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, $"Ошибка обновления заявки {courseApplicationId}");
+            }
+        }
+      
+        public async Task Open(int courseApplicationId)
+        {
+            try
+            { 
+            var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
+            if (courseApplication == null)
+            {
+                _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
+                return;
+            }
+            courseApplication.ApplicationStatus = EnumApplicationStatus.Open;
+            await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
+            await _unitOfWork.SaveAsync();
+            _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} Обновлена");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation(ex, $"Ошибка обновления заявки {courseApplicationId}");
+            }
+        }
+
         public async Task CreateAsync(CourseApplication item)
         {
             try
@@ -57,7 +105,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка создания заяки");
+                _logger.LogInformation(ex, "Ошибка создания заявки");
             }
         }
 
@@ -71,12 +119,12 @@ namespace Students.BLL.Services
                 {
                     await _unitOfWork.CourseApplicationRepository.DeleteAsync(courseApplication);
                     await _unitOfWork.SaveAsync();
-                    _logger.LogInformation(id, "Заяка удалена");
+                    _logger.LogInformation(id, "Заявка удалена");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка удаления заяки");
+                _logger.LogInformation(ex, "Ошибка удаления заявки");
             }
         }
 
@@ -86,7 +134,7 @@ namespace Students.BLL.Services
             {   
                 await _unitOfWork.CourseApplicationRepository.DeleteAsyncAllByStudentId(id);
                 await _unitOfWork.SaveAsync();
-                _logger.LogInformation(id, "Заяки студента удалены"); ;
+                _logger.LogInformation(id, "Заявки студента удалены"); ;
             }
             catch (Exception ex)
             {
@@ -99,7 +147,11 @@ namespace Students.BLL.Services
             try
             {
                 var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
-                if (courseApplication == null) return;
+                if (courseApplication == null)
+                {
+                    _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
+                    return;
+                }
                 var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null);
                 var group = (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == courseApplication.CourseId &&
                g.GroupStatus == EnumGroupStatus.Set &&
@@ -139,12 +191,12 @@ namespace Students.BLL.Services
         {
             try
             {
-                _logger.LogInformation("Получение заяки");
+                _logger.LogInformation("Получение заявки");
                 return await _unitOfWork.CourseApplicationRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка при получение заяки");
+                _logger.LogInformation(ex, "Ошибка при получение заявки");
                 return null;
             }
         }
@@ -159,7 +211,7 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка редактирования заяки");
+                _logger.LogInformation(ex, "Ошибка редактирования заявки");
                 return item;
             }
         }
@@ -168,12 +220,12 @@ namespace Students.BLL.Services
         {
             try
             {
-                _logger.LogInformation("Поиск заяки");
+                _logger.LogInformation("Поиск заявки");
                 return await _unitOfWork.CourseApplicationRepository.SearchAsync(query);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка поиска заяки");
+                _logger.LogInformation(ex, "Ошибка поиска заявки");
                 return null;
             }
         }

@@ -55,7 +55,7 @@ namespace Students.MVC.Controllers
         #endregion
 
         #region Отображения дополнительной информации о преподователе 
-        [Authorize(Roles = "teacher")]
+        [Authorize(Roles = "teacher,admin")]
         [ActionName("DetailsTeacher")]
         public async Task<IActionResult> Details()
         {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Students.BLL.Interface;
 using Students.DAL.Enum;
@@ -20,12 +21,17 @@ namespace Students.MVC.Controllers
         private readonly ILessonService _lessonService;
         private readonly IGroupService _groupService;
         private readonly IMapper _mapper;
-        public LessonTimesController(IMapper mapper, ILessonTimesService lessonTimesService, ILessonService lessonService, IGroupService groupService)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IStudentService _studentService;
+
+        public LessonTimesController(IStudentService studentService, UserManager<ApplicationUser> userManager, IMapper mapper, ILessonTimesService lessonTimesService, ILessonService lessonService, IGroupService groupService)
         {
+            _userManager = userManager;
             _lessonService = lessonService;
             _lessonTimesService = lessonTimesService;
             _groupService = groupService;
             _mapper = mapper;
+            _studentService = studentService;
         }
 
         #region Отображения расписания занятий
@@ -45,6 +51,8 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
+
+       
         #region Отображения расписания занятий
         [Authorize(Roles = "admin,manager,teacher")]
         [ActionName("IndexGroupId")]
@@ -59,7 +67,24 @@ namespace Students.MVC.Controllers
             return View(paginationModel);
         }
         #endregion
-
+        #region Отображения расписания занятий
+        [Authorize(Roles = "admin,student")]
+        public async Task<IActionResult> StudentSchedules(int page = 1)
+        {
+            var student = await _studentService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\"");
+            if(student.GroupId == null)
+            {
+                return RedirectToAction(actionName: "Index", controllerName: "Home");
+            }
+            var count = await _lessonTimesService.GetCount((int)student.GroupId);
+            var model = _mapper.Map<IEnumerable<LessonTimesViewModel>>((await _lessonTimesService.IndexView((int)student.GroupId, page, 10)));
+            var paginationModel = new PaginationModel<LessonTimesViewModel>(count, page)
+            {
+                Data = model
+            };
+            return View(paginationModel);
+            }
+        #endregion
         #region Отображения добавления расписания занятий
         public async Task<IActionResult> Create(string Url)
         {
