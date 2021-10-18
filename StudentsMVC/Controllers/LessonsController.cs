@@ -59,7 +59,7 @@ namespace Students.MVC.Controllers
         #endregion
 
         #region Отображения деталей урока
-        [Authorize(Roles = "admin,manager,teacher")]
+        [Authorize(Roles = "admin,manager,teacher,student")]
         public async Task<IActionResult> Details(int id, string Url)
         {
             var lesson = await _lessonService.GetAsync(id);

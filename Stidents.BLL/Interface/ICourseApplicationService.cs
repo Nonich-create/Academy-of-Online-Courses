@@ -9,6 +9,8 @@ namespace Students.BLL.Interface
     {
         Task Enroll(int courseApplicationId);
         Task Cancel(int courseApplicationId);
+        Task Open(int courseApplicationId);
+        Task CancelApplication(int courseApplicationId);
         Task<IEnumerable<CourseApplication>> SearchAllAsync(string query);
         Task DeleteAsyncAll(int id);
     }

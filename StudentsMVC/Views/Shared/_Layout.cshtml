@@ -31,8 +31,15 @@
                             <li>
                                 <a href="#">Меню</a>
                                 <ul>
+                                     
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Курсы</a>
+                                        <a class="nav-link text-white" asp-controller="Students" asp-action="DetailsStudents">Профиль</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Курсы</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-white" asp-controller="LessonTimes" asp-action="StudentSchedules">Расписания</a>
                                     </li>
                                 </ul>
                             </li>
@@ -63,22 +70,22 @@
                                         <a class="nav-link text-white" asp-area="" asp-controller="Course" asp-action="Index">Курсы</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Groups" asp-action="Index">Группы</a>
+                                        <a class="nav-link text-white" asp-controller="Groups" asp-action="Index">Группы</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Lessons" asp-action="Index">Уроки</a>
+                                        <a class="nav-link text-white" asp-controller="Lessons" asp-action="Index">Уроки</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="LessonTimes" asp-action="Index">Расписания</a>
+                                        <a class="nav-link text-white" asp-controller="LessonTimes" asp-action="Index">Расписания</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="CourseApplications" asp-action="Index">Заявки</a>
+                                        <a class="nav-link text-white" asp-controller="CourseApplications" asp-action="Index">Заявки</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Teachers" asp-action="Index">Преподаватели</a>
+                                        <a class="nav-link text-white" asp-controller="Teachers" asp-action="Index">Преподаватели</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Index">Студенты</a>
+                                        <a class="nav-link text-white" asp-controller="Students" asp-action="Index">Студенты</a>
                                     </li>
                                 </ul>
                             </li>
@@ -89,28 +96,28 @@
                                 <a href="#">Меню</a>
                                 <ul>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Course" asp-action="Index">Курсы</a>
+                                        <a class="nav-link text-white" asp-controller="Course" asp-action="Index">Курсы</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Groups" asp-action="Index">Группы</a>
+                                        <a class="nav-link text-white" asp-controller="Groups" asp-action="Index">Группы</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Lessons" asp-action="Index">Уроки</a>
+                                        <a class="nav-link text-white" asp-controller="Lessons" asp-action="Index">Уроки</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="LessonTimes" asp-action="Index">Расписания</a>
+                                        <a class="nav-link text-white" asp-controller="LessonTimes" asp-action="Index">Расписания</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="CourseApplications" asp-action="Index">Заявки</a>
+                                        <a class="nav-link text-white" asp-controller="CourseApplications" asp-action="Index">Заявки</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Teachers" asp-action="Index">Преподаватели</a>
+                                        <a class="nav-link text-white" asp-controller="Teachers" asp-action="Index">Преподаватели</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Manager" asp-action="Index">Менеджеры</a>
+                                        <a class="nav-link text-white" asp-controller="Manager" asp-action="Index">Менеджеры</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Index">Студенты</a>
+                                        <a class="nav-link text-white" asp-controller="Students" asp-action="Index">Студенты</a>
                                     </li>
                                 </ul>
                             </li>
@@ -128,10 +135,10 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Security" asp-action="Authorization">Вход</a>
+                                <a class="nav-link text-white" asp-controller="Security" asp-action="Authorization">Вход</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Students" asp-action="Create">Регистрация</a>
+                                <a class="nav-link text-white" asp-controller="Students" asp-action="Create">Регистрация</a>
                             </li>
                         }
                     </ul>

@@ -69,6 +69,22 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
+        #region Отображения подробной информации о студенте
+        [Authorize(Roles = "admin,student")]
+        public async Task<IActionResult> DetailsStudents()
+        {
+            var student = _mapper.Map<DetaliStudentViewModel>(await _studentService.SearchAsync($"UserId = \"{_userManager.GetUserId(User)}\""));
+            var user = await _userService.GetAsync(student.UserId);
+            var courseApplications = await _courseApplicationService.SearchAllAsync($"StudentId == {student.Id}");
+            var assessments = await _assessmentService.SearchAllAsync($"StudentId == {student.Id}");
+            student.Email = user.Email;
+            student.PhoneNumber = user.PhoneNumber;
+            student.CourseApplications = _mapper.Map<IEnumerable<CourseApplicationViewModel>>(courseApplications);
+            student.Assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>(assessments);
+            return View(student);
+        }
+        #endregion
+
         #region Отображения регистрации студента
         public IActionResult Create() => View();
         #endregion
@@ -106,7 +122,7 @@ namespace Students.MVC.Controllers
         #endregion
 
         #region Отображения редактирования студента
-        [Authorize(Roles = "admin,manager,teacher")]
+        [Authorize(Roles = "admin,manager,teacher,student")]
         public async Task<IActionResult> Edit(int id, string Url)
         {
             var model = _mapper.Map<EditStudentViewModel>(await _studentService.GetAsync(id));
@@ -118,7 +134,7 @@ namespace Students.MVC.Controllers
         #region Редактирования студента
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin,manager,teacher")]
+        [Authorize(Roles = "admin,manager,teacher,student")]
         public async Task<IActionResult> Edit(EditStudentViewModel model)
         {
             if (ModelState.IsValid)
