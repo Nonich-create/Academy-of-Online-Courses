@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Students.BLL.Interface.Base;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Students.BLL.Interface
 {
@@ -10,5 +11,7 @@ namespace Students.BLL.Interface
         Task PutRequest(int StudentId, int СourseId);
         Task<Student> GetAsync(int? id);
         Task<IEnumerable<Student>> SearchAllAsync(string query);
+        Task<Stream> GetContent(int studentId);
     }
+ 
 }

@@ -13,7 +13,15 @@ namespace Students.DAL.Specifications
             AddInclude(c => c.Student);
             AddInclude(c => c.Course);
         }
-            public CourseApplicationWithItemsSpecifications(int currentPage, int pageSize)
+
+        public CourseApplicationWithItemsSpecifications(int studentId)
+     : base(c => c.StudentId == studentId)
+        {
+            AddInclude(c => c.Student);
+            AddInclude(c => c.Course);
+        }
+
+        public CourseApplicationWithItemsSpecifications(int currentPage, int pageSize)
 : base(null)
         {
             AddInclude(c => c.Student);

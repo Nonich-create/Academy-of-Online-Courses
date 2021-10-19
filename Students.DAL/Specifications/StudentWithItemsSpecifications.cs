@@ -51,5 +51,13 @@ namespace Students.DAL.Specifications
             AddInclude(s => s.Group.Course);
             ApplyWhere(stringSearch);
         }
+
+        public StudentWithItemsSpecifications(int studentId)
+: base(s => s.Id == studentId)
+        {
+            AddInclude(s => s.User);
+            AddInclude(s => s.Group);
+            AddInclude(s => s.Group.Course);
+        }
     }
 }

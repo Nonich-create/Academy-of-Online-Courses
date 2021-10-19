@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
+using System.IO;
+using System.Text;
+using Students.BLL.GenerateFile;
 
 namespace Students.BLL.Services
 {
@@ -207,6 +210,30 @@ namespace Students.BLL.Services
             }
             var spec = new StudentWithItemsSpecifications(currentPage, pageSize);
             return await _unitOfWork.StudentRepository.GetAsync(spec);
+        }
+
+        public async Task<Stream> GetContent(int studentId)
+        {
+            var spec = new StudentWithItemsSpecifications(studentId);
+            var specCA = new CourseApplicationWithItemsSpecifications(studentId);
+            var student = await _unitOfWork.StudentRepository.GetAsync(spec,true);
+            var courseApplication = await _unitOfWork.CourseApplicationRepository.GetAsync(specCA);
+            var sb = new StringBuilder();
+            GenerateStream generateFile = new();
+            sb.AppendLine($"ФИО: {student.Surname} {student.Name} {student.MiddleName}");
+            sb.AppendLine($"Дата рождения {student.DateOfBirth}");
+            sb.AppendLine($"Email {student.User.Email}");
+            if (student.GroupId != null)
+            {
+                sb.AppendLine($"Курс {student.Group.Course.Name}");
+                sb.AppendLine($"Номер группы {student.Group.NumberGroup}");
+            }
+            foreach (var item in courseApplication)
+            {
+                sb.AppendLine($"Номер заявки {item.Id} на курс {item.Course.Name};");
+            }
+
+            return generateFile.GenerateStreamFromString(sb.ToString());
         }
     }   
 }
