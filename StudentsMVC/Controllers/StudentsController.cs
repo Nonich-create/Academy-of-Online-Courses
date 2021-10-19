@@ -9,6 +9,7 @@ using Students.BLL.Interface;
 using AutoMapper;
 using Students.DAL.Enum;
 using Students.MVC.Models;
+using System.IO;
 
 namespace Students.MVC.Controllers
 {
@@ -50,6 +51,16 @@ namespace Students.MVC.Controllers
             return View(paginationModel);
         }
         #endregion
+
+        [HttpGet("DownloadStudent")]
+        [Authorize(Roles = "admin,manager")]
+        public async Task<IActionResult> DownloadStudent(int studentId)
+        {
+            Stream content = await _studentService.GetContent(studentId);
+            var contentType = "text/plain";
+            var fileName = $"Студент{studentId}.docx";
+            return File(content, contentType, fileName);
+        }
 
         #region Отображения подробной информации о студенте
         [Authorize(Roles = "admin,manager,teacher")]

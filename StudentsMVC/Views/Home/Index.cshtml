@@ -21,7 +21,7 @@
         <input type="submit" value="Поиск" />
     </p>
 </form>
-<body>  
+<body>
     <div class="row">
         @foreach (var item in Model)
         {
@@ -32,7 +32,7 @@
                         <img width="150" height="200" src="@item.URLImagePhoto" class="card-img-top" alt="нет изображения">
                         <div class="card-body">
                             <h5 class="card-title">@item.Name</h5>
-                            <p   style="max-height: 70px; display: -webkit-box; -webkit-line-clamp: 3; 
+                            <p style="max-height: 70px; display: -webkit-box; -webkit-line-clamp: 3;
                             -webkit-box-orient: vertical; overflow:hidden">@item.Description</p>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">Длительность @item.Duration</li>
@@ -44,5 +44,8 @@
                 </div>
             }
         }
+    </div>
+    <div class="col-2">
+        <a class="btn btn-success" asp-controller="Course" asp-action="Download">Скачать список курсов</a>
     </div>
 </body>

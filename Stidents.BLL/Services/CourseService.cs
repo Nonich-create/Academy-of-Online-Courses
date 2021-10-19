@@ -6,9 +6,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
 using System.Linq;
-using System.Linq.Dynamic.Core;
+using Students.BLL.GenerateFile;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
+using System.IO;
+using System.Text;
 
 namespace Students.BLL.Services
 {
@@ -23,7 +25,23 @@ namespace Students.BLL.Services
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
-            
+
+        public async Task<Stream> GetContent()
+        {
+            var courses = await _unitOfWork.CourseRepository.GetAllAsync();
+            var sb = new StringBuilder();
+            GenerateStream generateFile = new();
+
+            foreach (var course in courses)
+            {
+                sb.AppendLine($"{course.Name};{course.Description};{course.Price}");
+            }
+ 
+            return generateFile.GenerateStreamFromString(sb.ToString());
+        }
+
+      
+
         public async Task CreateAsync(Course item)
         {
             try

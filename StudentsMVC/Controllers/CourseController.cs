@@ -9,6 +9,7 @@ using System.Linq;
 using AutoMapper;
 using Students.DAL.Enum;
 using Students.MVC.Models;
+using System.IO;
 
 namespace Students.MVC.Controllers
 {
@@ -25,6 +26,15 @@ namespace Students.MVC.Controllers
             _applicationCourseService = applicationCourseService;
             _groupService = groupService;
             _mapper = mapper;
+        }
+
+        [HttpGet("download")]
+        public async Task<IActionResult> Download()
+        {
+            Stream content = await _courseService.GetContent();
+            var contentType = "text/plain";
+            var fileName = "Курсы.docx";
+            return File(content, contentType, fileName);
         }
 
         #region отображения курсов
