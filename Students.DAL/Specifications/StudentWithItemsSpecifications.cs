@@ -1,6 +1,7 @@
 ﻿using Students.DAL.Enum;
 using Students.DAL.Models;
 using Students.DAL.Specifications.Base;
+using System.Linq;
 
 namespace Students.DAL.Specifications
 {
@@ -58,6 +59,11 @@ namespace Students.DAL.Specifications
             AddInclude(s => s.User);
             AddInclude(s => s.Group);
             AddInclude(s => s.Group.Course);
+        }
+
+        public StudentWithItemsSpecifications(uint groupId)
+: base(s => s.GroupId == groupId)
+        {
         }
     }
 }

@@ -68,5 +68,13 @@ namespace Students.DAL.Specifications
             ApplyOrderBy(g => g.NumberGroup);
             ApplyWhere(stringSearch);
         }
+
+        public GroupWithItemsSpecifications(int courseId, EnumGroupStatus groupStatus)
+: base(g => g.CourseId == courseId && g.GroupStatus == groupStatus)
+        {
+            AddInclude(g => g.Course);
+            AddInclude(g => g.Teacher);
+            AddInclude(g => g.Manager);
+        }
     }
 }
