@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Students.BLL.Repository;
+using Students.BLL.EmailSend;
 
 namespace Students.BLL.DataAccess
 {
@@ -18,6 +19,7 @@ namespace Students.BLL.DataAccess
         private AssessmentRepository _assessmentRepository;
         private CourseApplicationRepository _courseApplicationRepository;
         private LessonTimesRepository _lessonTimesRepository;
+        private EmailSenderService _emailSenderService;
         private bool disposed = false;
 
         public UnitOfWork(Context db)
@@ -25,6 +27,15 @@ namespace Students.BLL.DataAccess
             _db = db;
         }
 
+        public EmailSenderService EmailSenderService
+        {
+            get
+            {
+                if (_emailSenderService == null)
+                    _emailSenderService = new EmailSenderService();
+                return _emailSenderService;
+            }
+        }
         public CourseRepository CourseRepository
         {
             get
