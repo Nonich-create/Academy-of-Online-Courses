@@ -9,6 +9,8 @@ using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
+using Students.BLL.EmailSend;
+using System.Text;
 
 namespace Students.BLL.Services
 {
@@ -152,18 +154,48 @@ namespace Students.BLL.Services
                     _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
                     return;
                 }
-                var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId != null);
-                var group = (await _unitOfWork.GroupRepository.GetAllAsync()).First(g => g.CourseId == courseApplication.CourseId &&
-               g.GroupStatus == EnumGroupStatus.Set &&
-               g.CountMax > students.Count(s => s.GroupId == g.Id));
-                if (group == null) { throw new InvalidOperationException($"На данный момент подходящих групп нет"); }
-                var student = await _unitOfWork.StudentRepository.GetByIdAsync(courseApplication.StudentId);
-                if (student.GroupId != null) { throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе"); }
+
+                var specStudent = new StudentWithItemsSpecifications(courseApplication.StudentId);
+                var student = await _unitOfWork.StudentRepository.GetAsync(specStudent, false);
+                if (student.GroupId != null)
+                {
+                    throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе");
+                }
+
+                var specGroup = new GroupWithItemsSpecifications(courseApplication.CourseId, EnumGroupStatus.Set);
+                var groups = await _unitOfWork.GroupRepository.GetAsync(specGroup);
+                Group group = new();
+
+                foreach(var item in groups)
+                {
+                    var spec = new StudentWithItemsSpecifications(item.Id);
+                    var studentsCount = await _unitOfWork.StudentRepository.CountAsync(spec);
+                    if(item.CountMax > studentsCount)
+                    {
+                        group = item;
+                        break;
+                    }
+                }
+          
+                if (group.Id == 0)
+                {
+                     throw new InvalidOperationException($"На данный момент подходящих групп нет");
+                }
+
                 student.GroupId = group.Id;
                 await _unitOfWork.StudentRepository.UpdateAsync(student);
                 courseApplication.ApplicationStatus = EnumApplicationStatus.Close;
                 await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
                 await _unitOfWork.SaveAsync();
+
+                var sb = new StringBuilder();
+                sb.AppendLine($"Вас зачислели на курс {group.Course.Name} номер вашей группы {group.NumberGroup}.");
+                sb.AppendLine($"Менеджер группы {group.Manager.Surname} {group.Manager.Name} {group.Manager.MiddleName}.");
+                sb.AppendLine($"Преподователь группы {group.Teacher.Surname} {group.Teacher.Name} {group.Teacher.MiddleName}.");
+                sb.AppendLine($"Дата старта группы: {group.DateStart.ToString("D")}");
+                
+                await SendMessage($"{student.User.Email}", "Зачисления на курс", sb.ToString());
+
                 _logger.LogInformation($"Студент {courseApplication.StudentId} зачислен в группу {group.Id}");
             }
             catch (Exception ex)
@@ -273,6 +305,12 @@ namespace Students.BLL.Services
             }
             var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize);
             return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
+        }
+
+        private async Task SendMessage(string email,string topic,string text)
+        {
+            EmailService emailService = new EmailService();
+            await emailService.SendEmailAsync(email, topic, text);
         }
     }
 }

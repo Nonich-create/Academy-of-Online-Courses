@@ -106,6 +106,7 @@ namespace Students.BLL.Services
             try
             {
                 await _unitOfWork.StudentRepository.AddAsync(item);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("Студент создан");
             }
             catch (Exception ex)

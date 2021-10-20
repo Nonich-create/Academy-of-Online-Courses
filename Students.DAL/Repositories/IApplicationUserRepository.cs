@@ -7,5 +7,6 @@ namespace Students.DAL.Repositories
     public interface IApplicationUserRepository : IRepository<ApplicationUser>
     {
         Task<ApplicationUser> GetByIdAsync(string id);
+
     }
 }

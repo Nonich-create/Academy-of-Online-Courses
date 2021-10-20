@@ -1,4 +1,5 @@
-﻿using Students.BLL.Repository.Base;
+﻿using Microsoft.AspNetCore.Identity;
+using Students.BLL.Repository.Base;
 using Students.DAL.Models;
 using Students.DAL.Repositories;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Students.BLL.Repository
         {
             _db = db;
         }
+
 
         public async Task<ApplicationUser> GetByIdAsync(string id) => await _db.Set<ApplicationUser>().FindAsync(id);
     }

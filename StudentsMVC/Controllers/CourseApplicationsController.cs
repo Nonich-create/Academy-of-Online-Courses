@@ -75,6 +75,7 @@ namespace Students.MVC.Controllers
         }
         #endregion
 
+
         public IActionResult ReturnByUrl(string ReturnUrl)
         {
             return RedirectPermanent($"~{ReturnUrl}");
