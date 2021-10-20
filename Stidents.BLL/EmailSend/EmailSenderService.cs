@@ -1,5 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
+using Students.BLL.DataAccess;
+using Students.BLL.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +10,14 @@ using System.Threading.Tasks;
 
 namespace Students.BLL.EmailSend
 {
-    public class EmailService
+    public class EmailSenderService : IEmailSenderService
     {
-        public async Task SendEmailAsync(string email, string subject, string message)
+
+        public EmailSenderService()
+        {
+        }
+
+        private async Task SendEmailAsync(string email, string subject, string message)
         {
             var emailMessage = new MimeMessage();
 
@@ -21,7 +28,6 @@ namespace Students.BLL.EmailSend
             {
                 Text = message
             };
-
             using (var client = new SmtpClient())
             {
                 await client.ConnectAsync("smtp.yandex.ru", 465, true);
@@ -31,5 +37,12 @@ namespace Students.BLL.EmailSend
                 await client.DisconnectAsync(true);
             }
         }
+
+        public async Task SendAcceptanceConfirmation(string email, string text)
+        {
+            await SendEmailAsync(email, "Зачисления на курс", text);
+        }
+ 
     }
 }
+ 

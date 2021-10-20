@@ -9,7 +9,6 @@ using Students.DAL.Enum;
 using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
-using Students.BLL.EmailSend;
 using System.Text;
 
 namespace Students.BLL.Services
@@ -193,9 +192,7 @@ namespace Students.BLL.Services
                 sb.AppendLine($"Менеджер группы {group.Manager.Surname} {group.Manager.Name} {group.Manager.MiddleName}.");
                 sb.AppendLine($"Преподователь группы {group.Teacher.Surname} {group.Teacher.Name} {group.Teacher.MiddleName}.");
                 sb.AppendLine($"Дата старта группы: {group.DateStart.ToString("D")}");
-                
-                await SendMessage($"{student.User.Email}", "Зачисления на курс", sb.ToString());
-
+                await _unitOfWork.EmailSenderService.SendAcceptanceConfirmation(student.User.Email, sb.ToString());
                 _logger.LogInformation($"Студент {courseApplication.StudentId} зачислен в группу {group.Id}");
             }
             catch (Exception ex)
@@ -305,12 +302,6 @@ namespace Students.BLL.Services
             }
             var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize);
             return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
-        }
-
-        private async Task SendMessage(string email,string topic,string text)
-        {
-            EmailService emailService = new EmailService();
-            await emailService.SendEmailAsync(email, topic, text);
         }
     }
 }
