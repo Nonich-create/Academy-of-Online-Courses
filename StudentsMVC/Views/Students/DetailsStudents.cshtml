@@ -1,5 +1,5 @@
 ﻿@model Students.MVC.ViewModels.DetaliStudentViewModel
-@using Students.DAL.Enum;
+@using Students.DAL.Models;
 @{
     ViewData["Title"] = "Подробнее";
     Layout = "_Layout";
@@ -78,7 +78,7 @@
                     @Html.DisplayFor(modelItem => item.ApplicationStatus)
                 </td>
                 <td>
-                    @if (item.ApplicationStatus == EnumApplicationStatus.Open)
+                    @if (item.ApplicationStatus == ApplicationStatus.Open)
                     {
                         <form method="post" asp-controller="CourseApplications" asp-action="CancelApplication">
                             <div>
@@ -89,7 +89,7 @@
                             </div>  
                         </form>
                     }
-                    @if (item.ApplicationStatus == EnumApplicationStatus.Cancelled)
+                    @if (item.ApplicationStatus == ApplicationStatus.Cancelled)
                     {
                         <form method="post" asp-controller="CourseApplications" asp-action="Open">
                             <div>

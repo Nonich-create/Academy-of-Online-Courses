@@ -73,7 +73,7 @@ namespace Students.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Create(CourseCreateViewModel model)
+        public async Task<IActionResult> Create(CourseViewModel model)
         {
             if (ModelState.IsValid)
             {

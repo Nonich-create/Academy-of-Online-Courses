@@ -1,13 +1,10 @@
-﻿using System;
+﻿using Students.DAL.Models.Base;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Students.DAL.Models
 {
-    public class Lesson
+    public class Lesson : BaseModel
     {
-        [Key]
-        public int Id { get; set; }
         public string Name { get; set; }
         public int NumberLesson { get; set; }
         public string Homework { get; set; }

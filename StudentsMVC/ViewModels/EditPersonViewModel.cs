@@ -3,10 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class PersonEditViewModel : ModelReturnUrl
+    public class EditPersonViewModel : BaseViewModel
     {
-        [Key]
-        public int Id { get; set; }
+
         [Required(ErrorMessage = "Не указано имя")]
         [Display(Name = "Имя")]
         public string Name { get; set; }

@@ -10,24 +10,25 @@
             <div class="validation" asp-validation-summary="All"></div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ReturnUrl" />
             <div class="form-group">
                 <label class="form_label">Номер группы</label><br />
                 <input type="text" class="form-control item" asp-for="NumberGroup" id="numberGroup" placeholder="Номер группы">
                 <span asp-validation-for="NumberGroup" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+          
+     
                 <label class="form_label">Дата старта группы</label><br />
-                <input type="text" class="form-control item" asp-for="DateStart" id="dateStart" placeholder="Дата старта группы">
+                <input type="date" class="form-control item" asp-for="DateStart" id="dateStart" placeholder="Дата старта группы" />
                 <span asp-validation-for="DateStart" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+         
+         
                 <label class="form_label">Номер группы</label><br />
                 <input type="text" class="form-control item" asp-for="CountMax" id="countMax" placeholder="Количество студентов в группе">
                 <span asp-validation-for="CountMax" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="form_label" asp-for="GroupStatus">Статус группы</label><br />
-                <select class="form-control custom-select" asp-for="GroupStatus" id="groupStatus"  asp-items="Html.GetEnumValueSelectList<Students.DAL.Enum.EnumGroupStatus>()"></select>
+                <select class="form-control custom-select" asp-for="GroupStatus" id="groupStatus"  asp-items="Html.GetEnumSelectList<Students.DAL.Models.GroupStatus>()"></select>
             </div>
             <div class="form-group">
                 <label class="form_label">Курс</label><br />

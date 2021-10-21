@@ -5,11 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Students.MVC.ViewModels
 {
-    public class CourseViewModel: ModelReturnUrl
+    public class CourseViewModel: BaseViewModel
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "Не указано название курса")]
         [Display(Name = "Название курсов")]
         public string Name { get; set; }

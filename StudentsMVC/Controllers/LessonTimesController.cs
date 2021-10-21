@@ -90,7 +90,7 @@ namespace Students.MVC.Controllers
         {
             LessonTimesViewModel model = new()
             {
-                Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Training)),
+                Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == GroupStatus.Training)),
                 ReturnUrl = Url
             };
             return View(model);
@@ -122,7 +122,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var model = _mapper.Map<LessonTimesViewModel>(await _lessonTimesService.GetAsync(id));
-            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == EnumGroupStatus.Training));
+            model.Groups = _mapper.Map<IEnumerable<GroupViewModel>>((await _groupService.GetAllAsync()).ToList().Where(g => g.GroupStatus == GroupStatus.Training));
             return View(model);
         }
         #endregion

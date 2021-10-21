@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Students.DAL.Models.Base;
 
 namespace Students.DAL.Models
 {
-    public class Person
+    public class Person : BaseModel
     {
-        [Key]
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string MiddleName { get; set; }

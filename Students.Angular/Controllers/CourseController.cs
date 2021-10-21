@@ -1,12 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Students.Angular.Classes;
-using Students.Angular.Dto;
-using Students.DAL.Models;
-using Students.BLL.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Students.BLL.Interface;
 
 namespace Students.Angular.Controllers
 {

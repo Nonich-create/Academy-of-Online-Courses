@@ -2,6 +2,7 @@
 using Students.DAL.Models;
 using Students.DAL.Repositories;
 using Students.DAL.Specifications;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -21,6 +22,13 @@ namespace Students.BLL.Repository
         {
             var spec = new LessonTimesWithItemsSpecifications(currentPage,pageSize);
             return await GetAsync(spec);
+        }
+
+        public async Task DeleteRangeAsync(int groupId)
+        {
+            var spec = new LessonTimesWithItemsSpecifications((uint)groupId);
+            var LessonTimes = await GetAsync(spec);
+            await DeleteRangeAsync(LessonTimes);      
         }
 
     }

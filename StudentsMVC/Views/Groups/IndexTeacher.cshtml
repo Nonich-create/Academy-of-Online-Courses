@@ -1,5 +1,5 @@
 ﻿@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.GroupViewModel>
-@using Students.DAL.Enum;
+@using Students.DAL.Models;
 
 @{
     ViewData["Title"] = "Страница групп";
@@ -46,7 +46,7 @@
                         @Html.DisplayFor(modelItem => item.Course.Name)
                     </td>
                     <td>
-                        @if (item.GroupStatus == EnumGroupStatus.Training || item.GroupStatus == EnumGroupStatus.Close)
+                        @if (item.GroupStatus == GroupStatus.Training || item.GroupStatus == GroupStatus.Close)
                         {
                             <a class="btn btn-primary"
                                asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>

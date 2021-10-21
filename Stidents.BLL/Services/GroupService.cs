@@ -45,6 +45,7 @@ namespace Students.BLL.Services
                 Group group = await GetAsync(id);
                 if (group != null)
                 {
+                    await _unitOfWork.LessonTimesRepository.DeleteRangeAsync(id);
                     await _unitOfWork.GroupRepository.DeleteAsync(group);
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Группа удалена");
@@ -107,7 +108,7 @@ namespace Students.BLL.Services
             try
             {
                 var group = await _unitOfWork.GroupRepository.GetByIdAsync(id);
-                group.GroupStatus = EnumGroupStatus.Training;
+                group.GroupStatus = GroupStatus.Training;
                 var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId == group.Id);
                 var lesson = (await _unitOfWork.LessonRepository.GetAllAsync()).Where(l => l.CourseId == group.CourseId);
                 await _unitOfWork.GroupRepository.UpdateAsync(group);

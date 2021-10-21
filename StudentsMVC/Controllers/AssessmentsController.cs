@@ -11,7 +11,7 @@ using Students.BLL.Interface;
 
 namespace Students.MVC.Controllers
 {
-    public class AssessmentsController : Controller // Добавить дату создания заявки
+    public class AssessmentsController : Controller  
     {
 
         private readonly ICourseService _courseService;

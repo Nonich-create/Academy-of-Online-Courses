@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Students.DAL.Models;
+﻿using Students.DAL.Models;
 using Students.MVC.ViewModels;
 using AutoMapper;
 
@@ -12,21 +8,21 @@ namespace Students.MVC.Mapper
     {
         public MappingProfile()
         {
+            CreateMap<Student, EditStudentViewModel>()
+           .ReverseMap();
+            CreateMap<Manager, EditPersonViewModel>()
+           .ReverseMap();
+            CreateMap<Teacher, EditPersonViewModel>()
+            .ReverseMap();
             CreateMap<ApplicationUser, UserViewModel>()
            .ReverseMap();
             CreateMap<Person, PersonViewModel>()
-            .ReverseMap();
-            CreateMap<Teacher, PersonEditViewModel>()
-            .ReverseMap();
-            CreateMap<Manager, PersonEditViewModel>()
             .ReverseMap();
             CreateMap<Teacher, TeacherViewModel>()
             .ReverseMap();
             CreateMap<Student, StudentViewModel>()
             .ReverseMap();
             CreateMap<Student, DetaliStudentViewModel>()
-      .ReverseMap();
-            CreateMap<Student, EditStudentViewModel>()
             .ReverseMap();
             CreateMap<Manager, ManagerViewModel>()
             .ReverseMap();
@@ -46,8 +42,6 @@ namespace Students.MVC.Mapper
             .ReverseMap();
             CreateMap<Course, DetalisCourseViewModel>()
             .ReverseMap();
-            CreateMap<Course, CourseCreateViewModel>()
-           .ReverseMap();
         }
     }
 }
