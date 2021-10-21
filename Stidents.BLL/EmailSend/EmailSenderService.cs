@@ -17,7 +17,7 @@ namespace Students.BLL.EmailSend
         {
         }
 
-        private async Task SendEmailAsync(string email, string subject, string message)
+        private static async Task SendEmailAsync(string email, string subject, string message)
         {
             var emailMessage = new MimeMessage();
 
@@ -28,14 +28,12 @@ namespace Students.BLL.EmailSend
             {
                 Text = message
             };
-            using (var client = new SmtpClient())
-            {
-                await client.ConnectAsync("smtp.yandex.ru", 465, true);
-                await client.AuthenticateAsync("makita.ayasaki@yandex.by", "w2H-Vei-Z6d-t5U");
-                await client.SendAsync(emailMessage);
+            using var client = new SmtpClient();
+            await client.ConnectAsync("smtp.yandex.ru", 465, true);
+            await client.AuthenticateAsync("makita.ayasaki@yandex.by", "w2H-Vei-Z6d-t5U");
+            await client.SendAsync(emailMessage);
 
-                await client.DisconnectAsync(true);
-            }
+            await client.DisconnectAsync(true);
         }
 
         public async Task SendAcceptanceConfirmation(string email, string text)

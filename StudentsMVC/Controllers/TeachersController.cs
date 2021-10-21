@@ -105,7 +105,7 @@ namespace Students.MVC.Controllers
         [Authorize(Roles = "admin,manager,teacher")]
         public async Task<IActionResult> Edit(int id, string Url)
         {
-            var model = _mapper.Map<PersonEditViewModel>(await _teacherService.GetAsync(id));
+            var model = _mapper.Map<EditPersonViewModel>(await _teacherService.GetAsync(id));
             model.ReturnUrl = Url;
             return View(model);
         }
@@ -115,7 +115,7 @@ namespace Students.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin,manager,teacher")]
-        public async Task<IActionResult> Edit(PersonEditViewModel model)
+        public async Task<IActionResult> Edit(EditPersonViewModel model)
         {
             if (ModelState.IsValid)
             {

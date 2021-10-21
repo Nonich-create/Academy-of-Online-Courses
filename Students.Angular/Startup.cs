@@ -9,6 +9,9 @@ using Students.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Students.BLL.DataAccess;
 using Students.BLL.Services;
+using Students.BLL.Interface;
+using Students.DAL.Repositories.Base;
+using Students.BLL.Repository;
 
 namespace Students.Angular
 {

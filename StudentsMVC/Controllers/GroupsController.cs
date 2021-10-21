@@ -136,12 +136,11 @@ namespace Students.MVC.Controllers
         }
         #endregion
         #region удаления группы
-        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> DeleteConfirmed(int GroupId)
+        [Authorize(Roles = "admin,manager")]
+        public async Task<IActionResult> Delete(int groupId)
         {
-            await _groupService.DeleteAsync(GroupId);
+            await _groupService.DeleteAsync(groupId);
             return RedirectToAction("Index");
         }
         #endregion

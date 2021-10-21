@@ -1,5 +1,5 @@
 ﻿@model Students.MVC.ViewModels.DetalisCourseViewModel
-@using Students.DAL.Enum;
+@using Students.DAL.Models;
 @{
     ViewData["Title"] = "Подробнее";
     Layout = "_Layout";
@@ -145,7 +145,7 @@
                         </td>
                         <td>
                             <div>
-                                @if (item.ApplicationStatus == EnumApplicationStatus.Close)
+                                @if (item.ApplicationStatus == ApplicationStatus.Close)
                                 {
                                     <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
                                         <button class="btn btn-primary"

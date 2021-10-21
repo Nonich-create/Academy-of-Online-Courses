@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Students.DAL.Enum;
+using Students.DAL.Models;
 using Students.MVC.ViewModels.Base;
 
 namespace Students.MVC.ViewModels
 {
-    public class GroupViewModel : ModelReturnUrl
+    public class GroupViewModel : BaseViewModel
     {
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "Не указан номер группы")]
         [Display(Name = "Номер группы")]
         public string NumberGroup { get; set; }
@@ -20,7 +19,7 @@ namespace Students.MVC.ViewModels
         public DateTime DateStart { get; set; }
 
         [Display(Name = "Статус группы")]
-        public EnumGroupStatus GroupStatus { get; set; }
+        public GroupStatus GroupStatus { get; set; }
 
         [Required(ErrorMessage = "Не указана максимальная количество студентов")]
         [Display(Name = "Количество студентов")]

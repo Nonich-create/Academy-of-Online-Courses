@@ -1,5 +1,6 @@
 ﻿@model Students.MVC.Models.PaginationModel<Students.MVC.ViewModels.CourseApplicationViewModel>
 @using Students.DAL.Enum;
+@using Students.DAL.Models;
 
 @{
     ViewData["Title"] = "Заявки";
@@ -59,7 +60,7 @@
                     </td>
                     <td>
                         <div>
-                            @if (item.ApplicationStatus == EnumApplicationStatus.Close)
+                            @if (item.ApplicationStatus == ApplicationStatus.Close)
                             {
                                 <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
                                     <div>
@@ -96,5 +97,5 @@
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>
     </div>
- 
+
 </body>

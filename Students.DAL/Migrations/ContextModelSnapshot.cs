@@ -277,6 +277,9 @@ namespace Students.DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("ApplicationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ApplicationStatus")
                         .HasColumnType("int");
 
@@ -285,6 +288,9 @@ namespace Students.DAL.Migrations
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -370,7 +376,7 @@ namespace Students.DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("DateOfTheLesson")
+                    b.Property<DateTime?>("DateLesson")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("GroupId")
@@ -581,13 +587,13 @@ namespace Students.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Students.DAL.Models.Manager", "Manager")
-                        .WithMany("Groups")
+                        .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Students.DAL.Models.Teacher", "Teacher")
-                        .WithMany("Groups")
+                        .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -628,7 +634,7 @@ namespace Students.DAL.Migrations
             modelBuilder.Entity("Students.DAL.Models.Manager", b =>
                 {
                     b.HasOne("Students.DAL.Models.ApplicationUser", "User")
-                        .WithMany("Manager")
+                        .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
@@ -641,7 +647,7 @@ namespace Students.DAL.Migrations
                         .HasForeignKey("GroupId");
 
                     b.HasOne("Students.DAL.Models.ApplicationUser", "User")
-                        .WithMany("Student")
+                        .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("Group");
@@ -652,19 +658,10 @@ namespace Students.DAL.Migrations
             modelBuilder.Entity("Students.DAL.Models.Teacher", b =>
                 {
                     b.HasOne("Students.DAL.Models.ApplicationUser", "User")
-                        .WithMany("Teacher")
+                        .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Students.DAL.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Manager");
-
-                    b.Navigation("Student");
-
-                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("Students.DAL.Models.Course", b =>
@@ -684,21 +681,11 @@ namespace Students.DAL.Migrations
                     b.Navigation("Assessments");
                 });
 
-            modelBuilder.Entity("Students.DAL.Models.Manager", b =>
-                {
-                    b.Navigation("Groups");
-                });
-
             modelBuilder.Entity("Students.DAL.Models.Student", b =>
                 {
                     b.Navigation("Assessments");
 
                     b.Navigation("CourseApplication");
-                });
-
-            modelBuilder.Entity("Students.DAL.Models.Teacher", b =>
-                {
-                    b.Navigation("Groups");
                 });
 #pragma warning restore 612, 618
         }

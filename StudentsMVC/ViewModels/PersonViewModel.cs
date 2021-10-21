@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Students.MVC.ViewModels
 {
-    public class PersonViewModel: ModelReturnUrl
+    public class PersonViewModel: BaseViewModel
     {
-        [Key]
-        public int Id { get; set; }
         [Required(ErrorMessage = "Не указан Email")]
         [Display(Name = "Email")]
         [DataType(DataType.EmailAddress)]

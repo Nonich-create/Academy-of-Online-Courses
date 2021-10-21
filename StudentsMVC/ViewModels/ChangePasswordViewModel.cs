@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Students.MVC.ViewModels.Base;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Students.MVC.ViewModels
 {
-    public class ChangePasswordViewModel
+    public class ChangePasswordViewModel : ModelReturnUrl
     {
         public string UserIdentityId { get; set; }
         [Required(ErrorMessage = "Не указан пароль")]
@@ -18,7 +16,5 @@ namespace Students.MVC.ViewModels
         [DataType(DataType.Password)]
         [Display(Name = "Подтвердить пароль")]
         public string PasswordConfirm { get; set; }
-        public string ReturnUrl { get; set; }
-
     }
 }

@@ -1,16 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Students.DAL.Enum;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Students.DAL.Models.Base;
 
 namespace Students.DAL.Models
 {
-    public class CourseApplication
+    public class CourseApplication : BaseModel
     {
-        [Key]
-        public int Id { get; set; }
-        public EnumApplicationStatus ApplicationStatus { get; set; }
+        public ApplicationStatus ApplicationStatus { get; set; }
+        public DateTime ApplicationDate { get; set; } = DateTime.Now;
+        public DateTime UpdateDate { get; set; }
         public int CourseId { get; set; }
         public Course Course { get; set; }
         public int StudentId { get; set; }
         public Student Student { get; set; }
     }
+
+    public enum ApplicationStatus
+    {
+        [Display(Name = "Открыта")]
+        Open,
+        [Display(Name = "Закрыта")]
+        Close,
+        [Display(Name = "Отменена")]
+        Cancelled
+    }
 }
+ 

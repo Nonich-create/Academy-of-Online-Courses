@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Students.DAL.Migrations
 {
-    public partial class dataTest : Migration
+    public partial class initialUpdateDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -20,7 +20,7 @@ namespace Students.DAL.Migrations
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
-
+            
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
@@ -282,7 +282,7 @@ namespace Students.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DateOfTheLesson = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateLesson = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LessonId = table.Column<int>(type: "int", nullable: true),
                     GroupId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -368,6 +368,8 @@ namespace Students.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ApplicationStatus = table.Column<int>(type: "int", nullable: false),
+                    ApplicationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
                     StudentId = table.Column<int>(type: "int", nullable: false)
                 },

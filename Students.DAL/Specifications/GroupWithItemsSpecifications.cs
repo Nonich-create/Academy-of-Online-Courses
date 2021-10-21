@@ -69,7 +69,7 @@ namespace Students.DAL.Specifications
             ApplyWhere(stringSearch);
         }
 
-        public GroupWithItemsSpecifications(int courseId, EnumGroupStatus groupStatus)
+        public GroupWithItemsSpecifications(int courseId, GroupStatus groupStatus)
 : base(g => g.CourseId == courseId && g.GroupStatus == groupStatus)
         {
             AddInclude(g => g.Course);

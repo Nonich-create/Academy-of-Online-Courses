@@ -1,9 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace Students.MVC.ViewModels
 {
-    public class EditStudentViewModel: PersonEditViewModel
+    public class EditStudentViewModel : EditPersonViewModel
     {
         [DataType(DataType.Date)]
         [Display(Name = "Дата рождения")]
@@ -11,5 +12,6 @@ namespace Students.MVC.ViewModels
         public DateTime DateOfBirth { get; set; }
         [Display(Name = "Номер группы")]
         public int? GroupId { get; set; }
+        public GroupViewModel Group { get; set; }
     }
 }

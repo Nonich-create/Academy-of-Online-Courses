@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Students.DAL.Enum;
+using Students.DAL.Models;
+using Students.MVC.ViewModels.Base;
 
 namespace Students.MVC.ViewModels
 {
-    public class CourseApplicationViewModel
+    public class CourseApplicationViewModel : BaseViewModel
     {
-        [Display(Name = "№")]
-        public int Id { get; set; }
         [Display(Name = "Статус заявки")]
-        public EnumApplicationStatus ApplicationStatus { get; set; }
+        public ApplicationStatus ApplicationStatus { get; set; }
         [Display(Name = "Курс")]
         [Required(ErrorMessage = "Не указан курc")]
         public int CourseId { get; set; }

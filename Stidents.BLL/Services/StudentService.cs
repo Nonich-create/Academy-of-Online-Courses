@@ -42,7 +42,7 @@ namespace Students.BLL.Services
                 {
                     StudentId = StudentId,
                     CourseId = СourseId,
-                    ApplicationStatus = EnumApplicationStatus.Open
+                    ApplicationStatus = ApplicationStatus.Open
                 };
                 await _unitOfWork.CourseApplicationRepository.AddAsync(model);
                 await _unitOfWork.SaveAsync();

@@ -15,8 +15,8 @@
                     <label class="form_label">Группа: @Model.Group.NumberGroup</label><br />
                     <label class="form_label">Урок: @Model.Lesson.NumberLesson @Model.Lesson.Name</label><br />
                     <label class="form_label">Время проведения занятия</label><br />
-                    <input type="datetime-local" class="form-control item" asp-for="DateOfTheLesson" id="dateOfTheLesson" placeholder="Время проведения занятия" />
-                    <span asp-validation-for="DateOfTheLesson" class="text-danger"></span>
+                    <input type="datetime-local" class="form-control item" asp-for="DateLesson" id="dateOfTheLesson" placeholder="Время проведения занятия" />
+                    <span asp-validation-for="DateLesson" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Изменить" class="btn btn-block create-account" />

@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Students.DAL.Models.Base;
 
 namespace Students.DAL.Models
 {
-    public class Assessment
+    public class Assessment : BaseModel
     {
-        [Key]
-        public int Id { get; set; }
         public int StudentId { get; set; }
         public Student Student { get; set; }
         public int LessonId { get; set; }
