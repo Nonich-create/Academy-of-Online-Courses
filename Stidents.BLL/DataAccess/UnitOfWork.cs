@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Students.BLL.Repository;
 using Students.BLL.EmailSend;
+using Microsoft.Extensions.Logging;
 
 namespace Students.BLL.DataAccess
 {
@@ -20,6 +21,7 @@ namespace Students.BLL.DataAccess
         private CourseApplicationRepository _courseApplicationRepository;
         private LessonTimesRepository _lessonTimesRepository;
         private EmailSenderService _emailSenderService;
+        private readonly ILogger _logger;
         private bool disposed = false;
 
         public UnitOfWork(Context db)
@@ -32,7 +34,7 @@ namespace Students.BLL.DataAccess
             get
             {
                 if (_emailSenderService == null)
-                    _emailSenderService = new EmailSenderService();
+                    _emailSenderService = new EmailSenderService(_logger);
                 return _emailSenderService;
             }
         }

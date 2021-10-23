@@ -27,7 +27,7 @@ namespace Students.DAL.Specifications
             AddInclude(c => c.Student);
             AddInclude(c => c.Course);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
-            ApplyOrderBy(c => c.Course.Name);
+            ApplyOrderBy(c => c.Id);
         }
         public CourseApplicationWithItemsSpecifications(int currentPage, int pageSize, string stringSearch, EnumSearchParameters searchParametr)
 : base(null)
@@ -35,7 +35,7 @@ namespace Students.DAL.Specifications
             AddInclude(c => c.Student);
             AddInclude(c => c.Course);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
-            ApplyOrderBy(c => c.Course.Name);
+            ApplyOrderBy(c => c.Id);
             ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 

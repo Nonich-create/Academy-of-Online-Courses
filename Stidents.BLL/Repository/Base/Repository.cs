@@ -69,8 +69,6 @@ namespace Students.BLL.Repository.Base
 
         public virtual async Task<T> GetByIdAsync(int id) => await _db.Set<T>().FindAsync(id);
 
-      
-
         public async Task<T> AddAsync(T entity)
         {
             await _db.Set<T>().AddAsync(entity);

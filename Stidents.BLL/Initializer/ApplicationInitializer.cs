@@ -111,9 +111,9 @@ namespace Students.DAL.Models
                          Price = (decimal)2300.99,
                          Visible = true,
                          URLImagePhoto = "https://i.pinimg.com/originals/07/b6/1f/07b61f1a6ba560e352178dfbf6432ad9.png",
-                         Duration = "51 дней"
+                         Duration = 51
 
-                     },
+            },
                      new Course
                      {
                          Name = "Программирование на C++ для начинающих",
@@ -123,7 +123,7 @@ namespace Students.DAL.Models
                          Price = (decimal)860.80,
                          Visible = true,
                          URLImagePhoto = "https://akonit.net/image/cache/catalog/feed_3/35003-348084-1000x1000.jpg",
-                         Duration = "90 дней"
+                         Duration = 90
                      },
                      new Course
                      {
@@ -132,7 +132,7 @@ namespace Students.DAL.Models
                          Price = (decimal)375.80,
                          Visible = true,
                          URLImagePhoto = "https://media2.24aul.ru/imgs/52536dc9787ad725b8a95d7a/kursy-1s-v-krasnoyarske-kursy-bukhgaltera-kursy-dopolnitelnogo-1-3260476.jpg",
-                         Duration = "60 дней"
+                         Duration = 60
                      },
                      new Course
                      {
@@ -142,7 +142,7 @@ namespace Students.DAL.Models
                          Price = (decimal)359.80,
                          Visible = true,
                          URLImagePhoto = "https://miit-ief.ru/wp-content/uploads/2017/09/english2.jpg",
-                         Duration = "50 дней"
+                         Duration = 50
                      },
                      new Course
                      {
@@ -152,7 +152,7 @@ namespace Students.DAL.Models
                          Price = (decimal)2300.80,
                          Visible = true,
                          URLImagePhoto = "https://www.greatsolutionspinjore.com/img/course0006.jpg",
-                         Duration = "360 дней"
+                         Duration = 360
                      }
                  });
                 context.SaveChanges();

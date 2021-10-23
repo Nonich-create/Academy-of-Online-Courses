@@ -1,4 +1,5 @@
-﻿using Students.DAL.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Students.DAL.Models;
 using Students.MVC.ViewModels.Base;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,6 +8,8 @@ namespace Students.MVC.ViewModels
     public class PersonViewModel: BaseViewModel
     {
         [Required(ErrorMessage = "Не указан Email")]
+        [EmailAddress(ErrorMessage = "Некорректный адрес")]
+        [Remote(action: "CheckEmail", controller: "Security", ErrorMessage = "Email уже используется")]
         [Display(Name = "Email")]
         [DataType(DataType.EmailAddress)]
         public  string Email { get; set; }

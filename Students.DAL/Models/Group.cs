@@ -17,7 +17,6 @@ namespace Students.DAL.Models
         public Manager Manager { get; set; }
         public int CourseId { get; set; }
         public Course Course { get; set; }
-        public List<Student> Students { get; set; }
      }
 
     public enum  GroupStatus
