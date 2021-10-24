@@ -69,6 +69,21 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task<IEnumerable<Student>> GetAllAsync(int groupId)
+        {
+            try
+            {
+                _logger.LogInformation("Выполнения получения списка студентов");
+                var spec = new StudentWithItemsSpecifications((uint)groupId);
+                return await _unitOfWork.StudentRepository.GetAsync(spec);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка получение списка студентов");
+                return Enumerable.Empty<Student>();
+            }
+        }
+
         public async Task<Student> GetAsync(int? id)
         {
             try
@@ -78,7 +93,8 @@ namespace Students.BLL.Services
                 {
                     return null;
                 }
-                return await _unitOfWork.StudentRepository.GetByIdAsync((int)id); 
+                var spec = new StudentWithItemsSpecifications((int)id);
+                return await _unitOfWork.StudentRepository.GetAsync(spec, false);
             }
             catch(Exception ex)
             {
@@ -92,7 +108,8 @@ namespace Students.BLL.Services
             try
             {
                 _logger.LogInformation("Получение студента");
-                return await _unitOfWork.StudentRepository.GetByIdAsync(id);
+                var spec = new StudentWithItemsSpecifications(id);
+                return await _unitOfWork.StudentRepository.GetAsync(spec, false);
             }
             catch (Exception ex)
             {

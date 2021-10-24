@@ -71,16 +71,17 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<Group> GetAsync(int? id)
+        public async Task<Group> GetAsync(int? groupId)
         {
             try
             {
-                if (id == null)
+                if (groupId == null)
                 {
                     return null;
                 }
                 _logger.LogInformation("Получение группы");
-                return await _unitOfWork.GroupRepository.GetByIdAsync((int)id);
+                var spec = new GroupWithItemsSpecifications((uint)groupId);
+                return (await _unitOfWork.GroupRepository.GetAsync(spec, false));
             }
             catch (Exception ex)
             {
@@ -89,12 +90,13 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task<Group> GetAsync(int id)
+        public async Task<Group> GetAsync(int groupId)
         {
             try
             {
                 _logger.LogInformation("Получение группы");
-                return await _unitOfWork.GroupRepository.GetByIdAsync(id);
+                var spec = new GroupWithItemsSpecifications((uint)groupId);
+                return (await _unitOfWork.GroupRepository.GetAsync(spec,false));
             }
             catch (Exception ex)
             {
@@ -103,29 +105,121 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task StartGroup(int id) // переделать на addRAnge
+        public async Task StartGroup(int groupId)  
         {
             try
             {
-                var group = await _unitOfWork.GroupRepository.GetByIdAsync(id);
+                var group = await _unitOfWork.GroupRepository.GetByIdAsync(groupId);
                 group.GroupStatus = GroupStatus.Training;
-                var students = (await _unitOfWork.StudentRepository.GetAllAsync()).Where(s => s.GroupId == group.Id);
-                var lesson = (await _unitOfWork.LessonRepository.GetAllAsync()).Where(l => l.CourseId == group.CourseId);
-                await _unitOfWork.GroupRepository.UpdateAsync(group);
+                var specStudents = new StudentWithItemsSpecifications((uint)group.Id);
+                var students = await _unitOfWork.StudentRepository.GetAsync(specStudents);
+
+                var specLesson = new LessonWithItemsSpecifications(group.CourseId);
+                var lesson = await _unitOfWork.LessonRepository.GetAsync(specLesson);
+
+                List<Assessment> assessments = new();
+                List<LessonTimes> lessonTimes = new();
+
                 foreach (var itemLesson in lesson)
                 {
                     foreach (var itemStudent in students)
                     {
-                        await _unitOfWork.AssessmentRepository.AddAsync(new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id, Score = 0 });
+                        assessments.Add(new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id, Score = 0 }); 
                     }
-                    await _unitOfWork.LessonTimesRepository.AddAsync(new() { GroupId = group.Id, LessonId = itemLesson.Id });
+                    lessonTimes.Add(new() { GroupId = group.Id, LessonId = itemLesson.Id });
                 }
+
+                await _unitOfWork.AssessmentRepository.AddRangeAsync(assessments);
+                await _unitOfWork.LessonTimesRepository.AddRangeAsync(lessonTimes);
+                await _unitOfWork.GroupRepository.UpdateAsync(group);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Группа {group.Id} начала обучение");
             }
             catch(Exception ex)
             {
                 _logger.LogInformation(ex, "Ошибка старта группы");
+            }
+        }
+
+        public async Task FinallyGroup(int groupId)
+        {
+            try
+            {
+                var group = await _unitOfWork.GroupRepository.GetByIdAsync(groupId);
+                group.GroupStatus = GroupStatus.Close;
+
+                var specStudents = new StudentWithItemsSpecifications((uint)group.Id);
+                var students = await _unitOfWork.StudentRepository.GetAsync(specStudents);
+
+                foreach (var item in students)
+                {
+                    item.GroupId = null;
+                }
+
+                var specLessonTimes = new LessonTimesWithItemsSpecifications((uint)group.Id);
+                var lessonTimes = await _unitOfWork.LessonTimesRepository.GetAsync(specLessonTimes);
+
+                await _unitOfWork.LessonTimesRepository.DeleteRangeAsync(lessonTimes);
+                await _unitOfWork.StudentRepository.UpdateRangeAsync(students);
+                await _unitOfWork.GroupRepository.UpdateAsync(group);
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation($"Группа {group.Id} окончила обучение");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка завершение группы");
+            }
+        }
+
+        public async Task CancelGroup(int groupId)
+        {
+            try
+            {
+                var group = await _unitOfWork.GroupRepository.GetByIdAsync(groupId);
+                group.GroupStatus = GroupStatus.Cancelled;
+
+                var specStudents = new StudentWithItemsSpecifications((uint)group.Id);
+                var students = await _unitOfWork.StudentRepository.GetAsync(specStudents);
+
+                List<CourseApplication> courseApplications = new();
+
+                foreach (var item in students)
+                {
+                    var specCourseApplication = new CourseApplicationWithItemsSpecifications((uint)item.Id ,(uint)group.CourseId);
+                    var courseApplication = await _unitOfWork.CourseApplicationRepository.GetAsync(specCourseApplication,true);
+                    courseApplication.ApplicationStatus = ApplicationStatus.Cancelled;
+                    courseApplication.UpdateDate = DateTime.Now;
+                    courseApplications.Add(courseApplication);
+                    item.GroupId = null;
+                }
+
+                await _unitOfWork.CourseApplicationRepository.UpdateRangeAsync(courseApplications);
+                await _unitOfWork.StudentRepository.UpdateRangeAsync(students);
+                await _unitOfWork.GroupRepository.UpdateAsync(group);
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation($"Группа {group.Id} отмененна");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка отмены группы");
+            }
+        }
+
+         
+        public async Task RefreshGroup(int groupId)
+        {
+            try
+            {
+                var group = await _unitOfWork.GroupRepository.GetByIdAsync(groupId);
+                group.GroupStatus = GroupStatus.Set;
+
+                await _unitOfWork.GroupRepository.UpdateAsync(group);
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation($"Группа {group.Id} обновлена");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка обновление группы");
             }
         }
 

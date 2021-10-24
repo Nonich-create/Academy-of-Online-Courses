@@ -34,7 +34,7 @@
                 @Html.DisplayNameFor(model => model.CountMax)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.CountMax)
+                @Model.Students.Count() \ @Html.DisplayFor(model => model.CountMax)
             </dd>
             <dt class="col-sm-2">
                 Преподователь группы

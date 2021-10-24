@@ -77,7 +77,7 @@
                         @Html.DisplayFor(modelItem => item.Teacher.GetFullName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Course.Name)
+                        <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId" asp-route-Url="@Context.Request.Path">@item.Course.Name</a>    
                     </td>
                     <td>
                         <a class="btn btn-primary"
@@ -87,11 +87,28 @@
                             <a class="btn btn-primary"
                                asp-action="StartGroup" asp-route-id="@item.Id">Запуск группы</a>
                         }
-                        @if (item.GroupStatus == GroupStatus.Training || item.GroupStatus == GroupStatus.Close)
+                        @if (item.GroupStatus == GroupStatus.Training)
+                        {
+                            <a class="btn btn-primary"
+                               asp-action="FinallyGroup" asp-route-id="@item.Id">Закрыть группу</a>
+                        }
+                        @if (item.GroupStatus == GroupStatus.Set)
+                        {
+                            <a class="btn btn-primary"
+                               asp-action="CancelGroup" asp-route-id="@item.Id">Отменить набор</a>
+                        }
+                        @if (item.GroupStatus == GroupStatus.Cancelled || item.GroupStatus == GroupStatus.Close)
+                        {
+                            <a class="btn btn-primary"
+                               asp-action="RefreshGroup" asp-route-id="@item.Id">Обновить набор</a>
+                        }
+                        @if (item.GroupStatus == GroupStatus.Training)
                         {
                             <a class="btn btn-primary"
                                asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>
                         }
+
+
                         @if (item.GroupStatus == GroupStatus.Close || item.GroupStatus == GroupStatus.Cancelled)
                         {
                             <form method="post" asp-controller="Groups" asp-action="Delete" style="display:inline-table">
@@ -100,7 +117,7 @@
                                 </button>
                             </form>
                         }
-                        </td>
+                    </td>
                        
                 </tr>
             }

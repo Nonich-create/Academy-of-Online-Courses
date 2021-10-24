@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Students.DAL.Models;
 using Students.MVC.ViewModels.Base;
 
@@ -15,5 +16,9 @@ namespace Students.MVC.ViewModels
         [Display(Name = "ФИО")]
         public int StudentId { get; set; }
         public StudentViewModel Student { get; set; }
+        [Display(Name = "Дата подачи заявки")]
+        public DateTime ApplicationDate { get; set; } = DateTime.Now;
+        [Display(Name = "Дата последний обработки заявки")]
+        public DateTime UpdateDate { get; set; }
     }
 }

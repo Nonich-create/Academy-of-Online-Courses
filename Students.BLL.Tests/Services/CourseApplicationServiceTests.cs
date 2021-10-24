@@ -67,7 +67,33 @@ namespace Students.BLL.Tests.Services
             Assert.NotNull(result.GroupId);
         }
 
- 
+        [Fact]
+        public async Task Enroll_student_PresenceGroupId()
+        {
+            //Arrange
+            int courseApplicationId = 1;
+            int studentId = 1;
+            int groupId = 1;
+            var courseId = 1;
+            var group = new Group() {Id = groupId, GroupStatus = GroupStatus.Set, CourseId = courseId,CountMax = 15 };
+            var student = new Student() { Id = studentId };
+            var courseApplication = new CourseApplication() { Id = courseApplicationId, StudentId = student.Id, CourseId = courseId };
+          // var student = Fixture.Build<Student>().With(s => s.Id, studentId).Without(s => s.GroupId).Create();
+          // var courseApplication = Fixture.Build<CourseApplication>().With(c => c.StudentId, student.Id).With(c => c.Id, courseApplicationId).Create();
+            await UnitOfWork.GroupRepository.AddAsync(group);
+            await UnitOfWork.StudentRepository.AddAsync(student);
+            await UnitOfWork.CourseApplicationRepository.AddAsync(courseApplication);
+            await UnitOfWork.SaveAsync();
+
+
+            //Act 
+            await _courseApplicationService.Enroll(courseApplicationId);
+            var result = await UnitOfWork.StudentRepository.GetByIdAsync(studentId);
+
+            //Assert 
+            Assert.Equal(groupId,result.GroupId);
+        }
+
     }
 }
 

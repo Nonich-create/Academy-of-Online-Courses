@@ -70,7 +70,7 @@ namespace Students.MVC.Controllers
         public async Task<IActionResult> Details(int id, string Url)
         {
             var group = _mapper.Map<DetailGroupViewModel>(await _groupService.GetAsync(id));
-            group.Students = _mapper.Map<IEnumerable<StudentViewModel>>((await _studentService.GetAllAsync()).AsQueryable().Where(s => s.GroupId == group.Id));
+            group.Students = _mapper.Map<IEnumerable<StudentViewModel>>(await _studentService.GetAllAsync(id));
             group.ReturnUrl = Url;
             return View(group);
         }
@@ -146,9 +146,37 @@ namespace Students.MVC.Controllers
         #endregion
 
         #region Перевод группы режим обучение 
+        [Authorize(Roles = "admin,manager")]
         public async Task<IActionResult> StartGroup(int id)
         {
             await _groupService.StartGroup(id);
+            return RedirectToAction("Index");
+        }
+        #endregion
+
+        #region Перевод группы режим закрыта 
+        [Authorize(Roles = "admin,manager")]
+        public async Task<IActionResult> FinallyGroup(int id)
+        {
+            await _groupService.FinallyGroup(id);
+            return RedirectToAction("Index");
+        }
+        #endregion
+        
+        #region Отменить набор группы  
+        [Authorize(Roles = "admin,manager")]
+        public async Task<IActionResult> CancelGroup(int id)
+        {
+            await _groupService.CancelGroup(id);
+            return RedirectToAction("Index");
+        }
+        #endregion
+
+        #region Отменить набор группы  
+        [Authorize(Roles = "admin,manager")]
+        public async Task<IActionResult> RefreshGroup(int id)
+        {
+            await _groupService.RefreshGroup(id);
             return RedirectToAction("Index");
         }
         #endregion

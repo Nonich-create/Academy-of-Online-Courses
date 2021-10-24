@@ -1,14 +1,9 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using MimeKit;
-using Students.BLL.DataAccess;
 using Students.BLL.Interface;
 using Students.DAL.Models;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Students.BLL.EmailSend

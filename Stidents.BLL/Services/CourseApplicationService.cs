@@ -171,7 +171,7 @@ namespace Students.BLL.Services
 
                 foreach(var item in groups)
                 {
-                    var spec = new StudentWithItemsSpecifications(item.Id);
+                    var spec = new StudentWithItemsSpecifications((uint)item.Id);
                     var studentsCount = await _unitOfWork.StudentRepository.CountAsync(spec);
                     if(item.CountMax > studentsCount)
                     {

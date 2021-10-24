@@ -6,7 +6,7 @@ namespace Students.DAL.Enum
     {
         [Display(Name = "Не определён")]
         None = 0,
-        [Display(Name = "По уроку")]
+        [Display(Name = "По занятию")]
         Name = 1,
         [Display(Name = "По курсу")]
         Course_Name = 12,

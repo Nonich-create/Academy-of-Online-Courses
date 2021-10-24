@@ -43,26 +43,38 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PhoneNumber)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Group.NumberGroup)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Group != null)
+                @Html.DisplayFor(model => model.Group.NumberGroup)
+        </dd>
     </dl>
 </div>
 <div>
     <a class="btn btn-primary"
        asp-action="Edit" asp-route-id="@Model.Id" asp-route-Url="@Model.ReturnUrl">Редактировать</a>
     <a class="btn btn-primary" asp-action="Security" asp-controller="Security" asp-route-id="@Model.UserId" asp-route-Url="@Model.ReturnUrl">Безопасность</a>
-    <a class="btn btn-primary"
-       asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
+    <a class="btn btn-primary" asp-action="ReturnByUrl" asp-route-ReturnUrl="@Model.ReturnUrl">Назад</a>
 </div>
 <table class="purpleHorizon">
     <thead>
         <tr>
             <th>
-                Номер заяки
+                Номер заяки 
             </th>
             <th>
                 Курс
             </th>
             <th>
                 Статус заявки
+            </th>
+            <th>
+                Дата подачи заявки
+            </th>
+            <th>
+                Дата последний обработки заявки
             </th>
         </tr>
     </thead>
@@ -74,10 +86,16 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId"  asp-route-Url="@Model.ReturnUrl">@item.Course.Name</a>
+                    <a asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId" asp-route-Url="@Model.ReturnUrl">@item.Course.Name</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                </td>
+                <td>
+                    @item.ApplicationDate
+                </td>
+                <td>
+                    @item.UpdateDate
                 </td>
             </tr>
         }
@@ -90,10 +108,10 @@
                 Курс
             </th>
             <th>
-               Занятия
+                Занятия
             </th>
             <th>
-               Оценка
+                Оценка
             </th>
         </tr>
     </thead>
@@ -105,7 +123,7 @@
                     @item.Lesson.Course.Name
                 </td>
                 <td>
-                     @item.Lesson.NumberLesson @item.Lesson.Name
+                    @item.Lesson.NumberLesson @item.Lesson.Name
                 </td>
                 <td>
                     @item.Score
