@@ -19,10 +19,10 @@ namespace Students.DAL.Models
     {
         [Display(Name = "Открыта")]
         Open,
+        [Display(Name = "Отменена")]
+        Cancelled,
         [Display(Name = "Закрыта")]
         Close,
-        [Display(Name = "Отменена")]
-        Cancelled
     }
 }
  

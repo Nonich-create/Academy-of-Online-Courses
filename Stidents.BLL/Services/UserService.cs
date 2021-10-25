@@ -9,18 +9,23 @@ using System.Linq.Dynamic.Core;
 using System.Linq;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
+using Microsoft.AspNetCore.Identity;
 
 namespace Students.BLL.Services
 {
     public class UserService : IUserService
     {
+
+         
         private readonly UnitOfWork _unitOfWork;
         private readonly ILogger _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserService(UnitOfWork unitOfWork, ILogger<ApplicationUser> logger)
+        public UserService(UnitOfWork unitOfWork, ILogger<ApplicationUser> logger, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task CreateAsync(ApplicationUser item)
@@ -58,7 +63,7 @@ namespace Students.BLL.Services
         {
             try
             {
-                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(id);
+                ApplicationUser applicationUser = await _userManager.FindByIdAsync(id);
                 if (applicationUser != null)
                 {
                     await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);
@@ -87,7 +92,7 @@ namespace Students.BLL.Services
 
         public async Task<ApplicationUser> GetAsync(string id)
         {
-            return await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(id);
+            return await _userManager.FindByIdAsync(id);
         }
 
         public async Task<ApplicationUser> GetAsync(int id)

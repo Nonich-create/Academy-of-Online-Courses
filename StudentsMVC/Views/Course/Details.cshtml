@@ -1,5 +1,7 @@
 ﻿@model Students.MVC.ViewModels.DetalisCourseViewModel
 @using Students.DAL.Models;
+@using System.Linq;
+ 
 @{
     ViewData["Title"] = "Подробнее";
     Layout = "_Layout";
@@ -88,7 +90,7 @@
                             @Html.DisplayFor(modelItem => item.GroupStatus)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.CountMax)
+                            @Model.CourseApplications.Where(s => s.Student.GroupId == item.Id).Count() \ @Html.DisplayFor(modelItem => item.CountMax) 
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Manager.Surname)
@@ -125,47 +127,60 @@
                     <th>
                         Группа
                     </th>
+                    <th>
+                        Дата подачи заявки
+                    </th>
+                    <th>
+                        Дата последний обработки заявки
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.CourseApplications)
                 {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Id)
-                        </td>
-                        <td>
-                            <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId"  asp-route-ReturnUrl="@Model.ReturnUrl">@item.Student.GetFullName</a>
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ApplicationStatus)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Student.Group.NumberGroup)
-                        </td>
-                        <td>
-                            <div>
-                                @if (item.ApplicationStatus == ApplicationStatus.Close)
-                                {
-                                    <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
-                                        <button class="btn btn-primary"
-                                                asp-controller="CourseApplications" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
-                                            Отменить
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
-                                        <button class="btn btn-primary"
-                                               asp-controller="CourseApplications"  asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
-                                            Принять
-                                        </button>
-                                    </form>
-                                }
-                            </div>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId" asp-route-Url="@Model.ReturnUrl">@item.Student.GetFullName</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ApplicationStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Student.Group.NumberGroup)
+                    </td>
+                    <td>
+                        @item.ApplicationDate
+                    </td>
+                    <td>
+                        @if(item.UpdateDate != DateTime.MinValue)
+                        @item.UpdateDate
+                    </td>
+                    <td>
+                        <div>
+                            @if (item.ApplicationStatus == ApplicationStatus.Close)
+                            {
+                                <form method="post" asp-controller="CourseApplications" asp-action="Cancel">
+                                    <button class="btn btn-primary"
+                                            asp-controller="CourseApplications" asp-action="Cancel" asp-route-courseApplicationId="@item.Id">
+                                        Отменить
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-controller="CourseApplications" asp-action="Enroll">
+                                    <button class="btn btn-primary"
+                                            asp-controller="CourseApplications" asp-action="Enroll" asp-route-courseApplicationId="@item.Id">
+                                        Принять
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

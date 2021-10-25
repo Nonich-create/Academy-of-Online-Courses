@@ -69,8 +69,6 @@ namespace Students.BLL.Repository.Base
 
         public virtual async Task<T> GetByIdAsync(int id) => await _db.Set<T>().FindAsync(id);
 
-      
-
         public async Task<T> AddAsync(T entity)
         {
             await _db.Set<T>().AddAsync(entity);
@@ -78,6 +76,8 @@ namespace Students.BLL.Repository.Base
         }
 
         public async Task UpdateAsync(T entity) => _db.Entry(entity).State = EntityState.Modified;
+
+        public async Task UpdateRangeAsync(IEnumerable<T> entity) => _db.Set<T>().UpdateRange(entity);
 
         public async Task DeleteAsync(T entity) => _db.Set<T>().Remove(entity);
 

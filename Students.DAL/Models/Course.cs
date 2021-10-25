@@ -1,5 +1,6 @@
 ﻿using Students.DAL.Models.Base;
 using System.Collections.Generic;
+using System;
 
 namespace Students.DAL.Models
 {
@@ -10,9 +11,7 @@ namespace Students.DAL.Models
         public decimal Price { get; set; }
         public bool Visible { get; set; }
         public string URLImagePhoto { get; set; }
-        public string Duration { get; set; } // менять на дату
-        public List<Lesson> Lessons { get; set; }
-        public List<Group> Groups { get; set; }
+        public uint Duration { get; set; } 
     }
 }
  

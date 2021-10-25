@@ -12,6 +12,8 @@ namespace Students.BLL.Interface
         Task<Student> GetAsync(int? id);
         Task<IEnumerable<Student>> SearchAllAsync(string query);
         Task<Stream> GetContent(int studentId);
+        Task<IEnumerable<Student>> GetAllAsync(int groupId);
+        Task CreateAsync(Student student, ApplicationUser user, string password);
     }
  
 }

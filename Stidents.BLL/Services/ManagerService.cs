@@ -8,6 +8,7 @@ using Students.DAL.Enum;
 using System.Linq;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
+using Microsoft.AspNetCore.Identity;
 
 namespace Students.BLL.Services
 {
@@ -15,11 +16,13 @@ namespace Students.BLL.Services
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly ILogger _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ManagerService(UnitOfWork unitOfWork, ILogger<Manager> logger)
+        public ManagerService(UnitOfWork unitOfWork, ILogger<Manager> logger, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task CreateAsync(Manager item)
@@ -36,12 +39,37 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task CreateAsync(Manager manager, ApplicationUser user, string password)
+        {
+
+            try
+            {
+                var result = await _userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "manager");
+                    manager.UserId = user.Id;
+                    await _unitOfWork.ManagerRepository.AddAsync(manager);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation("Менеджер создан");
+                }
+                else
+                {
+                    _logger.LogInformation("Ошибка создания пользователя");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка создания менеджера");
+            }
+        }
+
         public async Task DeleteAsync(int id)
         {
             try
             {
                 Manager manager = await _unitOfWork.ManagerRepository.GetByIdAsync(id);
-                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(manager.UserId);
+                ApplicationUser applicationUser = await _userManager.FindByIdAsync(manager.UserId);
                 if (manager != null)
                 {
                     await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);

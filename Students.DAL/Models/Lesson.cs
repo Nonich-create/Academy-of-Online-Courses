@@ -11,6 +11,5 @@ namespace Students.DAL.Models
         public string Description { get; set; }
         public int CourseId { get; set; }
         public Course Course { get; set; }
-        public List<Assessment> Assessments { get; set; }
     }
 }

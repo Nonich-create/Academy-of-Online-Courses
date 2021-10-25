@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Students.DAL.Enum;
-using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
 using System.Text;
@@ -33,15 +32,18 @@ namespace Students.BLL.Services
                 _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
                 return;
             }
+
             var student = await _unitOfWork.StudentRepository.GetByIdAsync(courseApplication.StudentId);
-            var group =  (await _unitOfWork.GroupRepository.GetAllAsync()).FirstOrDefault(g => g.CourseId == courseApplication.CourseId
-            && g.Id == (int)student.GroupId 
-            && g.GroupStatus == GroupStatus.Training);
+
+            var spec = new GroupWithItemsSpecifications((uint)student.GroupId,GroupStatus.Training);
+            var group = await _unitOfWork.GroupRepository.GetAsync(spec, false);
+
             if (group == null)
             {
                 student.GroupId = null;
                 await _unitOfWork.StudentRepository.UpdateAsync(student);
                 courseApplication.ApplicationStatus = ApplicationStatus.Cancelled;
+                courseApplication.UpdateDate = DateTime.Now;
                 await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Заявка студента {student.Id} на курс {courseApplication.CourseId} отменена");
@@ -66,6 +68,7 @@ namespace Students.BLL.Services
                 if (courseApplication.ApplicationStatus == ApplicationStatus.Open)
                 {
                     courseApplication.ApplicationStatus = ApplicationStatus.Cancelled;
+                    courseApplication.UpdateDate = DateTime.Now;
                     await _unitOfWork.SaveAsync();
                 }
                 _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} отменена");
@@ -87,6 +90,7 @@ namespace Students.BLL.Services
                 return;
             }
             courseApplication.ApplicationStatus = ApplicationStatus.Open;
+            courseApplication.UpdateDate = DateTime.Now;
             await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
             await _unitOfWork.SaveAsync();
             _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} Обновлена");
@@ -110,7 +114,6 @@ namespace Students.BLL.Services
                 _logger.LogInformation(ex, "Ошибка создания заявки");
             }
         }
-
 
         public async Task DeleteAsync(int id)
         {
@@ -168,7 +171,7 @@ namespace Students.BLL.Services
 
                 foreach(var item in groups)
                 {
-                    var spec = new StudentWithItemsSpecifications(item.Id);
+                    var spec = new StudentWithItemsSpecifications((uint)item.Id);
                     var studentsCount = await _unitOfWork.StudentRepository.CountAsync(spec);
                     if(item.CountMax > studentsCount)
                     {
@@ -185,15 +188,11 @@ namespace Students.BLL.Services
                 student.GroupId = group.Id;
                 await _unitOfWork.StudentRepository.UpdateAsync(student);
                 courseApplication.ApplicationStatus = ApplicationStatus.Close;
+                courseApplication.UpdateDate = DateTime.Now;
                 await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
                 await _unitOfWork.SaveAsync();
 
-                var sb = new StringBuilder();
-                sb.AppendLine($"Вас зачислели на курс {group.Course.Name} номер вашей группы {group.NumberGroup}.");
-                sb.AppendLine($"Менеджер группы {group.Manager.Surname} {group.Manager.Name} {group.Manager.MiddleName}.");
-                sb.AppendLine($"Преподователь группы {group.Teacher.Surname} {group.Teacher.Name} {group.Teacher.MiddleName}.");
-                sb.AppendLine($"Дата старта группы: {group.DateStart:D}");
-                await _unitOfWork.EmailSenderService.SendAcceptanceConfirmation(student.User.Email, sb.ToString());
+                await _unitOfWork.EmailSenderService.SendAcceptanceConfirmation(student.User.Email,group,student);
                 _logger.LogInformation($"Студент {courseApplication.StudentId} зачислен в группу {group.Id}");
             }
             catch (Exception ex)

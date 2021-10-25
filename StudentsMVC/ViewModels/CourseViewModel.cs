@@ -15,15 +15,15 @@ namespace Students.MVC.ViewModels
         [Display(Name = "Описание курса")]
         public string Description { get; set; }
 
-        [Required(ErrorMessage = "Не указана цена курса")]
+ 
         [DataType(DataType.Currency)]
-        [Column(TypeName = "decimal(18, 2)")]
+        [Column(TypeName = "decimal(18, 2)"),Required(ErrorMessage ="Не правильно указана цена")]
         [Display(Name = "Цена")]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage = "Не указана длительность курса")]
-        [Display(Name = "Длительность курса")]
-        public string Duration { get; set; }
+        [Display(Name = "Длительность курса в днях")]
+        public uint Duration { get; set; }
 
         [Display(Name = "Изображения")]
         public string URLImagePhoto { get; set; }

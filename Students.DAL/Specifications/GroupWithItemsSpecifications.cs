@@ -76,5 +76,21 @@ namespace Students.DAL.Specifications
             AddInclude(g => g.Teacher);
             AddInclude(g => g.Manager);
         }
-    }
+
+        public GroupWithItemsSpecifications( uint groupId, GroupStatus groupStatus)
+: base(g => g.Id == groupId && g.GroupStatus == groupStatus)
+        {
+            AddInclude(g => g.Course);
+            AddInclude(g => g.Teacher);
+            AddInclude(g => g.Manager);
+        }
+
+        public GroupWithItemsSpecifications(uint groupId)
+: base(g => g.Id == groupId)
+        {
+            AddInclude(g => g.Course);
+            AddInclude(g => g.Teacher);
+            AddInclude(g => g.Manager);
+        }
+    }   
 }

@@ -147,9 +147,17 @@ namespace Students.MVC.Controllers
         {
                 await _signInManager.SignOutAsync();
                 return RedirectToAction("Index", "Home");
-    
         }
         #endregion
+
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            var result = await _userManager.FindByEmailAsync(email);
+            if (email == result.Email)
+                return Json(false);
+            return Json(true);
+        }
 
         public IActionResult ReturnByUrl(string ReturnUrl)
         {

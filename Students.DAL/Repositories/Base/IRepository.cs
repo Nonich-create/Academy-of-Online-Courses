@@ -26,6 +26,7 @@ namespace Students.DAL.Repositories.Base
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entity);
         Task UpdateAsync(T entity);
+        Task UpdateRangeAsync(IEnumerable<T> entity);
         Task DeleteAsync(T entity);
         Task DeleteRangeAsync(IEnumerable<T> entity);
         Task<int> CountAsync(ISpecification<T> spec);
