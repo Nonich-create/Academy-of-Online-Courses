@@ -34,6 +34,10 @@
                 <th>
                     Email
                 </th>
+                <th>
+                    Номер телеофона
+                </th>
+
                 <th style="text-align:left">
                     <a class="btn btn-primary" asp-action="Create">Регистрация методиста</a>
                 </th>
@@ -47,7 +51,10 @@
                     <a asp-action="Details" asp-route-id="@item.Id">@item.GetFullName</a>
                 </td>
                 <td>
-                    @item.User.Email 
+                    @item.User.Email
+                </td>
+                <td>
+                    @item.User.PhoneNumber
                 </td>
                 <td>
                     <a class="btn btn-primary"

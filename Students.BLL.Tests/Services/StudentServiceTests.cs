@@ -28,7 +28,7 @@ namespace Students.BLL.Tests.Services
                 .Options;
             UnitOfWork = new UnitOfWork(new Context(options));
             _mockLogger = new Mock<ILogger<Student>>();
-            _studentService = new StudentService(UnitOfWork, _mockLogger.Object);
+           // _studentService = new StudentService(UnitOfWork, _mockLogger.Object);
 
            // Fixture.Behaviors.Remove(new ThrowingRecursionBehavior());
            // Fixture.Behaviors.Add(new OmitOnRecursionBehavior());

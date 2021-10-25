@@ -12,10 +12,6 @@ namespace Students.BLL.Repository
 
         public ApplicationUserRepository(Context db) : base(db)
         {
-            _db = db;
         }
-
-
-        public async Task<ApplicationUser> GetByIdAsync(string id) => await _db.Set<ApplicationUser>().FindAsync(id);
     }
 }

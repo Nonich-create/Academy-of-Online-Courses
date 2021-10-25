@@ -107,7 +107,8 @@
                             <a class="btn btn-primary"
                                asp-controller="Assessments" asp-action="Index" asp-route-GroupId="@item.Id">Оценки</a>
                         }
-
+                        <a class="btn btn-primary"
+                           asp-controller="Lessons" asp-action="IndexСourseId" asp-route-CourseId="@item.CourseId">Занятия</a>
 
                         @if (item.GroupStatus == GroupStatus.Close || item.GroupStatus == GroupStatus.Cancelled)
                         {

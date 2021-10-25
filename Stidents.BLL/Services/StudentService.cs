@@ -12,6 +12,7 @@ using Students.DAL.Specifications;
 using System.IO;
 using System.Text;
 using Students.BLL.GenerateFile;
+using Microsoft.AspNetCore.Identity;
 
 namespace Students.BLL.Services
 {
@@ -19,11 +20,13 @@ namespace Students.BLL.Services
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly ILogger _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public StudentService(UnitOfWork unitOfWork, ILogger<Student> logger)
+        public StudentService(UnitOfWork unitOfWork, ILogger<Student> logger, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task PutRequest(int StudentId, int СourseId)
@@ -132,6 +135,31 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task CreateAsync(Student student, ApplicationUser user, string password)
+        {
+         
+            try
+            {
+                var result = await _userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "student");
+                    student.UserId = user.Id;
+                    await _unitOfWork.StudentRepository.AddAsync(student);
+                    await _unitOfWork.SaveAsync();      
+                    _logger.LogInformation("Студент создан");
+                }
+                else
+                {
+                    _logger.LogInformation("Ошибка создания пользователя");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка создания студента");
+            }
+        }
+
         public async Task<Student> Update(Student item)
         {
             try
@@ -154,12 +182,13 @@ namespace Students.BLL.Services
             try
             {
                 Student student = await _unitOfWork.StudentRepository.GetByIdAsync(id);
-                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(student.UserId);
+                ApplicationUser applicationUser = await _userManager.FindByIdAsync(student.UserId);
                 if (student != null)
                 {
                     await _unitOfWork.CourseApplicationRepository.DeleteAsyncAllByStudentId(id);
                     await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);
                     await _unitOfWork.StudentRepository.DeleteAsync(student);
+ 
                     await _unitOfWork.SaveAsync();
                     _logger.LogInformation(id, "Студент удален"); 
                 }

@@ -9,6 +9,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
+using Microsoft.AspNetCore.Identity;
 
 namespace Students.BLL.Services
 {
@@ -17,11 +18,13 @@ namespace Students.BLL.Services
 
         private readonly ILogger _logger;
         private readonly UnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TeacherService(UnitOfWork unitOfWork, ILogger<Teacher> logger)
+        public TeacherService(UnitOfWork unitOfWork, ILogger<Teacher> logger, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _userManager = userManager;
         }
         
         public async Task CreateAsync(Teacher item)
@@ -34,7 +37,31 @@ namespace Students.BLL.Services
             }
             catch (Exception ex)
             {
+                _logger.LogInformation(ex, "Ошибка создания преподователя");
+            }
+        }
 
+        public async Task CreateAsync(Teacher teacher, ApplicationUser user, string password)
+        {
+
+            try
+            {
+                var result = await _userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "teacher");
+                    teacher.UserId = user.Id;
+                    await _unitOfWork.TeacherRepository.AddAsync(teacher);
+                    await _unitOfWork.SaveAsync();
+                    _logger.LogInformation("Преподователь создан");
+                }
+                else
+                {
+                    _logger.LogInformation("Ошибка создания пользователя");
+                }
+            }
+            catch (Exception ex)
+            {
                 _logger.LogInformation(ex, "Ошибка создания преподователя");
             }
         }
@@ -44,7 +71,7 @@ namespace Students.BLL.Services
             try
             {
                 Teacher teacher = await GetAsync(id);
-                ApplicationUser applicationUser = await _unitOfWork.ApplicationUsersRepository.GetByIdAsync(teacher.UserId);
+                ApplicationUser applicationUser = await _userManager.FindByIdAsync(teacher.UserId);
                 if (teacher != null)
                 {
                     await _unitOfWork.ApplicationUsersRepository.DeleteAsync(applicationUser);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Students.BLL.Repository;
 using Students.BLL.EmailSend;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 
 namespace Students.BLL.DataAccess
 {
@@ -22,6 +23,7 @@ namespace Students.BLL.DataAccess
         private LessonTimesRepository _lessonTimesRepository;
         private EmailSenderService _emailSenderService;
         private readonly ILogger _logger;
+ 
         private bool disposed = false;
 
         public UnitOfWork(Context db)
@@ -29,6 +31,8 @@ namespace Students.BLL.DataAccess
             _db = db;
         }
 
+
+ 
         public EmailSenderService EmailSenderService
         {
             get

@@ -79,24 +79,11 @@ namespace Students.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = new() { UserName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "manager");
+                    ApplicationUser user = new() { UserName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
                     var manager = _mapper.Map<Manager>(model);
                     manager.UserId = user.Id;
-                    await _managerService.CreateAsync(manager);
+                    await _managerService.CreateAsync(manager,user,model.Password);
                     return RedirectToAction("Index");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                        return View(model);
-                    }
-                }
             }
             return View(model);
         }

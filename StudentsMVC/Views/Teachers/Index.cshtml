@@ -34,6 +34,9 @@
                 <th>
                     Email
                 </th>
+                <th>
+                 Номер телефона
+                </th>
                 <th style="text-align:left">
                     <a class="btn btn-primary" asp-action="Create">Регистрация преподавателя</a>
                 </th>
@@ -48,6 +51,9 @@
                 </td>
                 <td>
                     @item.User.Email
+                </td>
+                <td>
+                    @item.User.PhoneNumber
                 </td>
                 <td>
                     <a class="btn btn-primary"
