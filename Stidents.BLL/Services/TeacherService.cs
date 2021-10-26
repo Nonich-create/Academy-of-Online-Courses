@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Students.BLL.DataAccess;
 using Students.DAL.Models;
 using Students.DAL.Enum;
-using System.Linq.Dynamic.Core;
 using System.Linq;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
@@ -43,7 +42,6 @@ namespace Students.BLL.Services
 
         public async Task CreateAsync(Teacher teacher, ApplicationUser user, string password)
         {
-
             try
             {
                 var result = await _userManager.CreateAsync(user, password);
@@ -114,8 +112,6 @@ namespace Students.BLL.Services
             }
         }
 
-   
-         
         public async Task<Teacher> Update(Teacher item)
         {
             try
@@ -134,53 +130,35 @@ namespace Students.BLL.Services
 
         public async Task<Teacher> SearchAsync(string query)
         {
-            try
-            {
-                _logger.LogInformation("Поиск преподователя");
+                _logger.LogInformation($"Поиск преподователя {query}");
                 return await _unitOfWork.TeacherRepository.SearchAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска преподователя");
-                return null;
-            }
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new TeacherWithItemsSpecifications();
-                return (await _unitOfWork.TeacherRepository.CountAsync(spec));
-            }
+            _logger.LogInformation($"Получение количество преподователей");
             var specSearch = new TeacherWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.TeacherRepository.CountAsync(specSearch);
         }
         
         public async Task<IEnumerable<Teacher>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск преподователя {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Teacher>();
             var spec = new TeacherWithItemsSpecifications(searchString, searchParametr);
-            return await _unitOfWork.TeacherRepository.GetAsync(spec);
-
-        }
-
-        public async Task<IEnumerable<Teacher>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Teacher>();
-            var spec = new TeacherWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.TeacherRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Teacher>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение преподователей");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка преподователей");
+                return Enumerable.Empty<Teacher>();
             }
-            var spec = new TeacherWithItemsSpecifications(currentPage, pageSize);
+            var spec = new TeacherWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.TeacherRepository.GetAsync(spec);
         }
     }

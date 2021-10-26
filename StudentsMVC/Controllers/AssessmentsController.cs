@@ -36,12 +36,12 @@ namespace Students.MVC.Controllers
         }
 
         #region отображения оценок студента
-        [Authorize(Roles = "admin,manager,teacher,student")] // проверить 45 строку
+        [Authorize(Roles = "admin,manager,teacher,student")] 
         public async Task<IActionResult> StudentAssessments()
         {
             var id = _userManager.GetUserId(User);
-            var students = (await _studentService.GetAllAsync()).First(s => s.UserId == _userManager.GetUserId(User));
-            var assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>((await _assessmentService.GetAllAsync()).Where(a => a.StudentId == students.Id));
+            var students = await _studentService.GetAsync(id);
+            var assessments = _mapper.Map<IEnumerable<AssessmentViewModel>>(await _assessmentService.GetAllAsync(students.Id,students.Group.CourseId));
             return View(assessments);
         }
         #endregion

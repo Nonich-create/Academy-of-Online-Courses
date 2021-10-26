@@ -5,7 +5,6 @@ using Students.DAL.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using Students.DAL.Enum;
-using System.Linq.Dynamic.Core;
 using System.Linq;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
@@ -119,52 +118,36 @@ namespace Students.BLL.Services
 
         public async Task<ApplicationUser> SearchAsync(string query)
         {
-            try
-            {
+                _logger.LogInformation($"Поиск пользователей {query}");
                 _logger.LogInformation("Поиск пользователя");
                 return await _unitOfWork.ApplicationUsersRepository.SearchAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска пользователя");
-                return null;
-            }
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new UserWithItemsSpecifications();
-                return (await _unitOfWork.ApplicationUsersRepository.CountAsync(spec));
-            }
+            _logger.LogInformation($"Получение количество пользователей");
             var specSearch = new UserWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.ApplicationUsersRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск пользователей {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<ApplicationUser>();
             var spec = new UserWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.ApplicationUsersRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<ApplicationUser>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<ApplicationUser>();
-            var spec = new UserWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.ApplicationUsersRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<ApplicationUser>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение пользователей");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка пользователей");
+                return Enumerable.Empty<ApplicationUser>();
             }
-            var spec = new UserWithItemsSpecifications(currentPage, pageSize);
+            var spec = new UserWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.ApplicationUsersRepository.GetAsync(spec);
         }
     }

@@ -115,19 +115,12 @@ namespace Students.BLL.Services
                 var students = await _unitOfWork.StudentRepository.GetAsync(specStudents);
 
                 var specLesson = new LessonWithItemsSpecifications(group.CourseId);
-                var lesson = await _unitOfWork.LessonRepository.GetAsync(specLesson);
+                var lessones = await _unitOfWork.LessonRepository.GetAsync(specLesson);
 
                 List<Assessment> assessments = new();
                 List<LessonTimes> lessonTimes = new();
 
-                foreach (var itemLesson in lesson)
-                {
-                    foreach (var itemStudent in students)
-                    {
-                        assessments.Add(new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id, Score = 0 }); 
-                    }
-                    lessonTimes.Add(new() { GroupId = group.Id, LessonId = itemLesson.Id });
-                }
+                FillAssements(group, students, lessones, assessments, lessonTimes);
 
                 await _unitOfWork.AssessmentRepository.AddRangeAsync(assessments);
                 await _unitOfWork.LessonTimesRepository.AddRangeAsync(lessonTimes);
@@ -135,9 +128,21 @@ namespace Students.BLL.Services
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Группа {group.Id} начала обучение");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogInformation(ex, "Ошибка старта группы");
+            }
+        }
+
+        private static void FillAssements(Group group, IEnumerable<Student> students, IEnumerable<Lesson> lessones, List<Assessment> assessments, List<LessonTimes> lessonTimes)
+        {
+            foreach (var itemLesson in lessones)
+            {
+                foreach (var itemStudent in students)
+                {
+                    assessments.Add(new() { LessonId = itemLesson.Id, StudentId = itemStudent.Id, Score = 0 });
+                }
+                lessonTimes.Add(new() { GroupId = group.Id, LessonId = itemLesson.Id });
             }
         }
 
@@ -255,23 +260,21 @@ namespace Students.BLL.Services
 
         public async Task<int> GetCount(int teacherId)
         {
-                var spec = new GroupWithItemsSpecifications(teacherId);
-                return (await _unitOfWork.GroupRepository.CountAsync(spec));
+            _logger.LogInformation($"Получение количество групп преподователя {teacherId}");
+            var spec = new GroupWithItemsSpecifications(teacherId);
+            return (await _unitOfWork.GroupRepository.CountAsync(spec));
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new GroupWithItemsSpecifications();
-                return (await _unitOfWork.GroupRepository.CountAsync(spec));
-            }
+            _logger.LogInformation("Получение количество групп");
             var specSearch = new GroupWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.GroupRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск группы {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Group>();
             var spec = new GroupWithItemsSpecifications(searchString, searchParametr);
@@ -280,32 +283,33 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<Group>> SearchAllAsync(string query)
         {
+            _logger.LogInformation($"Поиск группы {query}");
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<Group>();
             var spec = new GroupWithItemsSpecifications(query);
             return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Group>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Group>();
-            var spec = new GroupWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.GroupRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<Group>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение групп");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка получение групп");
+                return Enumerable.Empty<Group>();
             }
-            var spec = new GroupWithItemsSpecifications(currentPage, pageSize);
+            var spec = new GroupWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.GroupRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Group>> IndexView(int teacherId,int currentPage, int pageSize = 10)
         {
+            _logger.LogInformation("Получение групп");
+            if (currentPage <= 0 || pageSize <= 0)
+            {
+                _logger.LogInformation("Ошибка получение групп");
+                return Enumerable.Empty<Group>();
+            }
             var spec = new GroupWithItemsSpecifications(teacherId,currentPage, pageSize);
             return await _unitOfWork.GroupRepository.GetAsync(spec);
         }

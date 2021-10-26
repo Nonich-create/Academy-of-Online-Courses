@@ -23,14 +23,18 @@ namespace Students.DAL.Specifications
         {;
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(c => c.Name);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 
         public CourseWithItemsSpecifications(string stringSearch, EnumSearchParameters searchParametr)
     : base(null)
         {
             ApplyOrderBy(c => c.Name);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+            {
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            }
         }
 
         public CourseWithItemsSpecifications(string stringSearch)

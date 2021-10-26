@@ -46,7 +46,8 @@ namespace Students.DAL.Specifications
             AddInclude(g => g.Manager);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(g => g.NumberGroup);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 
         public GroupWithItemsSpecifications(string stringSearch, EnumSearchParameters searchParametr)
@@ -56,7 +57,10 @@ namespace Students.DAL.Specifications
             AddInclude(g => g.Teacher);
             AddInclude(g => g.Manager);
             ApplyOrderBy(g => g.NumberGroup);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+            {
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            }
         }
 
         public GroupWithItemsSpecifications(string stringSearch)

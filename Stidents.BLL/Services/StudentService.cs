@@ -6,7 +6,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Students.DAL.Enum;
 using Microsoft.Extensions.Logging;
-using System.Linq.Dynamic.Core;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
 using System.IO;
@@ -29,32 +28,36 @@ namespace Students.BLL.Services
             _userManager = userManager;
         }
 
-        public async Task PutRequest(int StudentId, int СourseId)
+        public async Task PutRequest(string userId, int courseId)
         {
-            try
-            {
-                if ((await _unitOfWork.CourseApplicationRepository.GetAllAsync()).Any(a => a.CourseId == СourseId && a.StudentId == StudentId))
-                {
+                var specCourseApplication = new CourseApplicationSearchWithItemsSpecifications(userId, courseId);
+                if (await _unitOfWork.CourseApplicationRepository.GetAsync(specCourseApplication, false) != null)
                     throw new InvalidOperationException($"Вы уже подали заявку на этот курс");
-                }
-                var student = await _unitOfWork.StudentRepository.GetByIdAsync(StudentId);
-                if (student == null) { throw new InvalidOperationException($"Такого пользователя не существует"); }
-                var course = await _unitOfWork.CourseRepository.GetByIdAsync(СourseId);
-                if (course == null) { throw new InvalidOperationException($"Такого курса не существует"); }
+
+                var specStudent = new StudentSearchWithItemsSpecifications(userId);
+                var student = await _unitOfWork.StudentRepository.GetAsync(specStudent,true);
+                if (student == null)
+                    throw new InvalidOperationException($"Студента не существует");
+
+                if (await _unitOfWork.CourseRepository.GetByIdAsync(courseId) == null)
+                    throw new InvalidOperationException($"Курса {courseId} не существует"); 
+
                 CourseApplication model = new()
                 {
-                    StudentId = StudentId,
-                    CourseId = СourseId,
+                    StudentId = student.Id,
+                    CourseId = courseId,
                     ApplicationStatus = ApplicationStatus.Open
                 };
+            try
+            {
                 await _unitOfWork.CourseApplicationRepository.AddAsync(model);
                 await _unitOfWork.SaveAsync();
-                _logger.LogInformation($"Заявка принята Id Cтудента {StudentId}, Id Курса {СourseId}");
+                _logger.LogInformation($"Заявка принята Cтудент {student.Id}, Курс {courseId}");
                 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка принятия заявки");
+                _logger.LogError(ex, "Ошибка принятие заявки");
             }
         }
 
@@ -112,6 +115,21 @@ namespace Students.BLL.Services
             {
                 _logger.LogInformation("Получение студента");
                 var spec = new StudentWithItemsSpecifications(id);
+                return await _unitOfWork.StudentRepository.GetAsync(spec, false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "Ошибка при получение студента");
+                return null;
+            }
+        }
+
+        public async Task<Student> GetAsync(string userId)
+        {
+            try
+            {
+                _logger.LogInformation("Получение студента");
+                var spec = new StudentWithItemsSpecifications(userId);
                 return await _unitOfWork.StudentRepository.GetAsync(spec, false);
             }
             catch (Exception ex)
@@ -201,31 +219,20 @@ namespace Students.BLL.Services
 
         public async Task<Student> SearchAsync(string query)
         {
-            try
-            {
-                _logger.LogInformation("Поиск студета");
+                _logger.LogInformation($"Поиск студета {query}");
                 return await _unitOfWork.StudentRepository.SearchAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска студента");
-                return null;
-            }
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new StudentWithItemsSpecifications();
-                return (await _unitOfWork.StudentRepository.CountAsync(spec));
-            }
+            _logger.LogInformation($"Получение количество студентов");
             var specSearch = new StudentWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.StudentRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string query)
         {
+            _logger.LogInformation($"Поиск студетов {query}");
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<Student>();
             var spec = new StudentWithItemsSpecifications(query);
@@ -234,37 +241,33 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<Student>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск студетов {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Student>();
             var spec = new StudentWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.StudentRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Student>> SearchAllAsync(int currentPage, int pageSize,string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Student>();
-            var spec = new StudentWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.StudentRepository.GetAsync(spec);
-        }
-
-
         public async Task<IEnumerable<Student>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение студентов");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage,pageSize,searchString,searchParametr);
+                _logger.LogInformation("Ошибка студентов");
+                return Enumerable.Empty<Student>();
             }
-            var spec = new StudentWithItemsSpecifications(currentPage, pageSize);
+            var spec = new StudentWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.StudentRepository.GetAsync(spec);
         }
 
         public async Task<Stream> GetContent(int studentId)
         {
-            var spec = new StudentWithItemsSpecifications(studentId);
+            var specStudent = new StudentWithItemsSpecifications(studentId);
+            var student = await _unitOfWork.StudentRepository.GetAsync(specStudent, true);
+
             var specCA = new CourseApplicationWithItemsSpecifications(studentId);
-            var student = await _unitOfWork.StudentRepository.GetAsync(spec,true);
             var courseApplication = await _unitOfWork.CourseApplicationRepository.GetAsync(specCA);
+
             var sb = new StringBuilder();
             GenerateStream generateFile = new();
             sb.AppendLine($"ФИО: {student.Surname} {student.Name} {student.MiddleName}");

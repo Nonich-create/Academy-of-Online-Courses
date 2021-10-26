@@ -109,7 +109,11 @@
                         }
                         <a class="btn btn-primary"
                            asp-controller="Lessons" asp-action="IndexСourseId" asp-route-CourseId="@item.CourseId">Занятия</a>
-
+                        @if (item.GroupStatus == GroupStatus.Training)
+                        {
+                        <a class="btn btn-primary"
+                           asp-controller="LessonTimes" asp-action="IndexGroupId" asp-route-groupId="@item.Id">Расписания</a>
+                        }
                         @if (item.GroupStatus == GroupStatus.Close || item.GroupStatus == GroupStatus.Cancelled)
                         {
                             <form method="post" asp-controller="Groups" asp-action="Delete" style="display:inline-table">

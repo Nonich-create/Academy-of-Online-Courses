@@ -102,63 +102,53 @@ namespace Students.BLL.Services
 
         public async Task<LessonTimes> SearchAsync(string query)
         {
-            try
-            {
-                _logger.LogInformation("Поиск времени проведения занятия");
+                _logger.LogInformation($"Поиск времени проведения занятия {query}");
                 return await _unitOfWork.LessonTimesRepository.SearchAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска времени проведения занятия");
-                return null;
-            }
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new LessonTimesWithItemsSpecifications();
-                return (await _unitOfWork.LessonTimesRepository.CountAsync(spec));
-            }
+            _logger.LogInformation($"Получение количество записей с временем проведения занятий");
             var specSearch = new LessonTimesWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.LessonTimesRepository.CountAsync(specSearch);
         }
 
         public async Task<int> GetCount(int groupId)
         {
-                var spec = new LessonTimesWithItemsSpecifications((uint)groupId);
-                return (await _unitOfWork.LessonTimesRepository.CountAsync(spec));
+            _logger.LogInformation($"Получение количество записей с временем проведения занятий для группы {groupId}");
+            var spec = new LessonTimesWithItemsSpecifications((uint)groupId);
+            return (await _unitOfWork.LessonTimesRepository.CountAsync(spec));
         }
 
         public async Task<IEnumerable<LessonTimes>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск времени проведения занятия {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<LessonTimes>();
             var spec = new LessonTimesWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<LessonTimes>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<LessonTimes>();
-            var spec = new LessonTimesWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<LessonTimes>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение времени занятий");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка получение времени занятий");
+                return Enumerable.Empty<LessonTimes>();
             }
-            var spec = new LessonTimesWithItemsSpecifications(currentPage, pageSize);
+            var spec = new LessonTimesWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<LessonTimes>> IndexView(int groupId, int currentPage, int pageSize = 10)
         {
+            _logger.LogInformation($"Получение времени занятий для группы {groupId}");
+            if (currentPage <= 0 || pageSize <= 0)
+            {
+                _logger.LogInformation("Ошибка получение времени занятий");
+                return Enumerable.Empty<LessonTimes>();
+            }
             var spec = new LessonTimesWithItemsSpecifications(groupId, currentPage, pageSize);
             return await _unitOfWork.LessonTimesRepository.GetAsync(spec);
         }

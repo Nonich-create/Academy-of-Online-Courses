@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Students.DAL.Enum;
 using Students.DAL.Specifications;
+using System;
 
 namespace Students.BLL.Tests.Services
 {
@@ -44,7 +45,7 @@ namespace Students.BLL.Tests.Services
             var result = await _courseApplicationService.GetAsync(0);
 
             //Assert 
-            Assert.Null(result);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _courseApplicationService.Enroll(0));
         }
 
         [Fact]

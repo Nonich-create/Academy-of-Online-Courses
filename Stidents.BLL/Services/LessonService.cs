@@ -11,7 +11,6 @@ using Students.DAL.Specifications;
 
 namespace Students.BLL.Services
 {
-
     public class LessonService : ILessonService
     {
         private readonly UnitOfWork _unitOfWork;
@@ -108,31 +107,20 @@ namespace Students.BLL.Services
 
         public async Task<Lesson> SearchAsync(string query)
         {
-            try
-            {
-                _logger.LogInformation("Поиск урока");
+                _logger.LogInformation($"Поиск урока {query}");
                 return await _unitOfWork.LessonRepository.SearchAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска урока");
-                return null;
-            }
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new LessonWithItemsSpecifications();
-                return (await _unitOfWork.LessonRepository.CountAsync(spec));
-            }
+            _logger.LogInformation($"Полученик количество уроков");
             var specSearch = new LessonWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.LessonRepository.CountAsync(specSearch);
         }
 
         public async Task<int> GetCount(int courseId, string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Полученик количество уроков для курса {courseId}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
             {
                 var spec = new LessonWithItemsSpecifications(courseId);
@@ -144,39 +132,35 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<Lesson>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск урока {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Lesson>();
             var spec = new LessonWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.LessonRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Lesson>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Lesson>();
-            var spec = new LessonWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.LessonRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<Lesson>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение занятий");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка получение занятий");
+                return Enumerable.Empty<Lesson>();
             }
-            var spec = new LessonWithItemsSpecifications(currentPage, pageSize);
+            var spec = new LessonWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.LessonRepository.GetAsync(spec);
         }
 
         public async Task<IEnumerable<Lesson>> IndexView(int courseId, string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение занятий");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                var specSearch = new LessonWithItemsSpecifications(currentPage, pageSize, searchString, courseId, searchParametr);
-                return await _unitOfWork.LessonRepository.GetAsync(specSearch);
+                _logger.LogInformation("Ошибка получение занятий");
+                return Enumerable.Empty<Lesson>();
             }
-            var spec = new LessonWithItemsSpecifications(currentPage, pageSize, courseId);
-            return await _unitOfWork.LessonRepository.GetAsync(spec);
+            var specSearch = new LessonWithItemsSpecifications(currentPage, pageSize, searchString, courseId, searchParametr);
+            return await _unitOfWork.LessonRepository.GetAsync(specSearch);
         }
     }
 }

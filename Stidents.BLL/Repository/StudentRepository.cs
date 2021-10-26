@@ -6,10 +6,8 @@ namespace Students.BLL.Repository
 {   
     public class StudentRepository : Repository<Student>, IStudentRepository
     {
-        private readonly Context _db;
         public StudentRepository(Context db) : base(db)
         {
-            _db = db;
         }
     }
 }

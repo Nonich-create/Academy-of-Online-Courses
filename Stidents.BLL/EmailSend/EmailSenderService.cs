@@ -10,22 +10,20 @@ namespace Students.BLL.EmailSend
 {
     public class EmailSenderService : IEmailSenderService
     {
-        private readonly ILogger _logger;
 
-        public EmailSenderService(ILogger logger)
+        public EmailSenderService()
         {
-            _logger = logger;
         }
 
         private async Task SendEmailAsync(string email, string subject, string message)
         {
-            try
-            {
             var emailMessage = new MimeMessage();
-          
-            var builder = new BodyBuilder();
-            builder.TextBody = subject;
-            builder.HtmlBody = message;
+
+            var builder = new BodyBuilder
+            {
+                TextBody = subject,
+                HtmlBody = message
+            };
             emailMessage.From.Add(new MailboxAddress("Администрация сайта Академия онлайн курсов", "makita.ayasaki@yandex.by"));
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = subject;
@@ -36,11 +34,7 @@ namespace Students.BLL.EmailSend
             await client.SendAsync(emailMessage);
 
             await client.DisconnectAsync(true);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка отправки письма");
-            }
+            
         }
 
         public async Task SendAcceptanceConfirmation(string email, Group group, Student student)

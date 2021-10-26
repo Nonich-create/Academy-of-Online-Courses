@@ -22,7 +22,6 @@ namespace Students.BLL.DataAccess
         private CourseApplicationRepository _courseApplicationRepository;
         private LessonTimesRepository _lessonTimesRepository;
         private EmailSenderService _emailSenderService;
-        private readonly ILogger _logger;
  
         private bool disposed = false;
 
@@ -38,7 +37,7 @@ namespace Students.BLL.DataAccess
             get
             {
                 if (_emailSenderService == null)
-                    _emailSenderService = new EmailSenderService(_logger);
+                    _emailSenderService = new EmailSenderService();
                 return _emailSenderService;
             }
         }

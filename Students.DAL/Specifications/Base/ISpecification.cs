@@ -16,6 +16,6 @@ namespace Students.DAL.Specifications.Base
         string Where { get; }
         int Take { get; }
         int Skip { get; }
-        bool isPagingEnabled { get; }
+        bool IsPagingEnabled { get; }
     }
 }
