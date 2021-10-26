@@ -14,7 +14,6 @@ namespace Students.BLL.Interface.Base
         Task<T> SearchAsync(string query);
         Task<int> GetCount(string searchString, EnumSearchParameters searchParametr);
         Task<IEnumerable<T>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr);
-        Task<IEnumerable<T>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr);
         Task<IEnumerable<T>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize);
     }
 }

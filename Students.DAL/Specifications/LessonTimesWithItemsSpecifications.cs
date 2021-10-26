@@ -56,14 +56,18 @@ namespace Students.DAL.Specifications
             AddInclude(l => l.Group.Course);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(l => l.Group.NumberGroup);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 
         public LessonTimesWithItemsSpecifications(string stringSearch, EnumSearchParameters searchParametr)
     : base(null)
         {
             ApplyOrderBy(l => l.Group.NumberGroup);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+            {
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            }
         }
 
         public LessonTimesWithItemsSpecifications(int groupId , string stringSearch, EnumSearchParameters searchParametr)

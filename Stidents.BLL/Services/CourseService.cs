@@ -74,9 +74,6 @@ namespace Students.BLL.Services
             }
         }
 
-       
-
-
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
             try
@@ -137,38 +134,29 @@ namespace Students.BLL.Services
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new CourseWithItemsSpecifications();
-                return (await _unitOfWork.CourseRepository.CountAsync(spec));
-            }
+            _logger.LogInformation("Получение количество курсов");
             var specSearch = new CourseWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.CourseRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Course>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск курсов {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Course>();
             var spec = new CourseWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.CourseRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Course>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Course>();
-            var spec = new CourseWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.CourseRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<Course>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение курсов");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка получение курсов");
+                return Enumerable.Empty<Course>();
             }
-            var spec = new CourseWithItemsSpecifications(currentPage, pageSize);
+            var spec = new CourseWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.CourseRepository.GetAsync(spec);
         }
     }

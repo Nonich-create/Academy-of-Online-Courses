@@ -24,7 +24,7 @@ namespace Students.DAL.Specifications.Base
         public string Where { get; private set; }
         public int Take { get; private set; }
         public int Skip { get; private set; }
-        public bool isPagingEnabled { get; private set; } = false;
+        public bool IsPagingEnabled { get; private set; } = false;
 
         protected virtual void ApplyWhere(string where)
         {
@@ -41,7 +41,7 @@ namespace Students.DAL.Specifications.Base
         {
             Skip = skip;
             Take = take;
-            isPagingEnabled = true;
+            IsPagingEnabled = true;
         }
         protected virtual void ApplyOrderBy(Expression<Func<T, object>> orderByExpression) =>
             OrderBy = orderByExpression;

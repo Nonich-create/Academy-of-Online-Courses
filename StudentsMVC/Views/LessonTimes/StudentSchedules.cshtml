@@ -54,7 +54,7 @@
         <a href="#!-1" class="cdp_i" style="visibility:hidden">prev</a>
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
-            <a href="/LessonTimes/IndexByStudent?page=@i"
+            <a href="/LessonTimes/StudentSchedules?page=@i"
                class="cdp_i" onclick="jQueryAjaxGet('@i')">@i</a>
         }
         <a href="#!+1" class="cdp_i" style="visibility:hidden">next</a>

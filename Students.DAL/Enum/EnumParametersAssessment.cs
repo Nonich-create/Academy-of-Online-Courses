@@ -3,7 +3,7 @@
 namespace Students.DAL.Enum
 {
      public enum EnumParametersAssessment
-    {
+     {
         [Display(Name = "Не определён")]
         None = 0,
         [Display(Name = "По имени")]

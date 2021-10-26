@@ -8,8 +8,6 @@ namespace Students.BLL.Repository
 {
     public class ApplicationUserRepository : Repository<ApplicationUser>, IApplicationUserRepository
     {
-        private readonly Context _db;
-
         public ApplicationUserRepository(Context db) : base(db)
         {
         }

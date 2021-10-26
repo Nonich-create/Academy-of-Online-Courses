@@ -7,7 +7,7 @@ namespace Students.DAL.Enum
         Name = 1,
         Surname = 2,
         MiddleName = 3,
-        Group_NumberGroup = 4 ,
+        Group_NumberGroup = 4,
         Group_Course_Name = 5,
         Student_Name = 6,
         Student_Surname = 7,

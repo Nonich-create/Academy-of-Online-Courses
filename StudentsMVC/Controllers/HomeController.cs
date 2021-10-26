@@ -68,8 +68,7 @@ namespace Students.MVC.Controllers
             if (_signInManager.IsSignedIn(User))
             {
                 var id = _userManager.GetUserId(User);
-                var student = await _studentService.GetAllAsync();
-                await _studentService.PutRequest(student.Where(s => s.UserId == id).First().Id, CourseId);
+                await _studentService.PutRequest(id, CourseId);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             else

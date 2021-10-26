@@ -25,14 +25,17 @@ namespace Students.DAL.Specifications
             AddInclude(t => t.User);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(t => t.Surname);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 
         public TeacherWithItemsSpecifications(string stringSearch, EnumSearchParameters searchParametr)
     : base(null)
         {
             AddInclude(t => t.User);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            
         }
 
         public TeacherWithItemsSpecifications(string stringSearch)

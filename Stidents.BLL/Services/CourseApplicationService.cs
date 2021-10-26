@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Students.DAL.Enum;
 using Students.BLL.Interface;
 using Students.DAL.Specifications;
-using System.Text;
 
 
 namespace Students.BLL.Services
@@ -27,15 +26,16 @@ namespace Students.BLL.Services
         public async Task Cancel(int courseApplicationId)
         {
             var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
-            if (courseApplication == null)
-            {
-                _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
-                return;
-            }
+            ApplicationVerification(courseApplicationId, courseApplication);
 
             var student = await _unitOfWork.StudentRepository.GetByIdAsync(courseApplication.StudentId);
+            if (student == null)
+            {
+                _logger.LogInformation($"студент не существует {courseApplication.StudentId}");
+                throw new InvalidOperationException($"студент не существует {courseApplication.StudentId}");
+            }
 
-            var spec = new GroupWithItemsSpecifications((uint)student.GroupId,GroupStatus.Training);
+            var spec = new GroupWithItemsSpecifications((uint)student.GroupId, GroupStatus.Training);
             var group = await _unitOfWork.GroupRepository.GetAsync(spec, false);
 
             if (group == null)
@@ -48,54 +48,55 @@ namespace Students.BLL.Services
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Заявка студента {student.Id} на курс {courseApplication.CourseId} отменена");
             }
-            else 
+            else
             {
                 _logger.LogInformation($"На данный момент студент {student.Id} обучается в группе {group.Id}");
                 throw new InvalidOperationException($"На данный момент студент {student.Id} обучается в группе {group.Id}");
             }
         }
 
+
+
         public async Task CancelApplication(int courseApplicationId)
         {
-            try
+            var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
+            ApplicationVerification(courseApplicationId, courseApplication);
+            if (courseApplication.ApplicationStatus == ApplicationStatus.Open)
             {
-                var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
-                if (courseApplication == null)
-                {
-                    _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
-                    return;
-                }
-                if (courseApplication.ApplicationStatus == ApplicationStatus.Open)
-                {
-                    courseApplication.ApplicationStatus = ApplicationStatus.Cancelled;
-                    courseApplication.UpdateDate = DateTime.Now;
-                    await _unitOfWork.SaveAsync();
-                }
+                courseApplication.ApplicationStatus = ApplicationStatus.Cancelled;
+                courseApplication.UpdateDate = DateTime.Now;
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} отменена");
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogInformation(ex, $"Ошибка обновления заявки {courseApplicationId}");
+                _logger.LogInformation($"Ошибка обновления заявки {courseApplicationId}");
+                throw new InvalidOperationException($"Ошибка обновления заявки {courseApplicationId}");
             }
         }
-      
-        public async Task Open(int courseApplicationId)
+
+        private void ApplicationVerification(int courseApplicationId, CourseApplication courseApplication)
         {
-            try
-            { 
-            var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
             if (courseApplication == null)
             {
                 _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
-                return;
+                throw new InvalidOperationException($"Заявка студента {courseApplicationId} не существует");
             }
-            courseApplication.ApplicationStatus = ApplicationStatus.Open;
-            courseApplication.UpdateDate = DateTime.Now;
-            await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
-            await _unitOfWork.SaveAsync();
-            _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} Обновлена");
+        }
+
+        public async Task Open(int courseApplicationId)
+        {
+            var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
+            ApplicationVerification(courseApplicationId, courseApplication);
+            try
+            {
+                courseApplication.ApplicationStatus = ApplicationStatus.Open;
+                courseApplication.UpdateDate = DateTime.Now;
+                await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
+                await _unitOfWork.SaveAsync();
+                _logger.LogInformation($"Заявка студента {courseApplication.StudentId} на курс {courseApplication.CourseId} Обновлена");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogInformation(ex, $"Ошибка обновления заявки {courseApplicationId}");
             }
@@ -136,7 +137,7 @@ namespace Students.BLL.Services
         public async Task DeleteAsyncAll(int id)
         {
             try
-            {   
+            {
                 await _unitOfWork.CourseApplicationRepository.DeleteAsyncAllByStudentId(id);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation(id, "Заявки студента удалены"); ;
@@ -147,57 +148,60 @@ namespace Students.BLL.Services
             }
         }
 
-        public async Task Enroll(int courseApplicationId) 
+        public async Task Enroll(int courseApplicationId)
         {
+            var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
+            ApplicationVerification(courseApplicationId, courseApplication);
+
+            var specStudent = new StudentWithItemsSpecifications(courseApplication.StudentId);
+            var student = await _unitOfWork.StudentRepository.GetAsync(specStudent, false);
+            if (student.GroupId != null)
+            {
+                _logger.LogInformation($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе");
+                throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе");
+            }
+
+            var specGroup = new GroupWithItemsSpecifications(courseApplication.CourseId, GroupStatus.Set);
+            var groups = await _unitOfWork.GroupRepository.GetAsync(specGroup);
+
+            if (groups == null)
+            {
+                _logger.LogInformation($"Подходящей группы не найдена");
+                throw new InvalidOperationException($"Подходящей группы не найдена");
+            }
+
+            Group group = new();
+
+            foreach (var item in groups)
+            {
+                var spec = new StudentWithItemsSpecifications((uint)item.Id);
+                var studentsCount = await _unitOfWork.StudentRepository.CountAsync(spec);
+                if (item.CountMax > studentsCount)
+                {
+                    group = item;
+                    break;
+                }
+            }
+
+            if (group.Id == 0)
+            {
+                throw new InvalidOperationException($"На данный момент подходящих групп нет");
+            }
+
             try
             {
-                var courseApplication = await _unitOfWork.CourseApplicationRepository.GetByIdAsync(courseApplicationId);
-                if (courseApplication == null)
-                {
-                    _logger.LogInformation($"Заявка студента {courseApplicationId} не существует");
-                    return;
-                }
-
-                var specStudent = new StudentWithItemsSpecifications(courseApplication.StudentId);
-                var student = await _unitOfWork.StudentRepository.GetAsync(specStudent, false);
-                if (student.GroupId != null)
-                {
-                    throw new InvalidOperationException($"{student.Surname} {student.Name} {student.MiddleName} уже находится в группе");
-                }
-
-                var specGroup = new GroupWithItemsSpecifications(courseApplication.CourseId, GroupStatus.Set);
-                var groups = await _unitOfWork.GroupRepository.GetAsync(specGroup);
-                Group group = new();
-
-                foreach(var item in groups)
-                {
-                    var spec = new StudentWithItemsSpecifications((uint)item.Id);
-                    var studentsCount = await _unitOfWork.StudentRepository.CountAsync(spec);
-                    if(item.CountMax > studentsCount)
-                    {
-                        group = item;
-                        break;
-                    }
-                }
-          
-                if (group.Id == 0)
-                {
-                     throw new InvalidOperationException($"На данный момент подходящих групп нет");
-                }
-
                 student.GroupId = group.Id;
                 await _unitOfWork.StudentRepository.UpdateAsync(student);
                 courseApplication.ApplicationStatus = ApplicationStatus.Close;
                 courseApplication.UpdateDate = DateTime.Now;
                 await _unitOfWork.CourseApplicationRepository.UpdateAsync(courseApplication);
                 await _unitOfWork.SaveAsync();
-
-                await _unitOfWork.EmailSenderService.SendAcceptanceConfirmation(student.User.Email,group,student);
+                await _unitOfWork.EmailSenderService.SendAcceptanceConfirmation(student.User.Email, group, student);
                 _logger.LogInformation($"Студент {courseApplication.StudentId} зачислен в группу {group.Id}");
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Ошибка обработке заявки");
+                _logger.LogInformation(ex, $"Ошибка зачислен в группу {group.Id}");
             }
         }
 
@@ -229,7 +233,7 @@ namespace Students.BLL.Services
                 return null;
             }
         }
-       
+
         public async Task<CourseApplication> Update(CourseApplication item)
         {
             try
@@ -261,17 +265,14 @@ namespace Students.BLL.Services
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new CourseApplicationWithItemsSpecifications();
-                return (await _unitOfWork.CourseApplicationRepository.CountAsync(spec));
-            }
+            _logger.LogInformation("Получение количество заявок");
             var specSearch = new CourseApplicationWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.CourseApplicationRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string query)
         {
+            _logger.LogInformation($"Поиск заявок {query}");
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<CourseApplication>();
             var spec = new CourseApplicationWithItemsSpecifications(query);
@@ -280,27 +281,22 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<CourseApplication>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск заявок {searchString}");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<CourseApplication>();
             var spec = new CourseApplicationWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<CourseApplication>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<CourseApplication>();
-            var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<CourseApplication>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение заявок");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка получение заявок");
+                return Enumerable.Empty<CourseApplication>();
             }
-            var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize);
+            var spec = new CourseApplicationWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.CourseApplicationRepository.GetAsync(spec);
         }
     }

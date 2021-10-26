@@ -69,6 +69,21 @@ namespace Students.BLL.Services
             }
         }
 
+        public async Task<IEnumerable<Assessment>> GetAllAsync(int studentId, int courseId)
+        {
+            try
+            {
+                _logger.LogInformation("Выполнения получения списка оценок");
+                var spec = new AssessmentWithItemsSpecifications((uint)studentId, courseId);
+                return await _unitOfWork.AssessmentRepository.GetAsync(spec);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка получение списка оценок");
+                return Enumerable.Empty<Assessment>();
+            }
+        }
+
         public async Task<Assessment> GetAsync(int id)
         {
             try
@@ -116,33 +131,23 @@ namespace Students.BLL.Services
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new AssessmentWithItemsSpecifications();
-                return (await _unitOfWork.AssessmentRepository.CountAsync(spec));
-            }
+            _logger.LogInformation("Получение количество оценок");
             var specSearch = new AssessmentWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.AssessmentRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Assessment>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation("Поиск оценок по параметру");
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Assessment>();
             var spec = new AssessmentWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.AssessmentRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Assessment>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Assessment>();
-            var spec = new AssessmentWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.AssessmentRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<Assessment>> SearchAllAsync(string query)
         {
+            _logger.LogInformation("Поиск оценок по условию");
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<Assessment>();
             var spec = new AssessmentWithItemsSpecifications(query);
@@ -151,11 +156,13 @@ namespace Students.BLL.Services
 
         public async Task<IEnumerable<Assessment>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение оценок");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка получение оценок");
+                return Enumerable.Empty<Assessment>();
             }
-            var spec = new AssessmentWithItemsSpecifications(currentPage, pageSize);
+            var spec = new AssessmentWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.AssessmentRepository.GetAsync(spec);
         }
     }

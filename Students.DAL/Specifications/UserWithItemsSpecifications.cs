@@ -22,14 +22,17 @@ namespace Students.DAL.Specifications
         {;
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(u => u.Email);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
 
         public UserWithItemsSpecifications(string stringSearch, EnumSearchParameters searchParametr)
     : base(null)
         {
             ApplyOrderBy(u => u.Email);
-            ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
+                ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
+            
         }
         public UserWithItemsSpecifications(string stringSearch)
 : base(null)

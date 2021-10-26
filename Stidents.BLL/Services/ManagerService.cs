@@ -130,52 +130,35 @@ namespace Students.BLL.Services
 
         public async Task<Manager> SearchAsync(string query)
         {
-            try
-            {
-                _logger.LogInformation("Поиск менаджера");
+                _logger.LogInformation($"Поиск менаджера {query}");;
                 return await _unitOfWork.ManagerRepository.SearchAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex, "Ошибка поиска менаджера");
-                return null;
-            }
         }
 
         public async Task<int> GetCount(string searchString, EnumSearchParameters searchParametr)
         {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-            {
-                var spec = new ManagerWithItemsSpecifications();
-                return (await _unitOfWork.ManagerRepository.CountAsync(spec));
-            }
+            _logger.LogInformation("Получение количество менеджеров");
             var specSearch = new ManagerWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.ManagerRepository.CountAsync(specSearch);
         }
 
         public async Task<IEnumerable<Manager>> SearchAllAsync(string searchString, EnumSearchParameters searchParametr)
         {
+            _logger.LogInformation($"Поиск менеджеров {searchString}"); ;
             if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
                 return Enumerable.Empty<Manager>();
             var spec = new ManagerWithItemsSpecifications(searchString, searchParametr);
             return await _unitOfWork.ManagerRepository.GetAsync(spec);
         }
 
-        public async Task<IEnumerable<Manager>> SearchAllAsync(int currentPage, int pageSize, string searchString, EnumSearchParameters searchParametr)
-        {
-            if (string.IsNullOrEmpty(searchString) || searchParametr == EnumSearchParameters.None)
-                return Enumerable.Empty<Manager>();
-            var spec = new ManagerWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
-            return await _unitOfWork.ManagerRepository.GetAsync(spec);
-        }
-
         public async Task<IEnumerable<Manager>> IndexView(string searchString, EnumSearchParameters searchParametr, int currentPage, int pageSize = 10)
         {
-            if (!String.IsNullOrEmpty(searchString) && searchParametr != EnumSearchParameters.None)
+            _logger.LogInformation("Получение менеджеров");
+            if (currentPage <= 0 || pageSize <= 0)
             {
-                return await SearchAllAsync(currentPage, pageSize, searchString, searchParametr);
+                _logger.LogInformation("Ошибка менеджеров");
+                return Enumerable.Empty<Manager>();
             }
-            var spec = new ManagerWithItemsSpecifications(currentPage, pageSize);
+            var spec = new ManagerWithItemsSpecifications(currentPage, pageSize, searchString, searchParametr);
             return await _unitOfWork.ManagerRepository.GetAsync(spec);
         }
     }
