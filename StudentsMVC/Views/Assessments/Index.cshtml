@@ -14,7 +14,7 @@
                 @foreach (var mark in Model.GroupBy(l => l.Lesson.Id).Select(y => y.First()))
                 {
                     <th>
-                        <div align="left" style="width:30px; text-align:left;"> 
+                        <div align="left" style="width:30px; text-align:left;">
                             <ul align="left" style="width:inherit; text-align:inherit" id="nav">
                                 <li align="left" style="width: inherit; text-align: inherit; right: 15px; left:0px;">
                                     <a style="width:inherit; font-size: 15px" href="#"> @mark.Lesson.NumberLesson</a>
@@ -28,25 +28,31 @@
                         </div>
                     </th>
                 }
+                <th align="left" text-align:left;">
+                   Средний балл
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model.GroupBy(l => l.Student.Id).Select(y => y.First()))
             {
-                <tr>
-                    <td>
-                        <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId" asp-route-Url="@Context.Request.Path?GroupId=@item.Student.GroupId">@item.Student.GetFullName</a>
+            <tr>
+                <td>
+                    <a asp-controller="Students" asp-action="Details" asp-route-id="@item.StudentId" asp-route-Url="@Context.Request.Path?GroupId=@item.Student.GroupId">@item.Student.GetFullName</a>
+                </td>
+                @foreach (var mark in Model.Where(m => m.StudentId == item.Student.Id))
+                {
+                    <td style="text-align: center; padding-top: 15px">
+                        <a style="font-size: 25px;color:white;text-decoration: none" asp-controller="Assessments" asp-action="Edit"
+                           asp-route-idAssessment="@mark.Id"
+                           asp-route-Url="@Context.Request.Path?GroupId=@mark.Student.GroupId"
+                           asp-data>@mark.Score</a>
                     </td>
-                    @foreach (var mark in Model.Where(m => m.StudentId == item.Student.Id))
-                    {
-                        <td style="text-align: center; padding-top: 15px">
-                                <a style="font-size: 25px;color:white;text-decoration: none" asp-controller="Assessments" asp-action="Edit" 
-                                   asp-route-idAssessment="@mark.Id" 
-                                   asp-route-Url="@Context.Request.Path?GroupId=@mark.Student.GroupId"
-                                   asp-data>@mark.Score</a>
-                        </td>
-                    }
-                </tr>
+                }
+                <td style="text-align: center; padding-top: 15px">
+                    <p style="font-size: 25px";>@Model.Where(m => m.Score != 0 && item.StudentId == m.StudentId).Average(m => m.Score)</p>  
+                </td>
+            </tr>   
             }
         </tbody>
     </table>

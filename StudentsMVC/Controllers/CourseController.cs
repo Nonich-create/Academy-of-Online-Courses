@@ -69,6 +69,7 @@ namespace Students.MVC.Controllers
             return View();
         }
         #endregion
+
         #region создания курса
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -84,12 +85,13 @@ namespace Students.MVC.Controllers
             return View(model);
         }
         #endregion
+
         #region отображения редактирование курса
         [Authorize(Roles = "admin,manager")]
-        public async Task<IActionResult> Edit(int id, string Url)
+        public async Task<IActionResult> Edit(int id, string ReturnUrl)
         {
             var model = _mapper.Map<CourseViewModel>(await _courseService.GetAsync(id));
-            model.ReturnUrl = Url;
+            model.ReturnUrl = ReturnUrl;
             return View(model);
         }
         #endregion

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Serilog.Formatting.Compact;
 using Students.BLL.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
 
 namespace Students.MVC
 {
@@ -26,6 +25,7 @@ namespace Students.MVC
                 .WriteTo.File(new RenderedCompactJsonFormatter(), "/logs/log.ndjson")
                 .WriteTo.Seq("http://localhost:5341")
                 .CreateBootstrapLogger(); 
+
             var host = CreateHostBuilder(args).Build();
 
             try

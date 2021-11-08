@@ -61,7 +61,7 @@ namespace Students.DAL.Specifications
   : base(null)
         {
             AddInclude(l => l.Course);
-            ApplyOrderBy(l => l.Course.Name);
+            ApplyOrderBy(l => l.Course.Id);
             ApplyWhere(stringSearch);
         }
 
@@ -70,7 +70,7 @@ namespace Students.DAL.Specifications
         {
             AddInclude(l => l.Course);
             ApplyPaging((currentPage - 1) * pageSize, pageSize);
-            ApplyOrderBy(l => l.Course.Name);
+            ApplyOrderBy(l => l.NumberLesson);
             if (!string.IsNullOrEmpty(stringSearch) && searchParametr != EnumSearchParameters.None)
                 ApplyWhere($"{searchParametr.ToString().Replace('_', '.')}.Contains(\"{stringSearch}\")");
         }
@@ -78,8 +78,8 @@ namespace Students.DAL.Specifications
 : base(l => l.CourseId == courseId)
         {
             AddInclude(l => l.Course);
-            ApplyPaging((currentPage - 1) * pageSize, pageSize);
             ApplyOrderBy(l => l.NumberLesson);
+            ApplyPaging((currentPage - 1) * pageSize, pageSize);
         }
     }
 }
