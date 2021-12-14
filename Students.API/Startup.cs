@@ -17,6 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Students.BLL.Interface;
+using Students.BLL.Repository.Base;
+using Students.DAL.Repositories.Base;
+using Newtonsoft.Json.Serialization;
 
 namespace StudentsAPI
 {
@@ -43,9 +46,16 @@ namespace StudentsAPI
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<UnitOfWork>();
-
+            services.AddScoped<IRepository<Student>, Repository<Student>>();
+            services.AddScoped<IRepository<Course>, Repository<Course>>();
             services.AddMemoryCache();
-            services.AddControllers();
+
+            services.AddControllersWithViews()
+    .AddNewtonsoftJson(options => {
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        }
+);
 
             services.AddSwaggerGen(c =>
             {

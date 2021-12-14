@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Students.Angular.Dto;
 using Students.BLL.Interface;
+using Students.DAL.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Students.Angular.Controllers
 {
@@ -9,17 +14,19 @@ namespace Students.Angular.Controllers
     {
 
 
-        private readonly ICourseService _service;
+        private readonly ICourseService _courseService;
+        private readonly IMapper _mapper;
 
-        public CoursesController(ICourseService service)
+        public CoursesController(ICourseService courseService, IMapper mapper)
         {
-            _service = service;
+            _courseService = courseService;
+            _mapper = mapper;
         }
 
-     //  [HttpGet]
-     //  public IEnumerable<CourseDto> Get()
-     //  {
-     //    //  return _mapper.Map<CourseDto, Course>(_service.GetAllAsync().Result.ToList());
-     //  }
+         [HttpGet]  
+         public async Task<IEnumerable<CourseDto>> GetAsync()
+         {
+             return _mapper.Map<IEnumerable<CourseDto>>(await _courseService.GetAllAsync());
+        }
     }
 }

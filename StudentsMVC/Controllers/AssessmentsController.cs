@@ -14,7 +14,7 @@ namespace Students.MVC.Controllers
     public class AssessmentsController : Controller  
     {
 
-        private readonly ICourseService _courseService;
+
         private readonly ILessonService _lessonService;
         private readonly IStudentService _studentService;
         private readonly IAssessmentService _assessmentService;
@@ -23,11 +23,10 @@ namespace Students.MVC.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AssessmentsController(ITeacherService teacherService, IGroupService groupService, IAssessmentService assessmentService, ICourseService courseService, ILessonService lessonService, IStudentService studentService, UserManager<ApplicationUser> userManager, IMapper mapper)
+        public AssessmentsController(ITeacherService teacherService, IGroupService groupService, IAssessmentService assessmentService, ILessonService lessonService, IStudentService studentService, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _teacherService = teacherService;
             _groupService = groupService;
-            _courseService = courseService;
             _lessonService = lessonService;
             _studentService = studentService;
             _assessmentService = assessmentService;

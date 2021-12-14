@@ -12,6 +12,7 @@ using Students.BLL.Services;
 using Students.BLL.Interface;
 using Students.DAL.Repositories.Base;
 using Students.BLL.Repository;
+using Microsoft.AspNetCore.Identity;
 
 namespace Students.Angular
 {
@@ -27,20 +28,31 @@ namespace Students.Angular
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
             services.AddDbContext<Context>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IRepository<Course>, CourseRepository>();
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsAssembly("Students.DAL")));
 
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<Context>();
+
+            services.AddScoped<ICourseApplicationService, CourseApplicationService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IAssessmentService, AssessmentService>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<ILessonService, LessonService>();
+            services.AddScoped<IManagerService, ManagerService>();
+            services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<ILessonTimesService, LessonTimesService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<UnitOfWork>();
 
-
+            services.AddControllersWithViews();
 
         }
 
@@ -76,8 +88,6 @@ namespace Students.Angular
 
             app.UseSpa(spa =>
             {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
 
                 spa.Options.SourcePath = "ClientApp";
 

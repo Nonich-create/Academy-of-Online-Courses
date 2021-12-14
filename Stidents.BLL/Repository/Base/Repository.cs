@@ -20,17 +20,19 @@ namespace Students.BLL.Repository.Base
             _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
+        public async Task<T> SearchAsync(string query) => await _db.Set<T>().Where(query).FirstAsync();
+
         public async Task AddRangeAsync(IEnumerable<T> entity) => await _db.Set<T>().AddRangeAsync(entity);
 
         public async Task<IEnumerable<T>> GetAllAsync() => await _db.Set<T>().ToListAsync();
 
         private IQueryable<T> ApplySpecification(ISpecification<T> spec) => SpecificationEvaluator<T>.GetQuery(_db.Set<T>().AsQueryable(), spec);
-        
+
         public async Task<IEnumerable<T>> GetAsync(ISpecification<T> spec) => await ApplySpecification(spec).ToListAsync();
 
         public async Task<int> CountAsync(ISpecification<T> spec) => await ApplySpecification(spec).CountAsync();
 
-        public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate) =>  await _db.Set<T>().Where(predicate).ToListAsync();
+        public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate) => await _db.Set<T>().Where(predicate).ToListAsync();
 
         public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeString = null, bool disableTracking = true)
         {
@@ -83,8 +85,10 @@ namespace Students.BLL.Repository.Base
 
         public async Task DeleteRangeAsync(IEnumerable<T> entity) => _db.Set<T>().RemoveRange(entity);
 
-        public async Task<T> SearchAsync(string query) => await _db.Set<T>().Where(query).FirstAsync();
-
- 
+        public async Task SaveAsync()
+        {
+            await _db.SaveChangesAsync();
+        }
+        
     }
 }
