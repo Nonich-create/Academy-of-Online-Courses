@@ -24,7 +24,7 @@
                     Длительность в днях
                 </th>
                 <th>
-                    Цена
+                    Цена/руб
                 </th>
                 <th style="text-align:left">
                     <a class="btn btn-primary" asp-action="Create">Регистрация курсов</a>
@@ -45,11 +45,11 @@
                         @Html.DisplayFor(modelItem => item.Duration)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Price)
+                         @item.Price
                     </td>
                     <td>
                         <a class="btn btn-primary"
-                           asp-action="Edit" asp-route-id="@item.Id" asp-route-Url="@Context.Request.Path">Редактирование</a>
+                           asp-action="Edit" asp-route-id="@item.Id" asp-route-ReturnUrl="@Context.Request.Path">Редактирование</a>
                         <a class="btn btn-primary"
                            asp-controller="Lessons" asp-action="IndexСourseId" asp-route-CourseId="@item.Id">Занятия</a>
                         <a class="btn btn-primary"

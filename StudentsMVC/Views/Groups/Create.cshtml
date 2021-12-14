@@ -35,7 +35,7 @@
                 <select asp-for="ManagerId" class="form-control custom-select">
                     @foreach (var item in Model.Manageres)
                     {
-                        <option value="@item.Id">@item.Surname</option>
+                        <option value="@item.Id">@item.GetFullName</option>
                     }
                 </select>
             </div>
@@ -44,7 +44,7 @@
                 <select asp-for="TeacherId" class="form-control custom-select">
                     @foreach (var item in Model.Teachers)
                     {
-                        <option value="@item.Id">@item.Surname</option>
+                        <option value="@item.Id">@item.GetFullName</option>
                     }
                 </select>
             </div>

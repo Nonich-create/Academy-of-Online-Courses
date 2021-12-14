@@ -3,8 +3,6 @@ using System;
 using System.Threading.Tasks;
 using Students.BLL.Repository;
 using Students.BLL.EmailSend;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Identity;
 
 namespace Students.BLL.DataAccess
 {
@@ -30,8 +28,6 @@ namespace Students.BLL.DataAccess
             _db = db;
         }
 
-
- 
         public EmailSenderService EmailSenderService
         {
             get

@@ -14,7 +14,7 @@ namespace Students.MVC.Controllers
     public class AssessmentsController : Controller  
     {
 
-        private readonly ICourseService _courseService;
+
         private readonly ILessonService _lessonService;
         private readonly IStudentService _studentService;
         private readonly IAssessmentService _assessmentService;
@@ -23,11 +23,10 @@ namespace Students.MVC.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AssessmentsController(ITeacherService teacherService, IGroupService groupService, IAssessmentService assessmentService, ICourseService courseService, ILessonService lessonService, IStudentService studentService, UserManager<ApplicationUser> userManager, IMapper mapper)
+        public AssessmentsController(ITeacherService teacherService, IGroupService groupService, IAssessmentService assessmentService, ILessonService lessonService, IStudentService studentService, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _teacherService = teacherService;
             _groupService = groupService;
-            _courseService = courseService;
             _lessonService = lessonService;
             _studentService = studentService;
             _assessmentService = assessmentService;
@@ -55,7 +54,13 @@ namespace Students.MVC.Controllers
         #endregion
         #region отображения добавления оценки
         [Authorize(Roles = "admin,manager,teacher")]
-        public IActionResult Create() => View();
+        public async Task<IActionResult> Create(int idAssessment, string Url)
+        {
+            var assessment = await _assessmentService.GetAsync(idAssessment);
+            var model = _mapper.Map<AssessmentViewModel>(assessment);
+            model.ReturnUrl = Url;
+            return View(model);
+        }
         #endregion
         #region добавления оценки
         [HttpPost]
@@ -67,9 +72,11 @@ namespace Students.MVC.Controllers
             {
                 var assessment = _mapper.Map<Assessment>(model);
                 await _assessmentService.CreateAsync(assessment);
-                return Redirect(Request.Headers["Referer"].ToString());
+                return RedirectPermanent($"~{model.ReturnUrl}");
             }
-            return View(model);
+            var modelValidate = _mapper.Map<AssessmentViewModel>(await _assessmentService.GetAsync(model.Id));
+            modelValidate.ReturnUrl = model.ReturnUrl;
+            return View(modelValidate);
         }
         #endregion
         #region отображения редактирование оценки
@@ -111,6 +118,8 @@ namespace Students.MVC.Controllers
             return RedirectToAction(nameof(Index));
         }
         #endregion
+
+    
 
         public IActionResult ReturnByUrl(string ReturnUrl)
         {

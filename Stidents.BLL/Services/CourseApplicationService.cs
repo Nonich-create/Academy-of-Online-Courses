@@ -167,7 +167,7 @@ namespace Students.BLL.Services
             if (groups == null)
             {
                 _logger.LogInformation($"Подходящей группы не найдена");
-                throw new InvalidOperationException($"Подходящей группы не найдена");
+               // throw new InvalidOperationException($"Подходящей группы не найдена");
             }
 
             Group group = new();
@@ -185,7 +185,8 @@ namespace Students.BLL.Services
 
             if (group.Id == 0)
             {
-                throw new InvalidOperationException($"На данный момент подходящих групп нет");
+                _logger.LogInformation($"На данный момент подходящих групп нет");
+                //throw new InvalidOperationException($"На данный момент подходящих групп нет");
             }
 
             try

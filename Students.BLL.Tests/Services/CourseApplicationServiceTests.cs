@@ -32,78 +32,82 @@ namespace Students.BLL.Tests.Services
             UnitOfWork = new UnitOfWork(new Context(options));
             _mockLogger = new Mock<ILogger<CourseApplication>>();
             _courseApplicationService = new CourseApplicationService(UnitOfWork, _mockLogger.Object);
-  
+           
         }
 
    
-        private async Task SetUp()
+        private async Task Setup()
         {
             Random rand = new();
             List <Course> courses = new();
             List<Manager> managers = new();
             List<Teacher> teachers = new();
-            List<Group> groups = new(); 
             List<Student> students = new();
             List <CourseApplication> courseApplications = new();
             for (int i = 1; i < 6; i++)
             {
-                courses.Add(Fixture.Build<Course>().With(c => c.Id, i).Create()); 
+                courses.Add(Fixture.Build<Course>().Without(c => c.Id).Create());
             }
-            var UserManagers = Fixture.Build<ApplicationUser>().CreateMany<ApplicationUser>(5);
-            for (int i = 1; i < UserManagers.Count(); i++)
-            {
-                await UnitOfWork.ApplicationUsersRepository.AddAsync(UserManagers.ToList()[i]);
-                managers.Add(Fixture.Build<Manager>().With(m => m.Id,i).With(m => m.UserId,UserManagers.ToList()[i].Id).Create());
- 
-            }
-            var UserTeachers = Fixture.Build<ApplicationUser>().CreateMany<ApplicationUser>(5);
-            for (int i = 1; i < UserTeachers.Count(); i++)
-            {
-                await UnitOfWork.ApplicationUsersRepository.AddAsync(UserTeachers.ToList()[i]);
-                teachers.Add(Fixture.Build<Teacher>().With(m => m.Id, i).With(m => m.UserId, UserTeachers.ToList()[i].Id).Create());
-
-            }
-           
-            for (int i = 1; i < 5; i++)
-            {
-                groups.Add(Fixture.Build<Group>().
-                With(g => g.Id,i).
-                With(g => g.CourseId, courses[i].Id).
-                With(g => g.TeacherId, teachers[i].Id).
-                With(g => g.ManagerId, managers[i].Id).
-                With(g => g.GroupStatus, GroupStatus.Set).
-                With(g => g.CountMax, 30).Create());
-            }
-
-            var UserStudent = Fixture.Build<ApplicationUser>().CreateMany<ApplicationUser>(50);
-            for (int i = 1; i < UserStudent.Count(); i++)
-            {
-                await UnitOfWork.ApplicationUsersRepository.AddAsync(UserStudent.ToList()[i]);
-                students.Add(Fixture.Build<Student>().With(s => s.Id, i).With(s => s.UserId, UserStudent.ToList()[i].Id).Without(s => s.GroupId).Create());
-
-            }
- 
-            foreach(var item in students)
-            {
-                courseApplications.Add(Fixture.Build<CourseApplication>().Without(c => c.Id).With(c => c.StudentId, item.Id).With(c =>c.CourseId, rand.Next(1,5)).Create());
-            }
-
             await UnitOfWork.CourseRepository.AddRangeAsync(courses);
-            await UnitOfWork.ManagerRepository.AddRangeAsync(managers);
+
+            var UserManagers = Fixture.Build<ApplicationUser>().CreateMany<ApplicationUser>(5);
+            await UnitOfWork.ApplicationUsersRepository.AddRangeAsync(UserManagers);
+            foreach (var item in UserManagers)
+            {
+                managers.Add(Fixture.Build<Manager>().Without(m => m.Id)
+                    .With(m => m.UserId, item.Id).Create());
+
+            }
+            await  UnitOfWork.ManagerRepository.AddRangeAsync(managers);
+
+            var UserTeachers = Fixture.Build<ApplicationUser>().CreateMany<ApplicationUser>(5);
+            await UnitOfWork.ApplicationUsersRepository.AddRangeAsync(UserTeachers);
+            foreach (var item in UserTeachers)
+            {
+                teachers.Add(Fixture.Build<Teacher>().Without(m => m.Id)
+                    .With(m => m.UserId, item.Id).Create());
+            }
             await UnitOfWork.TeacherRepository.AddRangeAsync(teachers);
+
+                var groups =(Fixture.Build<Group>().
+                Without(g => g.Id).
+                With(g => g.CourseId, rand.Next(1, 5)).
+                With(g => g.TeacherId, rand.Next(1, 5)).
+                With(g => g.ManagerId, rand.Next(1, 5)).
+                With(g => g.GroupStatus, GroupStatus.Set).
+                With(g => g.CountMax, 30).CreateMany<Group>(6));
+
             await UnitOfWork.GroupRepository.AddRangeAsync(groups);
+
+
+            var UserStudents = Fixture.Build<ApplicationUser>().CreateMany<ApplicationUser>(50);
+            await UnitOfWork.ApplicationUsersRepository.AddRangeAsync(UserStudents);
+            foreach (var item in UserStudents)
+            {
+                students.Add(Fixture.Build<Student>().Without(s => s.Id).With(s => s.UserId, item.Id)
+                    .Without(s => s.GroupId).Create());
+            }
             await UnitOfWork.StudentRepository.AddRangeAsync(students);
-            await UnitOfWork.CourseApplicationRepository.AddRangeAsync(courseApplications);
-            await UnitOfWork.SaveAsync();
+            foreach (var item in students)
+            {
+                courseApplications.Add(Fixture.Build<CourseApplication>().Without(c => c.Id)
+                    .With(c => c.StudentId, item.Id).With(c =>c.CourseId, rand.Next(1,5)).Create());
+            }
+            await  UnitOfWork.CourseApplicationRepository.AddRangeAsync(courseApplications);
+           
         }
 
         [Fact]
-        public async Task Enroll_courseApplicationById_Null()
+        public async Task E1nroll_courseApplicationById_Null()
         {
+            await Setup();
+            await UnitOfWork.SaveAsync();
             //Arrange
-            //Act 
-            //Assert 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _courseApplicationService.Enroll(0));
+            var student = await UnitOfWork.StudentRepository.GetAllAsync();
+            var course = await UnitOfWork.CourseRepository.GetAllAsync();
+            ////Act 
+            ////Assert 
+            //await Assert.ThrowsAsync<InvalidOperationException>(() => _courseApplicationService.Enroll(0));
         }
 
         [Fact]
